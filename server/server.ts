@@ -1,5 +1,6 @@
 import express from "express"
 import dbConnect from "./config/dbconnect"
+import initRoutes from "./routes"
 require("dotenv").config()
 
 dbConnect()
@@ -9,14 +10,10 @@ dbConnect()
 
 		app.use(express.json())
 		app.use(express.urlencoded({ extended: true }))
-
-		app.use("/", (req, res) => {
-			res.send("Server is on")
-		})
-
 		app.listen(port, () => {
 			console.log("Server is running on port " + port)
 		})
+		initRoutes(app)
 	})
 	.catch((error) => {
 		// Handle database connection error
