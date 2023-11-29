@@ -11,16 +11,23 @@ const verifyAccessToken = asyncHandler(
 	): Promise<void> => {
 		if (req.headers.authorization?.startsWith("Bearer")) {
 			const token = req.headers.authorization.split(" ")[1]
-			jwt.verify(token, process.env.JWT_SECRET as string, (err, decode) => {
-				if (err)
-					return res.status(401).json({
-						success: false,
-						message: "Invalid access token",
-					})
+			jwt.verify(
+				token,
+				process.env.JWT_SECRET as string,
+				(
+					err: jwt.VerifyErrors | null,
+					decode: string | jwt.JwtPayload | undefined
+				) => {
+					if (err)
+						return res.status(401).json({
+							success: false,
+							message: "Invalid access token",
+						})
 
-				req.user = decode
-				next()
-			})
+					req.user = decode
+					next()
+				}
+			)
 		} else {
 			res.status(401).json({
 				success: false,

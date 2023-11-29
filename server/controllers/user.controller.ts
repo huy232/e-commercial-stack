@@ -4,6 +4,7 @@ import * as bcrypt from "bcrypt"
 import { Request, Response } from "express"
 import { generateAccessToken, generateRefreshToken } from "../middlewares/jwt"
 import { AuthenticatedRequest } from "../types/user"
+import jwt, { JwtPayload } from "jsonwebtoken"
 
 const register = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
@@ -75,7 +76,7 @@ const login = asyncHandler(
 			res.status(200).json({
 				success: true,
 				message: "Login successfully",
-				userData: rest,
+				userData: { ...rest, refreshToken },
 				accessToken,
 				refreshToken,
 			})
@@ -105,8 +106,56 @@ const getCurrentUser = asyncHandler(
 	}
 )
 
+const refreshAccessToken = asyncHandler(
+	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+		const cookies = req.cookies
+		if (!cookies && !cookies.refreshToken) {
+			throw new Error("No refresh token in cookies")
+		}
+
+		const responseToken = await jwt.verify(
+			cookies.refreshToken,
+			process.env.JWT_SECRET as string
+		)
+		const jwtPayload = responseToken as JwtPayload
+		const response = await User.findById({
+			_id: jwtPayload._id,
+			refreshToken: cookies.refreshToken,
+		})
+		res.status(200).json({
+			success: response ? true : false,
+			newAccessToken: response
+				? generateAccessToken(response._id, response.role)
+				: "Refresh token not matched",
+		})
+	}
+)
+
+const logout = asyncHandler(
+	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+		const cookies = req.cookies
+		if (!cookies && !cookies.refreshToken) {
+			throw new Error("No refresh token in cookies")
+		}
+
+		await User.findOneAndUpdate(
+			{ refreshToken: cookies.refreshToken },
+			{ refreshToken: "" },
+			{ new: true }
+		)
+
+		res.clearCookie("refreshToken", { httpOnly: true, secure: true })
+		res.status(200).json({
+			success: true,
+			message: "Successfully logout",
+		})
+	}
+)
+
 export default {
 	register,
 	login,
 	getCurrentUser,
+	refreshAccessToken,
+	logout,
 }
