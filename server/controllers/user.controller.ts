@@ -5,6 +5,8 @@ import { Request, Response } from "express"
 import { generateAccessToken, generateRefreshToken } from "../middlewares/jwt"
 import { AuthenticatedRequest } from "../types/user"
 import jwt, { JwtPayload } from "jsonwebtoken"
+import { sendMail } from "../utils/sendMail"
+import crypto from "crypto"
 
 const register = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
@@ -23,11 +25,8 @@ const register = asyncHandler(
 			throw new Error("User has existed")
 		}
 
-		const hashedPassword = await bcrypt.hash(password, 10)
-
 		const response = await User.create({
 			...req.body,
-			password: hashedPassword,
 		})
 
 		res.status(200).json({
@@ -55,20 +54,22 @@ const login = asyncHandler(
 		if (!user) {
 			throw new Error("User does not exist")
 		}
-		const passwordCompareCheck = await bcrypt.compare(password, user.password)
-		if (passwordCompareCheck) {
+
+		const passwordCheck = await user.isCorrectPassword(password)
+
+		if (passwordCheck) {
 			const userData = user.toObject()
-			const { password, role, ...rest } = userData
+			const { password, role, refreshToken, ...rest } = userData
 			const accessToken = generateAccessToken(userData._id, role)
-			const refreshToken = generateRefreshToken(userData._id)
+			const newRefreshToken = generateRefreshToken(userData._id)
 			// Save refresh token to database
 			await User.findByIdAndUpdate(
 				userData._id,
-				{ refreshToken },
+				{ refreshToken: newRefreshToken },
 				{ new: true }
 			)
 			// Save refresh token to cookie
-			res.cookie("refreshToken", refreshToken, {
+			res.cookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
 				maxAge: 7 * 24 * 60 * 60 * 1000,
 			})
@@ -76,9 +77,8 @@ const login = asyncHandler(
 			res.status(200).json({
 				success: true,
 				message: "Login successfully",
-				userData: { ...rest, refreshToken },
+				userData,
 				accessToken,
-				refreshToken,
 			})
 		} else {
 			throw new Error("Invalid credentials")
@@ -152,10 +152,156 @@ const logout = asyncHandler(
 	}
 )
 
+const forgotPassword = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const { email } = req.query
+		if (!email) {
+			throw new Error("Missing email")
+		}
+		const user = await User.findOne({ email })
+		if (!user) {
+			throw new Error("User not found")
+		}
+		const resetToken = user.createPasswordChangedToken()
+		await user.save()
+
+		const html = `Xin vui lòng nhấn vào đường dẫn bên dưới để thay đổi mật khẩu. Đường dẫn có hiệu lực từ lúc nhận tin nhắn cho đến 15 phút sau. 
+		<a 
+		href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}
+		>Quên mật khẩu</a>`
+
+		const data = {
+			email: email as string,
+			html,
+		}
+		const response = await sendMail(data)
+		res.status(200).json({
+			success: true,
+			response,
+		})
+	}
+)
+
+const resetPassword = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const { password, token } = req.body
+		if (!password || !token) {
+			throw new Error("Missing inputs")
+		}
+		const passwordResetToken = crypto
+			.createHash("sha256")
+			.update(token)
+			.digest("hex")
+		const user = await User.findOne({
+			passwordResetToken,
+			passwordResetExpired: { $gt: Date.now() },
+		})
+		if (!user) {
+			throw new Error("Invalid reset token")
+		}
+		user.password = password
+		user.passwordResetToken = undefined
+		user.passwordResetExpired = undefined
+		user.passwordChangedAt = Date.now().toString()
+		await user.save()
+		res.status(200).json({
+			success: user ? true : false,
+			message: user
+				? "Updated password"
+				: "Something went wrong while reset password",
+		})
+	}
+)
+
+const getAllUsers = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const response = await User.find().select("-password -refreshToken -role")
+		res.status(200).json({
+			success: response ? true : false,
+			users: response,
+		})
+	}
+)
+
+const deleteUser = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const { _id } = req.query
+		if (!_id) {
+			throw new Error("Missing inputs to delete user")
+		}
+		const response = await User.findByIdAndDelete(_id)
+		if (response) {
+			res.status(200).json({
+				success: true,
+				message: `Deleted user: ${response.email}`,
+			})
+		} else {
+			res.status(404).json({
+				success: false,
+				message: `Something went wrong while deleting user`,
+			})
+		}
+	}
+)
+
+const updateUser = asyncHandler(
+	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+		const { _id } = req.user
+		if (!_id || Object.keys(req.body).length === 0) {
+			throw new Error("Missing inputs to update user")
+		}
+		const response = await User.findByIdAndUpdate(_id, req.body, {
+			new: true,
+		}).select("-password -role -refreshToken")
+		if (response) {
+			res.status(200).json({
+				success: true,
+				response,
+				message: "Successfully update",
+			})
+		} else {
+			res.status(404).json({
+				success: false,
+				message: `Something went wrong while user tried to update`,
+			})
+		}
+	}
+)
+
+const updateUserByAdmin = asyncHandler(
+	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+		const { uid } = req.user
+		if (Object.keys(req.body).length === 0) {
+			throw new Error("Missing inputs to update user")
+		}
+		const response = await User.findByIdAndUpdate(uid, req.body, {
+			new: true,
+		}).select("-password -role -refreshToken")
+		if (response) {
+			res.status(200).json({
+				success: true,
+				response,
+				message: "Successfully update",
+			})
+		} else {
+			res.status(404).json({
+				success: false,
+				message: `Something went wrong while user tried to update`,
+			})
+		}
+	}
+)
+
 export default {
 	register,
 	login,
 	getCurrentUser,
 	refreshAccessToken,
 	logout,
+	forgotPassword,
+	resetPassword,
+	getAllUsers,
+	deleteUser,
+	updateUser,
+	updateUserByAdmin,
 }

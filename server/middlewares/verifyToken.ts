@@ -37,4 +37,22 @@ const verifyAccessToken = asyncHandler(
 	}
 )
 
-export { verifyAccessToken }
+const isAdmin = asyncHandler(
+	async (
+		req: AuthenticatedRequest,
+		res: Response,
+		next: NextFunction
+	): Promise<void> => {
+		const { role } = req.user
+		if (role && role.includes("admin")) {
+			next()
+		} else {
+			res.status(403).json({
+				success: false,
+				message: "Access denied. User is not an admin.",
+			})
+		}
+	}
+)
+
+export { verifyAccessToken, isAdmin }
