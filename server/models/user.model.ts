@@ -29,24 +29,29 @@ var userSchema = new mongoose.Schema<User>(
 		firstName: {
 			type: String,
 			required: true,
+			trim: true,
 		},
 		lastName: {
 			type: String,
 			required: true,
+			trim: true,
 		},
 		email: {
 			type: String,
 			required: true,
 			unique: true,
+			trim: true,
 		},
 		mobile: {
 			type: String,
 			required: true,
 			unique: true,
+			trim: true,
 		},
 		password: {
 			type: String,
 			required: true,
+			trim: true,
 		},
 		role: {
 			type: [String],
@@ -107,4 +112,4 @@ userSchema.methods = {
 
 const UserModel = mongoose.model<User>("User", userSchema)
 
-export default UserModel
+export { UserModel as User }

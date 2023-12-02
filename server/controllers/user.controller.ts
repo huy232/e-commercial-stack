@@ -1,4 +1,4 @@
-import User from "../models/user.model"
+import { User } from "../models/"
 import asyncHandler from "express-async-handler"
 import * as bcrypt from "bcrypt"
 import { Request, Response } from "express"
@@ -77,7 +77,7 @@ const login = asyncHandler(
 			res.status(200).json({
 				success: true,
 				message: "Login successfully",
-				userData,
+				userData: { ...rest },
 				accessToken,
 			})
 		} else {

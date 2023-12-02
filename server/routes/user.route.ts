@@ -1,4 +1,4 @@
-import express, { Router } from "express"
+import express from "express"
 import userController from "../controllers/user.controller"
 import { isAdmin, verifyAccessToken } from "../middlewares/verifyToken"
 
