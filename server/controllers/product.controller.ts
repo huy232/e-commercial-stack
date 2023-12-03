@@ -36,14 +36,48 @@ const getProduct = asyncHandler(
 
 const getAllProducts = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
-		const products = await Product.find()
-		res.status(200).json({
-			success: products ? true : false,
-			message: products
-				? "Successfully get a product"
-				: "Cannot find a product",
-			product: products ? products : {},
-		})
+		const queries = { ...req.query }
+		const excludeFields = ["limit", "sort", "page", "fields"]
+		excludeFields.forEach((element) => delete queries[element])
+
+		let queryString = JSON.stringify(queries)
+		queryString = queryString.replace(
+			/\b(gte|gt|lt|lte)\b/g,
+			(matchedElement) => `$${matchedElement}`
+		)
+		const formattedQueries = JSON.parse(queryString)
+
+		// Filtering
+		if (queries.title) {
+			formattedQueries.title = { $regex: queries.title, $options: "i" }
+		}
+
+		try {
+			// Use await with the Mongoose query directly
+			let response = await Product.find(formattedQueries)
+			if (req.query.sort) {
+				const sortBy = req.body.sort.split(",").join(" ")
+				response = response.sort(sortBy)
+			}
+
+			// Count the documents
+			const counts = await Product.countDocuments(formattedQueries)
+
+			res.status(200).json({
+				success: response ? true : false,
+				message: response
+					? "Successfully query all products"
+					: "Something went wrong while finding all products",
+				products: response ? response : {},
+				counts,
+			})
+		} catch (err: any) {
+			res.status(500).json({
+				success: false,
+				message: "Internal Server Error",
+				error: err.message,
+			})
+		}
 	}
 )
 
