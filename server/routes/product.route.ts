@@ -22,4 +22,10 @@ router.delete(
 	productController.deleteProduct
 )
 
+router.put(
+	"/rating-product",
+	verifyAccessToken,
+	productController.ratingProduct
+)
+
 export default { router }

@@ -2,6 +2,8 @@ import { Request, Response } from "express"
 import { Product } from "../models"
 import asyncHandler from "express-async-handler"
 import slugify from "slugify"
+import { parseInteger } from "../utils/parseInteger"
+import { AuthenticatedRequest } from "../types/user"
 
 const createProduct = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
@@ -36,40 +38,52 @@ const getProduct = asyncHandler(
 
 const getAllProducts = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
-		const queries = { ...req.query }
-		const excludeFields = ["limit", "sort", "page", "fields"]
-		excludeFields.forEach((element) => delete queries[element])
-
-		let queryString = JSON.stringify(queries)
-		queryString = queryString.replace(
-			/\b(gte|gt|lt|lte)\b/g,
-			(matchedElement) => `$${matchedElement}`
-		)
-		const formattedQueries = JSON.parse(queryString)
-
-		// Filtering
-		if (queries.title) {
-			formattedQueries.title = { $regex: queries.title, $options: "i" }
-		}
-
 		try {
-			// Use await with the Mongoose query directly
-			let response = await Product.find(formattedQueries)
-			if (req.query.sort) {
-				const sortBy = req.body.sort.split(",").join(" ")
-				response = response.sort(sortBy)
+			const queries = { ...req.query }
+			const excludeFields = ["limit", "sort", "page", "fields"]
+			excludeFields.forEach((element) => delete queries[element])
+
+			let queryString = JSON.stringify(queries)
+			queryString = queryString.replace(
+				/\b(gte|gt|lt|lte)\b/g,
+				(matchedElement) => `$${matchedElement}`
+			)
+			const formattedQueries = JSON.parse(queryString)
+			// Filtering
+			if (queries.title) {
+				formattedQueries.title = { $regex: queries.title, $options: "i" }
 			}
 
+			let query = Product.find(formattedQueries)
+
+			// Sorting
+			if (req.query.sort as string) {
+				const sortBy = (req.query.sort as string).split(",").join(" ")
+				query = query.sort(sortBy)
+			}
+
+			// Fields limiting
+			if (req.query.fields as string) {
+				const fields = (req.query.fields as string).split(",").join(" ")
+				query = query.select(fields)
+			}
+
+			const page = parseInteger(req.query.page, 1)
+			const limit = parseInteger(req.query.limit, 2)
+			const skip = (page - 1) * limit
+			query.skip(skip).limit(limit)
+
+			const response = await query.exec()
 			// Count the documents
 			const counts = await Product.countDocuments(formattedQueries)
 
 			res.status(200).json({
 				success: response ? true : false,
+				counts,
 				message: response
 					? "Successfully query all products"
 					: "Something went wrong while finding all products",
 				products: response ? response : {},
-				counts,
 			})
 		} catch (err: any) {
 			res.status(500).json({
@@ -119,10 +133,51 @@ const deleteProduct = asyncHandler(
 	}
 )
 
+const ratingProduct = asyncHandler(
+	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+		const { _id } = req.user
+		const { star, comment, product_id } = req.body
+		if (!star || !product_id) {
+			throw new Error("Missing input while rating product")
+		}
+		const product = await Product.findById(product_id)
+		const alreadyRatingProduct = product?.ratings.find(
+			(element) => element.postedBy.toString() === _id
+		)
+
+		if (alreadyRatingProduct) {
+			await Product.updateOne(
+				{
+					ratings: {
+						$elemMatch: alreadyRatingProduct,
+					},
+				},
+				{
+					$set: { "ratings.$.star": star, "ratings.$.comment": comment },
+				},
+				{ new: true }
+			)
+		} else {
+			const response = await Product.findByIdAndUpdate(
+				product_id,
+				{
+					$push: { ratings: { star, comment, postedBy: _id } },
+				},
+				{ new: true }
+			)
+		}
+
+		res.status(200).json({
+			status: true,
+		})
+	}
+)
+
 export default {
 	createProduct,
 	getProduct,
 	getAllProducts,
 	updateProduct,
 	deleteProduct,
+	ratingProduct,
 }
