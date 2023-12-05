@@ -1,6 +1,5 @@
 import { User } from "../models/"
 import asyncHandler from "express-async-handler"
-import * as bcrypt from "bcrypt"
 import { Request, Response } from "express"
 import { generateAccessToken, generateRefreshToken } from "../middlewares/jwt"
 import { AuthenticatedRequest } from "../types/user"
@@ -8,6 +7,7 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import { sendMail } from "../utils/sendMail"
 import crypto from "crypto"
 
+// ------------------------
 const register = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		let { firstName, lastName, email, password, mobile } = req.body
@@ -37,7 +37,7 @@ const register = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const login = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		let { email, password } = req.body
@@ -85,7 +85,7 @@ const login = asyncHandler(
 		}
 	}
 )
-
+// ------------------------
 const getCurrentUser = asyncHandler(
 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 		const { _id } = req.user
@@ -105,7 +105,7 @@ const getCurrentUser = asyncHandler(
 		}
 	}
 )
-
+// ------------------------
 const refreshAccessToken = asyncHandler(
 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 		const cookies = req.cookies
@@ -130,7 +130,7 @@ const refreshAccessToken = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const logout = asyncHandler(
 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 		const cookies = req.cookies
@@ -151,7 +151,7 @@ const logout = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const forgotPassword = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const { email } = req.query
@@ -181,7 +181,7 @@ const forgotPassword = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const resetPassword = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const { password, token } = req.body
@@ -212,7 +212,7 @@ const resetPassword = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const getAllUsers = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const response = await User.find().select("-password -refreshToken -role")
@@ -222,7 +222,7 @@ const getAllUsers = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const deleteUser = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const { _id } = req.query
@@ -243,7 +243,7 @@ const deleteUser = asyncHandler(
 		}
 	}
 )
-
+// ------------------------
 const updateUser = asyncHandler(
 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 		const { _id } = req.user
@@ -267,7 +267,7 @@ const updateUser = asyncHandler(
 		}
 	}
 )
-
+// ------------------------
 const updateUserByAdmin = asyncHandler(
 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 		const { uid } = req.user

@@ -5,6 +5,7 @@ import slugify from "slugify"
 import { parseInteger } from "../utils/parseInteger"
 import { AuthenticatedRequest } from "../types/user"
 
+// ------------------------
 const createProduct = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		if (Object.keys(req.body).length === 0) {
@@ -17,13 +18,13 @@ const createProduct = asyncHandler(
 		res.status(200).json({
 			success: newProduct ? true : false,
 			message: newProduct
-				? "Success creating product"
+				? "Success created product"
 				: "Cannot create new product",
 			product: newProduct ? newProduct : {},
 		})
 	}
 )
-
+// ------------------------
 const getProduct = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const { product_id } = req.params
@@ -35,7 +36,7 @@ const getProduct = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const getAllProducts = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		try {
@@ -94,7 +95,7 @@ const getAllProducts = asyncHandler(
 		}
 	}
 )
-
+// ------------------------
 const updateProduct = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const { product_id } = req.params
@@ -115,7 +116,7 @@ const updateProduct = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const deleteProduct = asyncHandler(
 	async (req: Request, res: Response): Promise<void> => {
 		const { product_id } = req.params
@@ -132,7 +133,7 @@ const deleteProduct = asyncHandler(
 		})
 	}
 )
-
+// ------------------------
 const ratingProduct = asyncHandler(
 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 		const { _id } = req.user
@@ -166,7 +167,7 @@ const ratingProduct = asyncHandler(
 				{ new: true }
 			)
 		}
-
+		// ------------------------
 		const updatedProduct = await Product.findById(product_id)
 		if (updatedProduct) {
 			const ratingCalculate = updatedProduct.ratings.length

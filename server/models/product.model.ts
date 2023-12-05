@@ -1,12 +1,12 @@
 import mongoose, { Document, Types, Schema } from "mongoose"
 
-interface Rating {
+interface IRating {
 	star: number
 	postedBy: mongoose.Types.ObjectId | Types.ObjectId | string
 	comment: string
 }
 
-interface Product extends Document {
+interface IProduct extends Document {
 	title: string
 	slug: string
 	description?: string
@@ -17,11 +17,11 @@ interface Product extends Document {
 	sold: number
 	images: string[]
 	color: "Black" | "Red" | "White"
-	ratings: Rating[]
+	ratings: IRating[]
 	totalRatings: number
 }
 
-var productSchema = new mongoose.Schema<Product>(
+var productSchema = new mongoose.Schema<IProduct>(
 	{
 		title: {
 			type: String,
@@ -83,6 +83,6 @@ var productSchema = new mongoose.Schema<Product>(
 	{ timestamps: true }
 )
 
-const ProductModel = mongoose.model<Product>("Product", productSchema)
+const ProductModel = mongoose.model<IProduct>("Product", productSchema)
 
 export { ProductModel as Product }

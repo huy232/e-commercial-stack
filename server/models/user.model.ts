@@ -2,7 +2,7 @@ import mongoose, { Document, Types } from "mongoose"
 import crypto from "crypto"
 import * as bcrypt from "bcrypt"
 
-interface User extends Document {
+interface IUser extends Document {
 	firstName: string
 	lastName: string
 	email: string
@@ -24,7 +24,7 @@ interface User extends Document {
 	isCorrectPassword(password: string): Promise<boolean>
 }
 
-var userSchema = new mongoose.Schema<User>(
+var userSchema = new mongoose.Schema<IUser>(
 	{
 		firstName: {
 			type: String,
@@ -110,6 +110,6 @@ userSchema.methods = {
 	},
 }
 
-const UserModel = mongoose.model<User>("User", userSchema)
+const UserModel = mongoose.model<IUser>("User", userSchema)
 
 export { UserModel as User }

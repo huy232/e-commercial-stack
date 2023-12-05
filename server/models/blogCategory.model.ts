@@ -1,7 +1,11 @@
-import mongoose from "mongoose" // Erase if already required
+import mongoose from "mongoose"
 
-// Declare the Schema of the Mongo model
-var blogCategorySchema = new mongoose.Schema(
+interface IBlogCategory extends Document {
+	title: string
+	createdAt: Date
+	updatedAt: Date
+}
+var blogCategorySchema = new mongoose.Schema<IBlogCategory>(
 	{
 		title: {
 			type: String,
@@ -14,6 +18,9 @@ var blogCategorySchema = new mongoose.Schema(
 )
 
 //Export the model
-const BlogCategoryModel = mongoose.model("BlogCategory", blogCategorySchema)
+const BlogCategoryModel = mongoose.model<IBlogCategory>(
+	"BlogCategory",
+	blogCategorySchema
+)
 
 export { BlogCategoryModel as BlogCategory }

@@ -1,0 +1,129 @@
+import { Request, Response } from "express"
+import { Blog } from "../models"
+import asyncHandler from "express-async-handler"
+import { AuthenticatedRequest } from "../types/user"
+import { Types } from "mongoose"
+
+// ------------------------
+const createNewBlog = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const { title, description, category } = req.body
+		if (!title || !description || !category) {
+			throw new Error("Missing inputs required")
+		}
+		const response = await Blog.create(req.body)
+		res.json({
+			success: response ? true : false,
+			message: response
+				? "Success created blog"
+				: "Something went wrong while created blog",
+			createCategory: response ? response : {},
+		})
+	}
+)
+// ------------------------
+const updateBlog = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const { blog_id } = req.params
+		if (Object.keys(req.body).length === 0) {
+			throw new Error("Missing inputs required for updating blog")
+		}
+		const response = await Blog.findByIdAndUpdate(blog_id, req.body, {
+			new: true,
+		})
+		res.json({
+			success: response ? true : false,
+			message: response
+				? "Successfully update blog"
+				: "Something went wrong while updating blog",
+			updateCategory: response ? response : {},
+		})
+	}
+)
+
+const getBlogs = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const response = await Blog.find()
+		res.json({
+			success: response ? true : false,
+			message: response
+				? "Successfully get blogs"
+				: "Something went wrong while get blogs",
+			blogs: response ? response : {},
+		})
+	}
+)
+// ------------------------
+interface UpdateQuery {
+	$addToSet: {
+		likes?: Types.ObjectId
+		dislikes?: Types.ObjectId
+	}
+	$pull: {
+		likes?: Types.ObjectId
+		dislikes?: Types.ObjectId
+	}
+}
+
+const likeOrDislikeBlog = asyncHandler(
+	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+		const { _id } = req.user
+		const { blog_id } = req.params
+		const { action } = req.query // Use query parameter to specify action
+
+		if (!blog_id || !action) {
+			throw new Error("Missing blog_id or action")
+		}
+
+		const updateQuery: UpdateQuery = {
+			$addToSet: {},
+			$pull: {},
+		}
+
+		const blog = await Blog.findById(blog_id)
+
+		if (blog) {
+			const likedIndex = blog.likes.indexOf(_id)
+			const dislikedIndex = blog.dislikes.indexOf(_id)
+
+			if (action === "like") {
+				if (likedIndex !== -1) {
+					// User already liked, remove like
+					updateQuery.$pull.likes = _id
+				} else {
+					// User neither liked nor disliked, toggle like
+					updateQuery.$addToSet.likes = _id
+					// Remove from dislikes if present
+					if (dislikedIndex !== -1) {
+						updateQuery.$pull.dislikes = _id
+					}
+				}
+			} else if (action === "dislike") {
+				if (dislikedIndex !== -1) {
+					// User already disliked, remove dislike
+					updateQuery.$pull.dislikes = _id
+				} else {
+					// User neither liked nor disliked, toggle dislike
+					updateQuery.$addToSet.dislikes = _id
+					// Remove from likes if present
+					if (likedIndex !== -1) {
+						updateQuery.$pull.likes = _id
+					}
+				}
+			} else {
+				throw new Error("Invalid action")
+			}
+
+			const updatedBlog = await Blog.findByIdAndUpdate(blog_id, updateQuery, {
+				new: true,
+			})
+
+			res.json({
+				success: true,
+				message: updatedBlog,
+			})
+		}
+	}
+)
+
+export default { createNewBlog, updateBlog, getBlogs, likeOrDislikeBlog }

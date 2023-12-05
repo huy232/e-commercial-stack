@@ -4,12 +4,14 @@ import user from "./user.route"
 import product from "./product.route"
 import productCategory from "./productCategory.route"
 import blogCategory from "./blogCategory.route"
+import blog from "./blog.route"
 
 const initRoutes = (app: Express): void => {
 	app.use("/api/user", user.router)
 	app.use("/api/product", product.router)
 	app.use("/api/product-category", productCategory.router)
 	app.use("/api/blog-category", blogCategory.router)
+	app.use("/api/blog", blog.router)
 
 	app.use(notFound)
 	app.use(errorHandler)

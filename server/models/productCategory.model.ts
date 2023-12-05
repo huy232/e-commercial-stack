@@ -1,7 +1,12 @@
-import mongoose from "mongoose" // Erase if already required
+import mongoose from "mongoose"
 
-// Declare the Schema of the Mongo model
-var productCategorySchema = new mongoose.Schema(
+interface IProductCategory extends Document {
+	title: string
+	createdAt: Date
+	updatedAt: Date
+}
+
+var productCategorySchema = new mongoose.Schema<IProductCategory>(
 	{
 		title: {
 			type: String,
@@ -14,7 +19,7 @@ var productCategorySchema = new mongoose.Schema(
 )
 
 //Export the model
-const ProductCategoryModel = mongoose.model(
+const ProductCategoryModel = mongoose.model<IProductCategory>(
 	"ProductCategory",
 	productCategorySchema
 )
