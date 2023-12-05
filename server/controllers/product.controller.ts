@@ -158,7 +158,7 @@ const ratingProduct = asyncHandler(
 				{ new: true }
 			)
 		} else {
-			const response = await Product.findByIdAndUpdate(
+			await Product.findByIdAndUpdate(
 				product_id,
 				{
 					$push: { ratings: { star, comment, postedBy: _id } },
@@ -167,8 +167,22 @@ const ratingProduct = asyncHandler(
 			)
 		}
 
+		const updatedProduct = await Product.findById(product_id)
+		if (updatedProduct) {
+			const ratingCalculate = updatedProduct.ratings.length
+			const sumRating = updatedProduct.ratings.reduce(
+				(acc, rating) => acc + Number(rating.star),
+				0
+			)
+			updatedProduct.totalRatings =
+				Math.round((sumRating * 10) / ratingCalculate) / 10
+
+			await updatedProduct.save()
+		}
 		res.status(200).json({
 			status: true,
+			message: "Success update rating",
+			updatedProduct,
 		})
 	}
 )
