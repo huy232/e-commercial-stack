@@ -1,0 +1,22 @@
+import express from "express"
+import { BlogController } from "../../controllers"
+import { isAdmin, verifyAccessToken } from "../../middlewares/verifyToken"
+
+const router = express.Router()
+
+router.post("/", [verifyAccessToken, isAdmin], BlogController.createNewBlog)
+router.put("/:blog_id", [verifyAccessToken, isAdmin], BlogController.updateBlog)
+router.get("/", BlogController.getBlogs)
+router.put(
+	"/blog-like/:blog_id",
+	verifyAccessToken,
+	BlogController.likeOrDislikeBlog
+)
+router.get("/one-blog/:blog_id", BlogController.getBlog)
+router.delete(
+	"/:blog_id",
+	[verifyAccessToken, isAdmin],
+	BlogController.deleteBlog
+)
+
+export { router as blogRouter }

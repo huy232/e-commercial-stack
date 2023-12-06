@@ -1,17 +1,20 @@
 import { Express } from "express"
 import { notFound, errorHandler } from "../middlewares/errorHandler"
-import user from "./user.route"
-import product from "./product.route"
-import productCategory from "./productCategory.route"
-import blogCategory from "./blogCategory.route"
-import blog from "./blog.route"
-
+import {
+	blogCategoryRouter,
+	blogRouter,
+	brandRouter,
+	productCategoryRouter,
+	productRouter,
+	userRouter,
+} from "./route"
 const initRoutes = (app: Express): void => {
-	app.use("/api/user", user.router)
-	app.use("/api/product", product.router)
-	app.use("/api/product-category", productCategory.router)
-	app.use("/api/blog-category", blogCategory.router)
-	app.use("/api/blog", blog.router)
+	app.use("/api/user", userRouter)
+	app.use("/api/product", productRouter)
+	app.use("/api/product-category", productCategoryRouter)
+	app.use("/api/blog-category", blogCategoryRouter)
+	app.use("/api/blog", blogRouter)
+	app.use("/api/brand", brandRouter)
 
 	app.use(notFound)
 	app.use(errorHandler)

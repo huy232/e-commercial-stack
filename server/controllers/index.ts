@@ -1,0 +1,6 @@
+export { default as BlogController } from "./controller/blog.controller"
+export { default as BlogCategoryController } from "./controller/blogCategory.controller"
+export { default as BrandController } from "./controller/brand.controller"
+export { default as ProductController } from "./controller/product.controller"
+export { default as ProductCategoryController } from "./controller/productCategory.controller"
+export { default as UserController } from "./controller/user.controller"
