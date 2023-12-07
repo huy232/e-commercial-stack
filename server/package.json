@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npx ts-node tsconfig-paths-bootstrap.ts && npx tsc --watch\" \"nodemon -q dist/server.js\"",
-    "start": "npx ts-node tsconfig-paths-bootstrap.ts && node dist/server.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\"",
+    "start": "node dist/server.js",
     "build": "npx tsc"
   },
   "keywords": [],

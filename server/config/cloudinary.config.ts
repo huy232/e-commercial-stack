@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary"
 import { CloudinaryStorage, Options } from "multer-storage-cloudinary"
 import multer, { Multer } from "multer"
+require("dotenv").config()
 
 // Configure Cloudinary
 cloudinary.config({
