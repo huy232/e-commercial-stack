@@ -2,6 +2,7 @@ import express from "express"
 import dbConnect from "./config/dbconnect"
 import initRoutes from "./routes"
 import cookieParser from "cookie-parser"
+import cors from "cors"
 
 require("dotenv").config()
 
@@ -10,6 +11,12 @@ dbConnect()
 		const app = express()
 		const port = process.env.PORT || 8000
 
+		app.use(
+			cors({
+				credentials: true,
+				origin: ["http://localhost:5000"],
+			})
+		)
 		app.use(cookieParser())
 		app.use(express.json())
 		app.use(express.urlencoded({ extended: true }))

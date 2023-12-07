@@ -15,7 +15,7 @@ class ProductCategoryController {
 			})
 		}
 	)
-	// ------------------------
+
 	getCategories = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const response = await ProductCategory.find().select("title _id")
@@ -28,7 +28,7 @@ class ProductCategoryController {
 			})
 		}
 	)
-	// ------------------------
+
 	updateCategory = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { productCategory_id } = req.params
@@ -47,7 +47,7 @@ class ProductCategoryController {
 			})
 		}
 	)
-	// ------------------------
+
 	deleteCategory = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { productCategory_id } = req.params

@@ -23,4 +23,4 @@ const BlogCategoryModel = mongoose.model<IBlogCategory>(
 	blogCategorySchema
 )
 
-export { BlogCategoryModel as BlogCategory }
+export { BlogCategoryModel as BlogCategory, IBlogCategory }

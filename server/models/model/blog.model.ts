@@ -1,6 +1,6 @@
 import mongoose, { Document, Types } from "mongoose"
 
-interface IUser {
+interface IUserBlog {
 	_id: Types.ObjectId
 	// Add other user properties if needed
 }
@@ -10,8 +10,8 @@ interface IBlog extends Document {
 	description: string
 	category: string
 	numberViews: number
-	likes: Types.ObjectId[] | IUser[]
-	dislikes: Types.ObjectId[] | IUser[]
+	likes: Types.ObjectId[] | IUserBlog[]
+	dislikes: Types.ObjectId[] | IUserBlog[]
 	image: string
 	author: string
 	createdAt: Date
@@ -68,4 +68,4 @@ var blogSchema = new mongoose.Schema<IBlog>(
 //Export the model
 const BlogModel = mongoose.model<IBlog>("Blog", blogSchema)
 
-export { BlogModel as Blog }
+export { BlogModel as Blog, IUserBlog, IBlog }

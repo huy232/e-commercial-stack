@@ -24,4 +24,4 @@ const ProductCategoryModel = mongoose.model<IProductCategory>(
 	productCategorySchema
 )
 
-export { ProductCategoryModel as ProductCategory }
+export { ProductCategoryModel as ProductCategory, IProductCategory }

@@ -1,7 +1,7 @@
 import express from "express"
 import { ProductController } from "../../controllers"
 import { isAdmin, verifyAccessToken } from "../../middlewares/verifyToken"
-
+import uploadCloud from "../../config/cloudinary.config"
 const router = express.Router()
 
 router.post(
@@ -21,11 +21,16 @@ router.delete(
 	[verifyAccessToken, isAdmin],
 	ProductController.deleteProduct
 )
-
 router.put(
 	"/rating-product",
 	verifyAccessToken,
 	ProductController.ratingProduct
+)
+router.put(
+	"/upload-image/:product_id",
+	[verifyAccessToken, isAdmin],
+	uploadCloud.single("images"),
+	ProductController.uploadImagesProduct
 )
 
 export { router as productRouter }

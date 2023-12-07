@@ -5,7 +5,6 @@ import slugify from "slugify"
 import { parseInteger } from "../../utils/parseInteger"
 import { AuthenticatedRequest } from "../../types/user"
 
-// ------------------------
 class ProductController {
 	createProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
@@ -25,7 +24,7 @@ class ProductController {
 			})
 		}
 	)
-	// ------------------------
+
 	getProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_id } = req.params
@@ -39,7 +38,7 @@ class ProductController {
 			})
 		}
 	)
-	// ------------------------
+
 	getAllProducts = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			try {
@@ -98,7 +97,7 @@ class ProductController {
 			}
 		}
 	)
-	// ------------------------
+
 	updateProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_id } = req.params
@@ -119,7 +118,7 @@ class ProductController {
 			})
 		}
 	)
-	// ------------------------
+
 	deleteProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_id } = req.params
@@ -136,7 +135,7 @@ class ProductController {
 			})
 		}
 	)
-	// ------------------------
+
 	ratingProduct = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
@@ -170,7 +169,7 @@ class ProductController {
 					{ new: true }
 				)
 			}
-			// ------------------------
+
 			const updatedProduct = await Product.findById(product_id)
 			if (updatedProduct) {
 				const ratingCalculate = updatedProduct.ratings.length
@@ -188,6 +187,24 @@ class ProductController {
 				message: "Success update rating",
 				updatedProduct,
 			})
+		}
+	)
+
+	uploadImagesProduct = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			try {
+				console.log("Hello world")
+				console.log(req.file)
+
+				// Your image processing logic here
+
+				res.json({ success: true, message: "Uploaded" })
+			} catch (error) {
+				console.error("Error uploading image:", error)
+				res
+					.status(500)
+					.json({ success: false, message: "An unexpected error occurred." })
+			}
 		}
 	)
 }

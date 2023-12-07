@@ -112,4 +112,4 @@ userSchema.methods = {
 
 const UserModel = mongoose.model<IUser>("User", userSchema)
 
-export { UserModel as User }
+export { UserModel as User, IUser }

@@ -32,7 +32,7 @@ class BlogController {
 			})
 		}
 	)
-	// ------------------------
+
 	updateBlog = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { blog_id } = req.params
@@ -64,7 +64,6 @@ class BlogController {
 			})
 		}
 	)
-	// ------------------------
 
 	likeOrDislikeBlog = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -126,7 +125,7 @@ class BlogController {
 			}
 		}
 	)
-	// ------------------------
+
 	getBlog = asyncHandler(async (req: Request, res: Response): Promise<void> => {
 		const { blog_id } = req.params
 
@@ -144,7 +143,7 @@ class BlogController {
 			blog,
 		})
 	})
-	// ------------------------
+
 	deleteBlog = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { blog_id } = req.params
@@ -157,6 +156,5 @@ class BlogController {
 		}
 	)
 }
-// ------------------------
 
 export default new BlogController()

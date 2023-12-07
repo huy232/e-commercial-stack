@@ -3,7 +3,6 @@ import { BlogCategory } from "../../models"
 import asyncHandler from "express-async-handler"
 
 class BlogCategoryController {
-	// ------------------------
 	createCategory = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const response = await BlogCategory.create(req.body)
@@ -16,7 +15,7 @@ class BlogCategoryController {
 			})
 		}
 	)
-	// ------------------------
+
 	getCategories = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const response = await BlogCategory.find().select("title _id")
@@ -29,7 +28,7 @@ class BlogCategoryController {
 			})
 		}
 	)
-	// ------------------------
+
 	updateCategory = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { blogCategory_id } = req.params
@@ -48,7 +47,7 @@ class BlogCategoryController {
 			})
 		}
 	)
-	// ------------------------
+
 	deleteCategory = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { blogCategory_id } = req.params

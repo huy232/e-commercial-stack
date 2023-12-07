@@ -1,14 +1,19 @@
-import mongoose from "mongoose" // Erase if already required
+import mongoose from "mongoose"
 
-// Declare the Schema of the Mongo model
-var couponSchema = new mongoose.Schema(
+interface ICoupon extends Document {
+	name: string
+	discount: number
+	expiry: Date
+}
+
+var couponSchema = new mongoose.Schema<ICoupon>(
 	{
 		name: {
 			type: String,
 			required: true,
 			unique: true,
 		},
-		coupon: {
+		discount: {
 			type: Number,
 			required: true,
 		},
@@ -21,6 +26,6 @@ var couponSchema = new mongoose.Schema(
 )
 
 //Export the model
-const CouponModel = mongoose.model("Coupon", couponSchema)
+const CouponModel = mongoose.model<ICoupon>("Coupon", couponSchema)
 
-export { CouponModel as Coupon }
+export { CouponModel as Coupon, ICoupon }

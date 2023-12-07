@@ -15,7 +15,7 @@ class BrandController {
 			})
 		}
 	)
-	// ------------------------
+
 	getBrands = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const response = await Brand.find()
@@ -28,7 +28,7 @@ class BrandController {
 			})
 		}
 	)
-	// ------------------------
+
 	updateBrand = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { brand_id } = req.params
@@ -45,7 +45,7 @@ class BrandController {
 			})
 		}
 	)
-	// ------------------------
+
 	deleteBrand = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { brand_id } = req.params

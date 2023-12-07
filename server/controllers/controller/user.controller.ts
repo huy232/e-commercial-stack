@@ -40,7 +40,7 @@ class UserController {
 			})
 		}
 	)
-	// ------------------------
+
 	login = asyncHandler(async (req: Request, res: Response): Promise<void> => {
 		let { email, password } = req.body
 
@@ -86,7 +86,7 @@ class UserController {
 			throw new Error("Invalid credentials")
 		}
 	})
-	// ------------------------
+
 	getCurrentUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
@@ -106,7 +106,7 @@ class UserController {
 			}
 		}
 	)
-	// ------------------------
+
 	refreshAccessToken = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const cookies = req.cookies
@@ -131,7 +131,7 @@ class UserController {
 			})
 		}
 	)
-	// ------------------------
+
 	logout = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const cookies = req.cookies
@@ -152,7 +152,7 @@ class UserController {
 			})
 		}
 	)
-	// ------------------------
+
 	forgotPassword = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { email } = req.query
@@ -182,7 +182,7 @@ class UserController {
 			})
 		}
 	)
-	// ------------------------
+
 	resetPassword = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { password, token } = req.body
@@ -213,7 +213,7 @@ class UserController {
 			})
 		}
 	)
-	// ------------------------
+
 	getAllUsers = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const response = await User.find().select("-password -refreshToken -role")
@@ -223,7 +223,7 @@ class UserController {
 			})
 		}
 	)
-	// ------------------------
+
 	deleteUser = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { _id } = req.query
@@ -244,7 +244,7 @@ class UserController {
 			}
 		}
 	)
-	// ------------------------
+
 	updateUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
@@ -268,7 +268,7 @@ class UserController {
 			}
 		}
 	)
-	// ------------------------
+
 	updateUserByAdmin = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { uid } = req.user
