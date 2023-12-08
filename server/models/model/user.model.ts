@@ -2,6 +2,12 @@ import mongoose, { Document, Types } from "mongoose"
 import crypto from "crypto"
 import * as bcrypt from "bcrypt"
 
+interface ICartItem {
+	product: mongoose.Schema.Types.ObjectId | string
+	quantity: number
+	color: string
+}
+
 interface IUser extends Document {
 	firstName: string
 	lastName: string
@@ -9,8 +15,8 @@ interface IUser extends Document {
 	mobile: string
 	password: string
 	role: string[]
-	cart: Types.ObjectId[]
-	address: Types.ObjectId[]
+	cart: ICartItem[]
+	address: string[]
 	wishlist: Types.ObjectId[]
 	isBlocked: boolean
 	refreshToken?: string
@@ -57,11 +63,17 @@ var userSchema = new mongoose.Schema<IUser>(
 			type: [String],
 			default: ["user"],
 		},
-		cart: {
-			type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+		cart: [
+			{
+				product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+				quantity: Number,
+				color: String,
+			},
+		],
+		address: {
+			type: [],
 			default: [],
 		},
-		address: [{ type: mongoose.Types.ObjectId, ref: "Address" }],
 		wishlist: [
 			{
 				type: mongoose.Types.ObjectId,

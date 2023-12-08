@@ -29,7 +29,7 @@ router.put(
 router.put(
 	"/upload-image/:product_id",
 	[verifyAccessToken, isAdmin],
-	uploadCloud.single("images"),
+	uploadCloud.array("images", 10),
 	ProductController.uploadImagesProduct
 )
 

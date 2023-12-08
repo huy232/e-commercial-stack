@@ -28,7 +28,7 @@ class BlogController {
 				message: response
 					? "Success created blog"
 					: "Something went wrong while created blog",
-				createdCategory: response ? response : {},
+				createdBlog: response ? response : {},
 			})
 		}
 	)
@@ -47,7 +47,7 @@ class BlogController {
 				message: response
 					? "Successfully update blog"
 					: "Something went wrong while updating blog",
-				updateCategory: response ? response : {},
+				updatedBlog: response ? response : {},
 			})
 		}
 	)
@@ -153,6 +153,38 @@ class BlogController {
 				message: "Success deleting a blog",
 				deletedBlog: blog,
 			})
+		}
+	)
+
+	uploadImageBlog = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			try {
+				const { blog_id } = req.params
+				if (!req.file) {
+					throw new Error("Missing images input")
+				}
+
+				const response = await Blog.findByIdAndUpdate(
+					blog_id,
+					{
+						image: req.file.path,
+					},
+					{ new: true }
+				)
+
+				res.json({
+					success: response ? true : false,
+					message: response
+						? "Uploaded blog image"
+						: "Failed to upload blog image",
+					updatedBlog: response ? response : {},
+				})
+			} catch (error) {
+				console.error("Error uploading image:", error)
+				res
+					.status(500)
+					.json({ success: false, message: "An unexpected error occurred." })
+			}
 		}
 	)
 }

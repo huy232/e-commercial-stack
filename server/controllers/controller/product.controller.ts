@@ -193,12 +193,27 @@ class ProductController {
 	uploadImagesProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			try {
-				console.log("Hello world")
-				console.log(req.file)
+				const { product_id } = req.params
+				if (!req.files || !Array.isArray(req.files)) {
+					throw new Error("Missing images input")
+				}
 
-				// Your image processing logic here
+				const imagePaths = Array.from(req.files).map((file) => file.path)
+				const response = await Product.findByIdAndUpdate(
+					product_id,
+					{
+						$push: { images: { $each: imagePaths } },
+					},
+					{ new: true }
+				)
 
-				res.json({ success: true, message: "Uploaded" })
+				res.json({
+					success: response ? true : false,
+					message: response
+						? "Uploaded all product images"
+						: "Failed to upload product images",
+					updatedProduct: response ? response : {},
+				})
 			} catch (error) {
 				console.error("Error uploading image:", error)
 				res

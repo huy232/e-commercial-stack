@@ -15,7 +15,7 @@ interface IProduct extends Document {
 	category: mongoose.Types.ObjectId | Types.ObjectId | string
 	quantity: number
 	sold: number
-	images: string[]
+	images: []
 	color: "Black" | "Red" | "White"
 	ratings: IRating[]
 	totalRatings: number
@@ -62,7 +62,7 @@ var productSchema = new mongoose.Schema<IProduct>(
 			default: 0,
 		},
 		images: {
-			type: [String],
+			type: [],
 		},
 		color: {
 			type: String,

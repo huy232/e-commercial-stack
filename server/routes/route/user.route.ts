@@ -27,5 +27,11 @@ router.put(
 	[verifyAccessToken, isAdmin],
 	UserController.updateUserByAdmin
 )
+router.put(
+	"/user-update-address",
+	verifyAccessToken,
+	UserController.updateUserAddress
+)
+router.put("/update-cart", verifyAccessToken, UserController.updateUserCart)
 
 export { router as userRouter }

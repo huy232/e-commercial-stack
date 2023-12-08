@@ -1,6 +1,7 @@
 import express from "express"
 import { BlogController } from "../../controllers"
 import { isAdmin, verifyAccessToken } from "../../middlewares/verifyToken"
+import uploadCloud from "../../config/cloudinary.config"
 
 const router = express.Router()
 
@@ -17,6 +18,13 @@ router.delete(
 	"/:blog_id",
 	[verifyAccessToken, isAdmin],
 	BlogController.deleteBlog
+)
+
+router.put(
+	"/upload-image/:blog_id",
+	[verifyAccessToken, isAdmin],
+	uploadCloud.single("image"),
+	BlogController.uploadImageBlog
 )
 
 export { router as blogRouter }
