@@ -1,18 +1,15 @@
-import mongoose, { Types } from "mongoose"
+import mongoose, { Document } from "mongoose"
 import { IProduct } from "./product.model"
-
-interface IPaymentIntent {
-	// Define properties related to payment (e.g., paymentId, paymentStatus, etc.)
-}
 
 interface IOrder extends Document {
 	products: IProduct[]
 	status: "Cancelled" | "Processing" | "Success" | "Refund" | "Delivering"
-	paymentIntent: IPaymentIntent
-	orderBy: Types.ObjectId
+	total: Number
+	coupon: mongoose.Schema.Types.ObjectId
+	orderBy: mongoose.Schema.Types.ObjectId // Correct type for 'orderBy'
 }
 
-var orderSchema = new mongoose.Schema({
+var orderSchema = new mongoose.Schema<IOrder>({
 	products: [
 		{
 			product: { type: mongoose.Types.ObjectId, ref: "Product" },
@@ -25,13 +22,17 @@ var orderSchema = new mongoose.Schema({
 		default: "Processing",
 		enum: ["Cancelled", "Processing", "Success", "Refund", "Delivering"],
 	},
-	paymentIntent: {},
+	total: Number,
+	coupon: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Coupon",
+	},
 	orderBy: {
-		type: mongoose.Types.ObjectId,
+		type: mongoose.Schema.Types.ObjectId, // Correct type for 'orderBy'
 		ref: "User",
 	},
 })
 
 const orderModel = mongoose.model<IOrder>("Order", orderSchema)
 
-export { orderModel as Order, IPaymentIntent, IOrder }
+export { orderModel as Order, IOrder }

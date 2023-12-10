@@ -323,62 +323,67 @@ class UserController {
 
 	updateUserCart = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			const { _id } = req.user
+			const { product_id, quantity, color } = req.body
+
+			if (!product_id || !quantity || !color) {
+				throw new Error("Missing inputs for updating user cart")
+			}
+
 			try {
-				const { _id } = req.user
-				const { product_id, quantity, color } = req.body
-
-				if (!product_id || !quantity || !color) {
-					throw new Error("Missing inputs for updating user cart")
-				}
-
 				const user = await User.findById(_id).select("cart")
 
 				if (!user) {
 					res.status(404).json({ success: false, message: "User not found" })
+					return
+				}
+
+				let updatedUserCart
+
+				// Check if the product already exists in the cart with the same color
+				const existingProductIndex = user.cart.findIndex(
+					(element) =>
+						element.product?.toString() === product_id &&
+						element.color === color
+				)
+
+				if (existingProductIndex !== -1) {
+					// Update the quantity of the existing product
+					updatedUserCart = user.cart.map((cartItem, index) =>
+						index === existingProductIndex
+							? { ...cartItem, quantity }
+							: cartItem
+					)
 				} else {
-					let updatedUserCart
+					// Add a new product to the cart
+					updatedUserCart = [
+						...user.cart,
+						{ product: product_id, quantity, color },
+					]
+				}
 
-					// Check if the product already exists in the cart
-					const existingProductIndex = user.cart.findIndex(
-						(element) => element.product?.toString() === product_id
-					)
+				// Update the user document with the modified cart
+				const updatedUser = await User.findByIdAndUpdate(
+					_id,
+					{ cart: updatedUserCart },
+					{ new: true }
+				)
 
-					if (existingProductIndex !== -1) {
-						// Update the quantity of the existing product
-						updatedUserCart = user.cart.map((cartItem, index) =>
-							index === existingProductIndex
-								? { ...cartItem, quantity }
-								: cartItem
-						)
-					} else {
-						// Add a new product to the cart
-						updatedUserCart = [
-							...user.cart,
-							{ product: product_id, quantity, color },
-						]
-					}
-
-					// Update the user document with the modified cart
-					const updatedUser = await User.findByIdAndUpdate(
-						_id,
-						{ cart: updatedUserCart },
-						{ new: true }
-					)
-
-					// Modify the structure of cart before sending the response
-					updatedUserCart = updatedUser?.cart.map((cartItem: any) => ({
+				// Modify the structure of cart before sending the response
+				const updatedUserCartResponse = updatedUser?.cart.map(
+					(cartItem: any) => ({
 						product: cartItem.product,
 						quantity: cartItem.quantity,
 						color: cartItem.color,
 						_id: cartItem._id,
-					}))
-
-					res.status(200).json({
-						success: true,
-						message: "User cart updated",
-						cart: updatedUserCart,
 					})
-				}
+				)
+
+				res.status(200).json({
+					success: true,
+					message: "User cart updated",
+					cart: updatedUserCartResponse,
+				})
 			} catch (error) {
 				console.error("Error updating user cart:", error)
 				res.status(500).json({

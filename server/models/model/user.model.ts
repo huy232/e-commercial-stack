@@ -3,7 +3,7 @@ import crypto from "crypto"
 import * as bcrypt from "bcrypt"
 
 interface ICartItem {
-	product: mongoose.Schema.Types.ObjectId | string
+	product: mongoose.Document | string
 	quantity: number
 	color: string
 }
@@ -124,4 +124,4 @@ userSchema.methods = {
 
 const UserModel = mongoose.model<IUser>("User", userSchema)
 
-export { UserModel as User, IUser }
+export { UserModel as User, IUser, ICartItem }
