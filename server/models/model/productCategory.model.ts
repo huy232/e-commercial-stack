@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 
 interface IProductCategory extends Document {
 	title: string
+	brand: []
 	createdAt: Date
 	updatedAt: Date
 }
@@ -13,6 +14,10 @@ var productCategorySchema = new mongoose.Schema<IProductCategory>(
 			required: true,
 			unique: true,
 			index: true,
+		},
+		brand: {
+			type: [],
+			required: true,
 		},
 	},
 	{ timestamps: true }

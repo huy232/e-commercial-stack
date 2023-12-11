@@ -5,6 +5,7 @@ import {
 	blogRouter,
 	brandRouter,
 	couponRouter,
+	insertDataRoute,
 	orderRouter,
 	productCategoryRouter,
 	productRouter,
@@ -19,6 +20,7 @@ const initRoutes = (app: Express): void => {
 	app.use("/api/brand", brandRouter)
 	app.use("/api/coupon", couponRouter)
 	app.use("/api/order", orderRouter)
+	app.use("/api/insert-data", insertDataRoute)
 
 	app.use(notFound)
 	app.use(errorHandler)

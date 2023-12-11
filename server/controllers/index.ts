@@ -6,3 +6,4 @@ export { default as ProductCategoryController } from "./controller/productCatego
 export { default as UserController } from "./controller/user.controller"
 export { default as CouponController } from "./controller/coupon.controller"
 export { default as OrderController } from "./controller/order.controller"
+export { default as InsertDataController } from "./controller/insertData.controller"

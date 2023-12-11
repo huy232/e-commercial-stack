@@ -12,11 +12,11 @@ interface IProduct extends Document {
 	description?: string
 	brand: string
 	price: number
-	category: mongoose.Types.ObjectId | Types.ObjectId | string
+	category: String[]
 	quantity: number
 	sold: number
 	images: []
-	color: "Black" | "Red" | "White"
+	color: String[]
 	ratings: IRating[]
 	totalRatings: number
 }
@@ -50,8 +50,8 @@ var productSchema = new mongoose.Schema<IProduct>(
 			trim: true,
 		},
 		category: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Category",
+			type: [],
+			required: true,
 		},
 		quantity: {
 			type: Number,
@@ -65,8 +65,8 @@ var productSchema = new mongoose.Schema<IProduct>(
 			type: [],
 		},
 		color: {
-			type: String,
-			enum: ["Black", "Red", "White"],
+			type: [],
+			required: true,
 		},
 		ratings: [
 			{
