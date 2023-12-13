@@ -9,7 +9,7 @@ import Link from "next/link"
 
 export const Header = () => {
 	return (
-		<div className="border w-main h-[110px] py-[35px] flex justify-between">
+		<div className="w-main h-[110px] py-[35px] flex justify-between">
 			<Link
 				href={path.HOME}
 				className="uppercase font-black group border-2 border-transparent hover:border-black border-solid rounded"

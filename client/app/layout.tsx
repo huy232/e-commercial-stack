@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
-import { Header, Navbar } from "@/components"
+import { Header, Navbar } from "@/app/components"
 import clsx from "clsx"
+import ReduxProvider from "./context/reduxProvider"
 
 const poppins = Poppins({
 	subsets: ["latin"],
@@ -27,12 +28,14 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<html lang="en">
-			<body className={bodyClassName}>
-				<Header />
-				<Navbar />
-				<div className="w-main">{children}</div>
-			</body>
-		</html>
+		<ReduxProvider>
+			<html lang="en">
+				<body className={bodyClassName}>
+					<Header />
+					<Navbar />
+					<div className="w-main">{children}</div>
+				</body>
+			</html>
+		</ReduxProvider>
 	)
 }
