@@ -16,12 +16,12 @@ export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 		setIsLoaded(true)
 	}
 
-	const imageClass = clsx("", className)
+	const imageClass = clsx(className)
 
 	return (
-		<div className="w-full relative">
+		<div className="w-full">
 			<div
-				className={clsx("absolute inset-0 transition-opacity", {
+				className={clsx("inset-0 transition-opacity", {
 					"opacity-0": !isLoaded,
 					"opacity-100": isLoaded,
 				})}

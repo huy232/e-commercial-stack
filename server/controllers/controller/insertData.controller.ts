@@ -52,6 +52,7 @@ const insertCategoryFn = async (categoryBrand: CategoryBrandData) => {
 	await ProductCategory.create({
 		title: categoryBrand.cate,
 		brand: categoryBrand.brand,
+		slug: slugify(categoryBrand.cate, { trim: true, lower: true }),
 	})
 }
 
@@ -92,6 +93,17 @@ class InsertDataController {
 			await Promise.all(promises)
 
 			res.json("Done category data")
+		}
+	)
+
+	deleteAllCategories = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			const response = await ProductCategory.deleteMany()
+
+			res.status(200).json({
+				message: "Done",
+				deleted: response ? response : {},
+			})
 		}
 	)
 }

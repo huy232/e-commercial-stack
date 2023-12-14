@@ -18,7 +18,9 @@ class ProductCategoryController {
 
 	getCategories = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const response = await ProductCategory.find().select("title _id")
+			const response = await ProductCategory.find().select(
+				"title _id slug brand"
+			)
 			res.json({
 				success: response ? true : false,
 				message: response

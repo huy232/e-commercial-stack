@@ -14,7 +14,8 @@ dbConnect()
 		app.use(
 			cors({
 				credentials: true,
-				origin: ["http://localhost:5000"],
+				origin: [process.env.CLIENT_URL as string],
+				methods: ["POST", "PUT", "GET", "DELETE"],
 			})
 		)
 		app.use(cookieParser())

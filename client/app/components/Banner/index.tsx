@@ -1,6 +1,7 @@
 import BannerImage from "@/assets/images/banner.png"
 import { CustomImage } from "@/app/components"
-export const Banner = () => {
+import { FC } from "react"
+export const Banner: FC = () => {
 	return (
 		<div className="w-full">
 			<CustomImage

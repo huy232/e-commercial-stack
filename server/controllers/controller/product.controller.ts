@@ -72,7 +72,7 @@ class ProductController {
 				}
 
 				const page = parseInteger(req.query.page, 1)
-				const limit = parseInteger(req.query.limit, 2)
+				const limit = parseInteger(req.query.limit, 10)
 				const skip = (page - 1) * limit
 				query.skip(skip).limit(limit)
 

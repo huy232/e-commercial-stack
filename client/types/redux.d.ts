@@ -1,17 +1,7 @@
 import { ThunkAction } from "@reduxjs/toolkit"
 import { RootState } from "./reduxTypes"
 
-export interface RootState {
-	app: {
-		categories: CategoryType[] // Adjust the type based on your actual structure
-		// Add other properties as needed
-	}
-	// Add other slices as needed
-}
-
-export type AppThunk<ReturnType = void> = ThunkAction<
-	ReturnType,
-	RootState,
-	unknown,
-	unknown
->
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch

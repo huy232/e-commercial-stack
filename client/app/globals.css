@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+button.slick-next {
+	right: 80px;
+}
+
+button.slick-prev {
+	left: 20px;
+}
+
+button.slick-next::before,
+button.slick-prev::before {
+	color: gray;
+	background-color: #ffd3d3;
+	width: 80px;
+	height: 80px;
+	font-size: 30px;
+	display: inline-block;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+button.slick-next::before {
+	content: "\203A";
+}
+
+button.slick-prev::before {
+	content: "\2039";
+}
