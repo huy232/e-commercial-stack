@@ -4,10 +4,12 @@
 
 button.slick-next {
 	right: 80px;
+	z-index: 10;
 }
 
 button.slick-prev {
 	left: 20px;
+	z-index: 10;
 }
 
 button.slick-next::before,

@@ -3,11 +3,11 @@ import { CustomImage } from "@/app/components"
 import { FC } from "react"
 export const Banner: FC = () => {
 	return (
-		<div className="w-full">
+		<div className="w-full h-[400px] relative">
 			<CustomImage
 				src={BannerImage}
 				alt="Banner image"
-				className="h-[400px] w-full object-contain"
+				className="w-full h-full"
 			/>
 		</div>
 	)

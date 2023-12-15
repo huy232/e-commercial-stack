@@ -1,14 +1,11 @@
 "use client"
 import { getProducts } from "@/app/api"
 import clsx from "clsx"
-import { FC, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import Slider from "react-slick"
 import { Product } from ".."
 import { ProductType } from "@/types/product"
-const tabs = [
-	{ id: 1, name: "Best sellers" },
-	{ id: 2, name: "New arrivals" },
-]
+
 const slickSettings = {
 	dots: false,
 	infinite: true,
@@ -17,20 +14,32 @@ const slickSettings = {
 	slidestoScroll: 1,
 }
 
+interface ProductsState {
+	[key: number]: ProductType[]
+}
+
 export const Seller: FC = () => {
-	const [bestSeller, setBestSeller] = useState([])
-	const [newProducts, setNewProducts] = useState([])
+	const tabs = useMemo(
+		() => [
+			{ id: 1, name: "Best sellers", sort: "-sold", markLabel: "Trending" },
+			{ id: 2, name: "New arrivals", sort: "-createdAt", markLabel: "New" },
+		],
+		[]
+	)
+
 	const [activeTab, setActiveTab] = useState(1)
+	const [products, setProducts] = useState<ProductsState>({
+		[1]: [],
+		[2]: [],
+	})
 
-	const fetchProducts = async () => {
+	const fetchProducts = async (tabId: number, sort: string) => {
 		try {
-			const [bestSellerResponse, newProductsResponse] = await Promise.all([
-				getProducts({ sort: "-sold" }),
-				getProducts({ sort: "-createdAt" }),
-			])
-
-			setBestSeller(bestSellerResponse.data)
-			setNewProducts(newProductsResponse.data)
+			const response = await getProducts({ sort })
+			setProducts((prevProducts) => ({
+				...prevProducts,
+				[tabId]: response.data.products,
+			}))
 		} catch (error) {
 			console.error("Error fetching products:", error)
 		}
@@ -42,21 +51,22 @@ export const Seller: FC = () => {
 			{ "text-main": activeTab === tabId },
 			{ "text-black opacity-20 hover:opacity-80": activeTab !== tabId }
 		)
-	const handleActiveTab = (tabId: number) => {
-		setActiveTab(tabId)
-	}
 
-	useEffect(() => {
-		fetchProducts()
+	const handleActiveTab = useCallback((tabId: number, sort: string) => {
+		setActiveTab(tabId)
+		fetchProducts(tabId, sort)
 	}, [])
 
-	console.log(bestSeller)
+	useEffect(() => {
+		fetchProducts(tabs[0].id, tabs[0].sort)
+	}, [tabs])
+
 	return (
 		<div className="w-full">
 			<div className="flex text-xl gap-8 border-b-2 border-main">
 				{tabs.map((tab) => (
 					<span
-						onClick={() => handleActiveTab(tab.id)}
+						onClick={() => handleActiveTab(tab.id, tab.sort)}
 						className={headingTab(tab.id)}
 						key={tab.id}
 					>
@@ -66,10 +76,13 @@ export const Seller: FC = () => {
 			</div>
 			<div className="mt-4">
 				<Slider {...slickSettings}>
-					{bestSeller.length > 0 &&
-						bestSeller.map((item: ProductType) => (
-							<Product key={item._id} product={item} />
-						))}
+					{products[activeTab].map((item: ProductType) => (
+						<Product
+							key={item._id}
+							product={item}
+							markLabel={tabs[activeTab - 1].markLabel}
+						/>
+					))}
 				</Slider>
 			</div>
 		</div>

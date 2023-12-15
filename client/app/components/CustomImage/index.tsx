@@ -1,5 +1,6 @@
 "use client"
-import React, { FC, useState } from "react"
+
+import { FC, useState } from "react"
 import Image, { StaticImageData } from "next/image"
 import clsx from "clsx"
 
@@ -19,21 +20,20 @@ export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 	const imageClass = clsx(className)
 
 	return (
-		<div className="w-full">
-			<div
-				className={clsx("inset-0 transition-opacity", {
-					"opacity-0": !isLoaded,
-					"opacity-100": isLoaded,
-				})}
-			>
-				<Image
-					src={src}
-					alt={alt}
-					className={imageClass}
-					loading="lazy"
-					onLoad={handleImageLoad}
-				/>
-			</div>
+		<div
+			className={clsx("inset-0 transition-opacity duration-200 ease-in-out", {
+				"opacity-0": !isLoaded,
+				"opacity-100": isLoaded,
+			})}
+		>
+			<Image
+				src={src}
+				alt={alt}
+				className={imageClass}
+				loading="lazy"
+				onLoad={handleImageLoad}
+				layout="fill"
+			/>
 		</div>
 	)
 }

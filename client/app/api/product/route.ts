@@ -10,7 +10,7 @@ const api = axios.create({
 
 export const getProducts = (params: GetProductsParams) =>
 	api({
-		url: "/product/get-all-product/",
+		url: "/product/get-all-product",
 		method: "get",
 		params,
 	})

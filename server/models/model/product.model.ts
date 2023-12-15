@@ -19,6 +19,7 @@ interface IProduct extends Document {
 	color: String[]
 	ratings: IRating[]
 	totalRatings: number
+	thumbnail: string
 }
 
 var productSchema = new mongoose.Schema<IProduct>(
@@ -44,6 +45,7 @@ var productSchema = new mongoose.Schema<IProduct>(
 			required: true,
 			trim: true,
 		},
+		thumbnail: String,
 		price: {
 			type: Number,
 			required: true,

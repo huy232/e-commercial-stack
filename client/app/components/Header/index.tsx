@@ -4,7 +4,7 @@ import {
 	MdEmail,
 	RiPhoneFill,
 } from "@/assets/icons"
-import { path } from "@/utils/path"
+import { path } from "@/utils/"
 import Link from "next/link"
 import { FC } from "react"
 

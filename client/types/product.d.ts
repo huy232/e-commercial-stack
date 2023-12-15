@@ -14,4 +14,5 @@ export type ProductType = {
 	totalRatings: number
 	updatedAt: Date
 	_id: string
+	thumbnail: string
 }
