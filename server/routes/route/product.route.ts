@@ -33,4 +33,6 @@ router.put(
 	ProductController.uploadImagesProduct
 )
 
+router.get("/daily-product", ProductController.getRandomProductWithFiveStars)
+
 export { router as productRouter }

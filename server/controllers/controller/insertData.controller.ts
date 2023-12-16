@@ -46,6 +46,7 @@ const insertProductFn = async (product: ProductData) => {
 		images: product.images,
 		color: colorVariant,
 		thumbnail: product.thumb,
+		totalRatings: Math.floor(Math.random() * 5) + 1,
 	})
 }
 

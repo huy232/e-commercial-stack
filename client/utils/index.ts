@@ -1,4 +1,5 @@
 export * from "./formatPrice"
 export * from "./navigation"
 export * from "./path"
-export * from "./renderStartFromNumber"
+export * from "./renderStarFromNumber"
+export * from "./formatTime"

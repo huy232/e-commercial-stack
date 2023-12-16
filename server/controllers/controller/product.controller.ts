@@ -1,11 +1,19 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { Product } from "../../models"
 import asyncHandler from "express-async-handler"
 import slugify from "slugify"
 import { parseInteger } from "../../utils/parseInteger"
 import { AuthenticatedRequest } from "../../types/user"
+import moment from "moment"
+import { DailyDeal } from "../../models/model/dailyDeal.model"
+import { ProductType } from "../../../client/types/product"
 
 class ProductController {
+	static cachedDailyDeal: {
+		product: ProductType
+		expirationTime: string
+	} | null = null
+
 	createProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			if (Object.keys(req.body).length === 0) {
@@ -222,6 +230,79 @@ class ProductController {
 			}
 		}
 	)
+
+	getRandomProductWithFiveStars = async (
+		req: Request,
+		res: Response
+	): Promise<void> => {
+		try {
+			let cachedDeal = ProductController.cachedDailyDeal
+
+			// Check if the cached deal exists and is not expired
+			if (cachedDeal && moment().isBefore(moment(cachedDeal.expirationTime))) {
+				res.json({
+					success: true,
+					message: "Fetch daily deal from cache",
+					dailyDeal: cachedDeal,
+				})
+				return
+			}
+
+			// Fetch a new random product
+			const randomProduct = await Product.aggregate([
+				{ $match: { totalRatings: { $gte: 5 } } },
+				{ $sample: { size: 1 } },
+			])
+
+			// Update the MongoDB and cache with the new deal
+			if (randomProduct && randomProduct.length > 0) {
+				const expirationTime = moment().endOf("day").toISOString()
+				await ProductController.updateCachedDailyDeal(
+					randomProduct[0],
+					expirationTime
+				)
+
+				res.json({
+					success: true,
+					message: "Fetch daily deal",
+					dailyDeal: randomProduct[0],
+					expirationTime,
+				})
+			} else {
+				res.json({
+					success: false,
+					message: "Failed to fetch daily deal",
+					dailyDeal: {},
+					expirationTime: moment().endOf("day").toISOString(),
+				})
+			}
+		} catch (error) {
+			console.error("Error fetching random product with five stars:", error)
+			res
+				.status(500)
+				.json({ success: false, message: "An unexpected error occurred." })
+		}
+	}
+
+	static updateCachedDailyDeal = async (
+		product: any,
+		expirationTime: string
+	): Promise<void> => {
+		try {
+			const existingDailyDeal = await DailyDeal.findOne({})
+			if (existingDailyDeal) {
+				existingDailyDeal.product = product
+				existingDailyDeal.expirationTime = expirationTime
+				await existingDailyDeal.save()
+			} else {
+				await DailyDeal.create({ product, expirationTime })
+			}
+
+			ProductController.cachedDailyDeal = { product, expirationTime }
+		} catch (error) {
+			console.error("Error updating daily deal in MongoDB:", error)
+		}
+	}
 }
 
 export default new ProductController()

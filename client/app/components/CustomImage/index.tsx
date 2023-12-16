@@ -17,23 +17,24 @@ export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 		setIsLoaded(true)
 	}
 
-	const imageClass = clsx(className)
+	clsx()
+	const imageClass = clsx(
+		className,
+		"transition-opacity duration-200 ease-in-out",
+		{
+			"opacity-0": !isLoaded,
+			"opacity-100": isLoaded,
+		}
+	)
 
 	return (
-		<div
-			className={clsx("inset-0 transition-opacity duration-200 ease-in-out", {
-				"opacity-0": !isLoaded,
-				"opacity-100": isLoaded,
-			})}
-		>
-			<Image
-				src={src}
-				alt={alt}
-				className={imageClass}
-				loading="lazy"
-				onLoad={handleImageLoad}
-				layout="fill"
-			/>
-		</div>
+		<Image
+			src={src}
+			alt={alt}
+			className={imageClass}
+			loading="lazy"
+			onLoad={handleImageLoad}
+			fill={true}
+		/>
 	)
 }

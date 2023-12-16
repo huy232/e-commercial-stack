@@ -16,3 +16,7 @@ export type ProductType = {
 	_id: string
 	thumbnail: string
 }
+
+export interface DailyDealType extends ProductType {
+	expirationTime: string
+}

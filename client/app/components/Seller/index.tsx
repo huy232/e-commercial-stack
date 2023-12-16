@@ -1,10 +1,13 @@
 "use client"
+
 import { getProducts } from "@/app/api"
 import clsx from "clsx"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import Slider from "react-slick"
-import { Product } from ".."
+import { CustomImage, Product } from "@/app/components"
 import { ProductType } from "@/types/product"
+import BannerLeft from "@/assets/images/banner-1.png"
+import BannerRight from "@/assets/images/banner-2.png"
 
 const slickSettings = {
 	dots: false,
@@ -33,7 +36,7 @@ export const Seller: FC = () => {
 		[2]: [],
 	})
 
-	const fetchProducts = async (tabId: number, sort: string) => {
+	const fetchProducts = useCallback(async (tabId: number, sort: string) => {
 		try {
 			const response = await getProducts({ sort })
 			setProducts((prevProducts) => ({
@@ -43,7 +46,7 @@ export const Seller: FC = () => {
 		} catch (error) {
 			console.error("Error fetching products:", error)
 		}
-	}
+	}, [])
 
 	const headingTab = (tabId: number) =>
 		clsx(
@@ -52,14 +55,17 @@ export const Seller: FC = () => {
 			{ "text-black opacity-20 hover:opacity-80": activeTab !== tabId }
 		)
 
-	const handleActiveTab = useCallback((tabId: number, sort: string) => {
-		setActiveTab(tabId)
-		fetchProducts(tabId, sort)
-	}, [])
+	const handleActiveTab = useCallback(
+		(tabId: number, sort: string) => {
+			setActiveTab(tabId)
+			fetchProducts(tabId, sort)
+		},
+		[fetchProducts]
+	)
 
 	useEffect(() => {
 		fetchProducts(tabs[0].id, tabs[0].sort)
-	}, [tabs])
+	}, [fetchProducts, tabs])
 
 	return (
 		<div className="w-full">
@@ -76,14 +82,23 @@ export const Seller: FC = () => {
 			</div>
 			<div className="mt-4">
 				<Slider {...slickSettings}>
-					{products[activeTab].map((item: ProductType) => (
-						<Product
-							key={item._id}
-							product={item}
-							markLabel={tabs[activeTab - 1].markLabel}
-						/>
-					))}
+					{products[activeTab].length > 0 &&
+						products[activeTab].map((item: ProductType) => (
+							<Product
+								key={item._id}
+								product={item}
+								markLabel={tabs[activeTab - 1].markLabel}
+							/>
+						))}
 				</Slider>
+			</div>
+			<div className="h-[140px] w-full flex gap-4 mt-8">
+				<div className="w-1/2 relative">
+					<CustomImage src={BannerLeft} alt="Banner left" />
+				</div>
+				<div className="w-1/2 relative">
+					<CustomImage src={BannerRight} alt="Banner right" />
+				</div>
 			</div>
 		</div>
 	)
