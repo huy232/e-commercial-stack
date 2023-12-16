@@ -1,6 +1,6 @@
 "use client"
 
-import { getDailyDeal, getProducts } from "@/app/api"
+import { getDailyDeal } from "@/app/api"
 import { AiFillStar } from "@/assets/icons"
 import { useCallback, useEffect, useState } from "react"
 import { CustomImage, SaleCountdown } from "@/app/components"
@@ -86,10 +86,13 @@ export const DailySale = () => {
 								{renderStarFromNumber(dailyDeal.product.totalRatings, 20)}
 							</span>
 							<span>{formatPrice(dailyDeal.product.price)} VND</span>
-							<SaleCountdown expirationTime={dailyDeal.expirationTime} />
+							<SaleCountdown
+								expirationTime={dailyDeal.expirationTime}
+								onExpiration={fetchDealDaily}
+							/>
 							<div className="flex items-center w-full mt-4">
 								<Link
-									className="flex items-center justify-center gap-2 border-2 border-transparent bg-main p-2 mx-8 rounded w-full hover:opacity-80 hover:bg-white hover:border-main duration-200 ease-in-out"
+									className="flex items-center justify-center gap-2 border-2 border-transparent bg-main p-2 mx-2 rounded w-full hover:opacity-80 hover:bg-white hover:border-main duration-200 ease-in-out"
 									href={`/product/${dailyDeal.product.slug}`}
 								>
 									<span>Detail</span>

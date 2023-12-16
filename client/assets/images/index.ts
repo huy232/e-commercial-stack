@@ -1,0 +1,8 @@
+export { default as BannerLeft } from "./banner-1.png"
+export { default as BannerRight } from "./banner-2.png"
+export { default as HomeBanner } from "./banner.png"
+export { default as BottomBanner1 } from "./bottom-banner/bottom-banner-1.png"
+export { default as BottomBanner2 } from "./bottom-banner/bottom-banner-2.png"
+export { default as BottomBanner3 } from "./bottom-banner/bottom-banner-3.png"
+export { default as BottomBanner4 } from "./bottom-banner/bottom-banner-4.png"
+export { default as NoProductImage } from "./no-product-image.png"

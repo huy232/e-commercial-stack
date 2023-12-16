@@ -1,12 +1,12 @@
 "use client"
 
 import { ProductType } from "@/types/product"
-import { FC, useState } from "react"
+import { FC } from "react"
 import { CustomImage, ProductOptions } from "@/app/components/"
-import NoProductImage from "@/assets/images/no-product-image.png"
 import { formatPrice, renderStarFromNumber } from "@/utils/"
 import { AiFillEye, AiOutlineMenu, BsFillSuitHeartFill } from "@/assets/icons"
 import clsx from "clsx"
+import { NoProductImage } from "@/assets/images"
 
 interface ProductProps {
 	product: ProductType

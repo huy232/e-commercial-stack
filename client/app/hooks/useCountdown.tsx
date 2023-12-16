@@ -1,9 +1,17 @@
 "use client"
 
-import moment from "moment"
 import { useEffect, useState } from "react"
+import moment from "moment"
 
-export const useCountdown = (expirationTime: string) => {
+interface UseCountdownProps {
+	expirationTime: string
+	onExpiration: () => void
+}
+
+export const useCountdown = ({
+	expirationTime,
+	onExpiration,
+}: UseCountdownProps) => {
 	const [timeRemaining, setTimeRemaining] = useState(
 		moment.duration(moment(expirationTime).diff(moment()))
 	)
@@ -17,7 +25,9 @@ export const useCountdown = (expirationTime: string) => {
 			const newTimeRemaining = moment.duration(expiration.diff(now))
 
 			if (newTimeRemaining.asMilliseconds() <= 0) {
+				// If time has expired, trigger the provided callback
 				clearInterval(intervalId)
+				onExpiration()
 			}
 
 			setTimeRemaining(newTimeRemaining)
@@ -28,7 +38,7 @@ export const useCountdown = (expirationTime: string) => {
 		intervalId = setInterval(calculateTimeRemaining, 1000)
 
 		return () => clearInterval(intervalId)
-	}, [expirationTime])
+	}, [expirationTime, onExpiration])
 
 	return timeRemaining
 }

@@ -6,8 +6,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import Slider from "react-slick"
 import { CustomImage, Product } from "@/app/components"
 import { ProductType } from "@/types/product"
-import BannerLeft from "@/assets/images/banner-1.png"
-import BannerRight from "@/assets/images/banner-2.png"
+import { BannerLeft, BannerRight } from "@/assets/images"
 
 const slickSettings = {
 	dots: false,
