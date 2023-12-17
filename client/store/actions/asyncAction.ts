@@ -1,11 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { getCategories } from "@/app/api/home/route"
+import { getProductCategories } from "@/app/api"
 
 export const getCategoriesAction = createAsyncThunk(
 	"app/categories",
 	async (data, { rejectWithValue }) => {
 		try {
-			const response = await getCategories()
+			const response = await getProductCategories()
 
 			if (!response.success) {
 				return rejectWithValue(response.message)

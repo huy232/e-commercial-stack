@@ -17,12 +17,12 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
 					className="object-contain"
 				/>
 			</div>
-			<div className="flex-1 flex flex-col w-1/2">
-				<span className="line-clamp-1 text-sm">{product.title}</span>
+			<div className="flex-1 flex flex-col w-1/2 gap-2">
+				<span className="line-clamp-1 text-xs">{product.title}</span>
 				<span className="flex h-4">
 					{renderStarFromNumber(product.totalRatings, 14)}
 				</span>
-				<span>{formatPrice(product.price)} VND</span>
+				<span className="text-xs">{formatPrice(product.price)} VND</span>
 			</div>
 		</div>
 	)

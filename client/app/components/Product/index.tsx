@@ -10,7 +10,9 @@ import { NoProductImage } from "@/assets/images"
 
 interface ProductProps {
 	product: ProductType
-	markLabel: string
+	markLabel?: string
+	supportHover?: boolean
+	supportDetail?: boolean
 }
 
 const productHoverOptions = [
@@ -18,7 +20,12 @@ const productHoverOptions = [
 	{ id: 2, icon: <AiOutlineMenu /> },
 	{ id: 3, icon: <BsFillSuitHeartFill /> },
 ]
-export const Product: FC<ProductProps> = ({ product, markLabel }) => {
+export const Product: FC<ProductProps> = ({
+	product,
+	markLabel,
+	supportHover,
+	supportDetail,
+}) => {
 	const labelProduct = clsx(
 		"absolute top-0 left-0 text-xs font-medium me-2 px-2.5 py-0.5 rounded border",
 		{ "bg-red-100 text-red-800 border-red-400": markLabel === "Trending" },
@@ -37,16 +44,18 @@ export const Product: FC<ProductProps> = ({ product, markLabel }) => {
 					alt={product.title}
 					className="object-contain"
 				/>
-				<div className={labelProduct}>{markLabel}</div>
-				<div
-					className="
+				{markLabel && <div className={labelProduct}>{markLabel}</div>}
+				{supportHover && (
+					<div
+						className="
 				hidden bottom-[-10px] left-0 right-0 justify-center gap-2 
 				group-hover:animate-slide-up 
 				group-hover:flex 
 				group-hover:absolute"
-				>
-					{listProductOptions}
-				</div>
+					>
+						{listProductOptions}
+					</div>
+				)}
 			</div>
 			<div className="flex flex-col gap-1 mt-4 items-star w-full">
 				<span className="line-clamp-2 h-[60px]">{product.title}</span>

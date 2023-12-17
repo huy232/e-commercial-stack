@@ -5,8 +5,10 @@ import {
 	Banner,
 	DailySale,
 	FeatureProducts,
+	NewArrivals,
 	Seller,
 	Sidebar,
+	HotCollections,
 } from "@/app/components"
 import { AppDispatch } from "@/types/redux"
 import { getCategoriesAction } from "@/store/actions/asyncAction"
@@ -30,9 +32,14 @@ export default function Home() {
 					<Seller />
 				</div>
 			</div>
-
 			<div className="my-8">
 				<FeatureProducts />
+			</div>
+			<div className="my-8">
+				<NewArrivals />
+			</div>
+			<div className="my-8">
+				<HotCollections />
 			</div>
 		</main>
 	)

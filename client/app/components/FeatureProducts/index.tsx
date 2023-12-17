@@ -32,7 +32,7 @@ export const FeatureProducts: FC = () => {
 			<h3 className="uppercase text-lg font-semibold py-[15px] border-b-2 border-main">
 				Feature products
 			</h3>
-			<div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-6">
+			<div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-14">
 				{products ? (
 					products.map((product) => (
 						<ProductCard key={product._id} product={product} />
@@ -41,27 +41,35 @@ export const FeatureProducts: FC = () => {
 					<div>Loading...</div>
 				)}
 			</div>
-			<div className="flex justify-between h-[600px] mt-12">
-				<div className="w-[50%] relative">
+			<div className="flex justify-between h-[675px] mt-12 gap-4">
+				<div className="w-[50%] h-full relative">
 					<CustomImage
 						src={BottomBanner1}
 						alt="Bottom banner 1"
-						className="object-contain"
+						className="object-fit h-full w-full"
 					/>
 				</div>
 				<div className="flex flex-col justify-between w-[25%] gap-4">
 					<div className="h-1/2 relative">
-						<CustomImage src={BottomBanner2} alt="Bottom banner 2" />
+						<CustomImage
+							src={BottomBanner2}
+							alt="Bottom banner 2"
+							className="object-fit h-full w-full"
+						/>
 					</div>
 					<div className="h-1/2 relative">
-						<CustomImage src={BottomBanner3} alt="Bottom banner 3" />
+						<CustomImage
+							src={BottomBanner3}
+							alt="Bottom banner 3"
+							className="object-fit h-full w-full"
+						/>
 					</div>
 				</div>
-				<div className="w-[25%] relative">
+				<div className="w-[25%] h-full relative">
 					<CustomImage
 						src={BottomBanner4}
 						alt="Bottom banner 4"
-						className="object-contain"
+						className="object-cover h-full w-full"
 					/>
 				</div>
 			</div>
