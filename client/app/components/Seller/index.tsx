@@ -41,11 +41,11 @@ export const Seller: FC = () => {
 				initialActiveTab={1}
 				supportHover={true}
 			/>
-			<div className="h-[140px] w-full flex gap-4 mt-8">
-				<div className="w-1/2 relative">
+			<div className="w-full flex gap-4 mt-8">
+				<div className="w-1/2">
 					<CustomImage src={BannerLeft} alt="Banner left" />
 				</div>
-				<div className="w-1/2 relative">
+				<div className="w-1/2">
 					<CustomImage src={BannerRight} alt="Banner right" />
 				</div>
 			</div>

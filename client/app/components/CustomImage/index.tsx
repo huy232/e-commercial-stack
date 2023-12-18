@@ -19,7 +19,7 @@ export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 
 	clsx()
 	const imageClass = clsx(
-		"transition-opacity duration-200 ease-in-out",
+		"transition-opacity duration-200 ease-in-out static",
 		{
 			"opacity-0": !isLoaded,
 			"opacity-100": isLoaded,
@@ -35,6 +35,7 @@ export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 			loading="lazy"
 			onLoad={handleImageLoad}
 			fill
+			objectFit="contain"
 		/>
 	)
 }

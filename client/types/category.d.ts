@@ -3,4 +3,5 @@ export type CategoryType = {
 	title: string
 	brand: string[]
 	slug: string
+	image: string
 }

@@ -71,11 +71,10 @@ export const DailySale = () => {
 				{dailyDeal.loading && <p>Loading...</p>}
 				{dailyDeal.product && (
 					<>
-						<div className="w-full h-[250px] relative ">
+						<div className="w-full">
 							<CustomImage
 								src={dailyDeal.product.thumbnail || NoProductImage}
 								alt="Daily deal"
-								className="object-contain"
 							/>
 						</div>
 						<div className="flex flex-col justify-center items-center w-full">

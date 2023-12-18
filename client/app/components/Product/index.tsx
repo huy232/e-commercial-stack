@@ -38,11 +38,10 @@ export const Product: FC<ProductProps> = ({
 
 	return (
 		<div className="w-full text-base px-1">
-			<div className="w-[274px] h-[274px] border p-4 flex flex-col items-center relative group">
+			<div className="border p-4 flex flex-col items-center relative group">
 				<CustomImage
 					src={product.thumbnail || NoProductImage}
 					alt={product.title}
-					className="object-contain"
 				/>
 				{markLabel && <div className={labelProduct}>{markLabel}</div>}
 				{supportHover && (

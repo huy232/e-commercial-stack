@@ -10,7 +10,7 @@ interface ProductCardProps {
 export const ProductCard: FC<ProductCardProps> = ({ product }) => {
 	return (
 		<div className="flex flex-row border">
-			<div className="flex-1 relative w-1/2">
+			<div className="flex-1 w-1/2">
 				<CustomImage
 					src={product.thumbnail}
 					alt={product.title}
