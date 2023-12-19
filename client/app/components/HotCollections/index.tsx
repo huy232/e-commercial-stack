@@ -24,7 +24,7 @@ export const HotCollections: FC = () => {
 
 	return (
 		<>
-			<h3 className="uppercase font-bold border-b-2 border-main py-2 mb-8">
+			<h3 className="uppercase text-lg font-semibold border-b-2 border-main py-2 mb-8">
 				Hot collections
 			</h3>
 			<div className="w-full flex-wrap gap-12 grid grid-cols-2 md:grid-cols-3">

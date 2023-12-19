@@ -55,6 +55,7 @@ const insertCategoryFn = async (categoryBrand: CategoryBrandData) => {
 		title: categoryBrand.cate,
 		brand: categoryBrand.brand,
 		slug: slugify(categoryBrand.cate, { trim: true, lower: true }),
+		image: categoryBrand.image,
 	})
 }
 

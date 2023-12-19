@@ -1,14 +1,20 @@
 "use client"
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { CategoryType } from "@/types/category"
 import Link from "next/link"
-import { useSelector } from "react-redux"
-import { RootState } from "@/types/redux"
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, RootState } from "@/types/redux"
+import { getCategoriesAction } from "@/store/actions/asyncAction"
 
 export const Sidebar: FC = () => {
+	const dispatch = useDispatch<AppDispatch>()
 	const { categories, isLoading, errorMessage } = useSelector(
 		(state: RootState) => state.app
 	)
+
+	useEffect(() => {
+		dispatch(getCategoriesAction())
+	}, [dispatch])
 
 	if (isLoading) {
 		return <div>Loading...</div>

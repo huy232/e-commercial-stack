@@ -4,6 +4,7 @@ interface IProductCategory extends Document {
 	title: string
 	brand: []
 	slug: string
+	image: string
 	createdAt: Date
 	updatedAt: Date
 }
@@ -23,6 +24,9 @@ var productCategorySchema = new mongoose.Schema<IProductCategory>(
 		slug: {
 			type: String,
 			required: true,
+		},
+		image: {
+			type: String,
 		},
 	},
 	{ timestamps: true }

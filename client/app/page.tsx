@@ -1,4 +1,3 @@
-"use client"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 import {
@@ -9,17 +8,10 @@ import {
 	Seller,
 	Sidebar,
 	HotCollections,
+	Blog,
 } from "@/app/components"
-import { AppDispatch } from "@/types/redux"
-import { getCategoriesAction } from "@/store/actions/asyncAction"
-import { useEffect } from "react"
-import { useDispatch } from "react-redux"
 
 export default function Home() {
-	const dispatch = useDispatch<AppDispatch>()
-	useEffect(() => {
-		dispatch(getCategoriesAction())
-	}, [dispatch])
 	return (
 		<main className="w-main">
 			<div className="flex">
@@ -40,6 +32,9 @@ export default function Home() {
 			</div>
 			<div className="my-8">
 				<HotCollections />
+			</div>
+			<div className="my-8">
+				<Blog />
 			</div>
 		</main>
 	)

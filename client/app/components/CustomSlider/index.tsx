@@ -75,7 +75,9 @@ export const CustomSlider: FC<CustomSliderProps> = ({
 		<div className="w-full">
 			<div className={headingClass}>
 				{headingTitle && (
-					<h3 className="mr-auto capitalize font-bold">{headingTitle}</h3>
+					<h3 className="mr-auto uppercase text-lg font-semibold">
+						{headingTitle}
+					</h3>
 				)}
 				{tabs.length > 0 &&
 					tabs.map((tab) => (
