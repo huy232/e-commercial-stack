@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
-import { Header, Navbar } from "@/app/components"
+import { Footer, Header, Navbar, TopHeader } from "@/app/components"
 import clsx from "clsx"
 import ReduxProvider from "./context/reduxProvider"
 
@@ -31,9 +31,11 @@ export default function RootLayout({
 		<ReduxProvider>
 			<html lang="en">
 				<body className={bodyClassName}>
+					<TopHeader />
 					<Header />
 					<Navbar />
 					<div className="w-main">{children}</div>
+					<Footer />
 				</body>
 			</html>
 		</ReduxProvider>
