@@ -10,7 +10,7 @@ import {
 	BottomBanner4,
 } from "@/assets/images"
 
-export const FeatureProducts: FC = () => {
+const FeatureProducts: FC = () => {
 	const [products, setProducts] = useState<ProductType[] | null>(null)
 
 	const fetchProducts = useCallback(async () => {
@@ -60,3 +60,5 @@ export const FeatureProducts: FC = () => {
 		</div>
 	)
 }
+
+export default FeatureProducts

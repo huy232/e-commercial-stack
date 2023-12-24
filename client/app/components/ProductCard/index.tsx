@@ -7,7 +7,7 @@ interface ProductCardProps {
 	product: ProductType
 }
 
-export const ProductCard: FC<ProductCardProps> = ({ product }) => {
+const ProductCard: FC<ProductCardProps> = ({ product }) => {
 	return (
 		<div className="flex flex-row border">
 			<div className="flex-1 w-1/2">
@@ -27,3 +27,5 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
 		</div>
 	)
 }
+
+export default ProductCard

@@ -4,7 +4,7 @@ import { ProductType } from "@/types/product"
 import { CustomSlider } from "@/app/components"
 import { getProducts } from "@/app/api"
 
-export const NewArrivals: FC = () => {
+const NewArrivals: FC = () => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Smartphone", sort: "-sold" },
@@ -46,3 +46,5 @@ export const NewArrivals: FC = () => {
 		</div>
 	)
 }
+
+export default NewArrivals

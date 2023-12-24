@@ -3,10 +3,10 @@ import { FC, useMemo, useState, useCallback } from "react"
 import { CustomImage } from "@/app/components"
 import { ProductType } from "@/types/product"
 import { BannerLeft, BannerRight } from "@/assets/images"
-import { CustomSlider } from "../CustomSlider"
+import { CustomSlider } from "@/app/components"
 import { getProducts } from "@/app/api"
 
-export const Seller: FC = () => {
+const Seller: FC = () => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Best sellers", sort: "-sold", markLabel: "Trending" },
@@ -52,3 +52,5 @@ export const Seller: FC = () => {
 		</div>
 	)
 }
+
+export default Seller

@@ -20,7 +20,7 @@ const productHoverOptions = [
 	{ id: 2, icon: <AiOutlineMenu /> },
 	{ id: 3, icon: <BsFillSuitHeartFill /> },
 ]
-export const Product: FC<ProductProps> = ({
+const Product: FC<ProductProps> = ({
 	product,
 	markLabel,
 	supportHover,
@@ -66,3 +66,5 @@ export const Product: FC<ProductProps> = ({
 		</div>
 	)
 }
+
+export default Product

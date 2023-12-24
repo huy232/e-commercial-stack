@@ -1,4 +1,4 @@
-export const Blog = () => {
+const Blog = () => {
 	return (
 		<div className="w-full">
 			<h3 className="uppercase text-lg font-semibold py-[15px] border-b-2 border-main">
@@ -7,3 +7,4 @@ export const Blog = () => {
 		</div>
 	)
 }
+export default Blog

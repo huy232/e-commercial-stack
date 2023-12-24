@@ -18,7 +18,7 @@ interface CustomSliderProps {
 	supportDetail?: boolean
 }
 
-export const CustomSlider: FC<CustomSliderProps> = ({
+const CustomSlider: FC<CustomSliderProps> = ({
 	tabs,
 	products,
 	fetchProducts,
@@ -105,3 +105,5 @@ export const CustomSlider: FC<CustomSliderProps> = ({
 		</div>
 	)
 }
+
+export default CustomSlider

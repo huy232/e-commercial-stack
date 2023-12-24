@@ -10,7 +10,7 @@ interface CustomImageProps {
 	className?: string
 }
 
-export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
+const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 	const [isLoaded, setIsLoaded] = useState(false)
 
 	const handleImageLoad = () => {
@@ -38,3 +38,5 @@ export const CustomImage: FC<CustomImageProps> = ({ src, alt, className }) => {
 		/>
 	)
 }
+
+export default CustomImage

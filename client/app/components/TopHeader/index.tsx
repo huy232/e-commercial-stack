@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { path } from "@/utils"
 
-export const TopHeader = () => {
+const TopHeader = () => {
 	return (
 		<div className="h-[40px] w-full bg-main flex items-center justify-center">
 			<div className="w-main flex items-center justify-between text-xs text-white">
@@ -11,3 +11,5 @@ export const TopHeader = () => {
 		</div>
 	)
 }
+
+export default TopHeader

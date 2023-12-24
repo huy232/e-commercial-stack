@@ -11,7 +11,7 @@ import Link from "next/link"
 import { MdOutlineSubdirectoryArrowLeft } from "react-icons/md"
 import moment from "moment"
 
-export const DailySale = () => {
+const DailySale = () => {
 	const [dailyDeal, setDailyDeal] = useState({
 		loading: true,
 		product: null as DailyDealType | null,
@@ -105,3 +105,5 @@ export const DailySale = () => {
 		</div>
 	)
 }
+
+export default DailySale

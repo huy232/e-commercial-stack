@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/types/redux"
 import { getCategoriesAction } from "@/store/actions/asyncAction"
 
-export const Sidebar: FC = () => {
+const Sidebar: FC = () => {
 	const dispatch = useDispatch<AppDispatch>()
 	const { categories, isLoading, errorMessage } = useSelector(
 		(state: RootState) => state.app
@@ -42,3 +42,5 @@ export const Sidebar: FC = () => {
 
 	return <div>No categories available</div>
 }
+
+export default Sidebar

@@ -8,7 +8,7 @@ interface SaleCountdownProps {
 	onExpiration: () => void
 }
 
-export const SaleCountdown: FC<SaleCountdownProps> = ({
+const SaleCountdown: FC<SaleCountdownProps> = ({
 	expirationTime,
 	onExpiration,
 }) => {
@@ -34,3 +34,5 @@ export const SaleCountdown: FC<SaleCountdownProps> = ({
 
 	return <div className="flex flex-row gap-2 text-sm mt-4">{time}</div>
 }
+
+export default SaleCountdown

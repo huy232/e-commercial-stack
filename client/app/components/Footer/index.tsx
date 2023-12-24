@@ -1,9 +1,15 @@
-import MailNotify from "../MailNotify"
+import { FooterContent, MailNotify } from "@/app/components"
+import { memo } from "react"
 
-export const Footer = () => {
+const Footer = memo(() => {
 	return (
 		<div className="w-full">
 			<MailNotify />
+			<FooterContent />
 		</div>
 	)
-}
+})
+
+Footer.displayName = "Footer"
+
+export default Footer

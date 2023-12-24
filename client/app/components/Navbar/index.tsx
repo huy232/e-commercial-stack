@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import clsx from "clsx"
 import { FC } from "react"
 
-export const Navbar: FC = () => {
+const Navbar: FC = () => {
 	const currentPath = usePathname()
 
 	return (
@@ -29,3 +29,5 @@ export const Navbar: FC = () => {
 		</div>
 	)
 }
+
+export default Navbar

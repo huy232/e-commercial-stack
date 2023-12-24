@@ -6,7 +6,7 @@ import { getProductCategories, getProducts } from "@/app/api"
 import { CategoryType } from "@/types"
 import Link from "next/link"
 
-export const HotCollections: FC = () => {
+const HotCollections: FC = () => {
 	const [categories, setCategories] = useState<CategoryType[]>([])
 
 	const fetchCategories = useCallback(async () => {
@@ -56,3 +56,5 @@ export const HotCollections: FC = () => {
 		</>
 	)
 }
+
+export default HotCollections

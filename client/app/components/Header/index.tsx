@@ -8,7 +8,7 @@ import { path } from "@/utils/"
 import Link from "next/link"
 import { FC } from "react"
 
-export const Header: FC = () => {
+const Header: FC = () => {
 	return (
 		<div className="w-main h-[110px] py-[35px] flex justify-between">
 			<Link
@@ -49,3 +49,5 @@ export const Header: FC = () => {
 		</div>
 	)
 }
+
+export default Header
