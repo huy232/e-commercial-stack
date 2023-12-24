@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 }
 
 const bodyClassName = clsx(
-	"w-full flex flex-col items-center",
+	"w-full flex flex-col items-center min-h-screen",
 	poppins.className
 )
 
@@ -34,7 +34,7 @@ export default function RootLayout({
 					<TopHeader />
 					<Header />
 					<Navbar />
-					<div className="w-main">{children}</div>
+					<div className="w-main flex-grow">{children}</div>
 					<Footer />
 				</body>
 			</html>

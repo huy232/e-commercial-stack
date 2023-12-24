@@ -1,3 +1,9 @@
+import { LoginForm } from "@/app/components"
+
 export default function Home() {
-	return <main>Login</main>
+	return (
+		<section className="flex items-center justify-center h-full">
+			<LoginForm />
+		</section>
+	)
 }

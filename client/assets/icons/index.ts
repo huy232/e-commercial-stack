@@ -10,3 +10,5 @@ export {
 	AiOutlineMenu,
 } from "react-icons/ai"
 export { IoMenu } from "react-icons/io5"
+export { PiPasswordFill } from "react-icons/pi"
+export { BiShow, BiHide } from "react-icons/bi"
