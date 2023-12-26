@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { useState } from "react"
 
-const LoginForm = () => {
+const SignUpForm = () => {
 	const {
 		register,
 		handleSubmit,
@@ -30,6 +30,20 @@ const LoginForm = () => {
 			onSubmit={handleSubmit((data) => console.log(data))}
 		>
 			<div>
+				<div className="flex flex-col gap-2 py-2">
+					<label className="text-md font-medium">Name</label>
+					<input
+						className="rounded p-1"
+						{...register("name", { required: true })}
+						placeholder="Name"
+					/>
+					{errors.name && (
+						<p className="text-main duration-300 ease-out">
+							Please enter your name.
+						</p>
+					)}
+				</div>
+
 				<div className="flex flex-col gap-2 py-2">
 					<label className="text-md font-medium">Email</label>
 					<input
@@ -73,9 +87,9 @@ const LoginForm = () => {
 				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
 				type="submit"
 			>
-				Login
+				Sign up
 			</button>
 		</form>
 	)
 }
-export default LoginForm
+export default SignUpForm
