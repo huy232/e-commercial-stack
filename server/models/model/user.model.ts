@@ -50,8 +50,8 @@ var userSchema = new mongoose.Schema<IUser>(
 		},
 		mobile: {
 			type: String,
-			required: true,
-			unique: true,
+			required: false,
+			unique: false,
 			trim: true,
 		},
 		password: {

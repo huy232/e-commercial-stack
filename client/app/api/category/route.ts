@@ -1,9 +1,6 @@
-import axios from "axios"
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_URI,
-})
+import axios from "@/axios"
 
 export const getProductCategories = async () => {
-	const response = await api.get("/product-category")
+	const response = await axios.get("/product-category")
 	return response.data
 }

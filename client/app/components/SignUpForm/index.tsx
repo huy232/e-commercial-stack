@@ -4,6 +4,9 @@ import { useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { useState, useCallback } from "react"
 import { UserRegister, userRegister } from "@/app/api"
+import axios from "axios"
+import { passwordHashingClient } from "@/utils"
+import { useRouter } from "next/navigation"
 
 const SignUpForm = () => {
 	const {
@@ -11,8 +14,9 @@ const SignUpForm = () => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm()
-
+	const router = useRouter()
 	const [passwordVisible, setPasswordVisible] = useState(false)
+	const [errorMessage, setErrorMessage] = useState("")
 
 	const togglePasswordVisibility = () => {
 		const passwordInput = document.getElementById(
@@ -26,17 +30,29 @@ const SignUpForm = () => {
 	}
 
 	const handleRegister = useCallback(
-		() =>
-			handleSubmit(async (data) => {
-				const { firstName, lastName, email, password } = data as UserRegister
-				const response = await userRegister({
-					firstName,
-					lastName,
-					email,
-					password,
-				})
-			}),
-		[handleSubmit]
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault()
+			try {
+				await handleSubmit(async (data) => {
+					const { firstName, lastName, email, password } = data as UserRegister
+					const hashPassword = await passwordHashingClient(password)
+					await userRegister({
+						firstName,
+						lastName,
+						email,
+						password: hashPassword,
+					})
+					router.push("/")
+				})(event)
+			} catch (err: unknown) {
+				if (axios.isAxiosError(err)) {
+					setErrorMessage(err.response?.data?.message || "An error occurred")
+				} else {
+					setErrorMessage("An error occured")
+				}
+			}
+		},
+		[handleSubmit, router]
 	)
 
 	return (
@@ -59,7 +75,7 @@ const SignUpForm = () => {
 						placeholder="Last name"
 					/>
 					{(errors.firstName || errors.lastName) && (
-						<p className="text-main duration-300 ease-out">
+						<p className="text-main duration-300 ease-in-out">
 							Please enter your name.
 						</p>
 					)}
@@ -73,7 +89,7 @@ const SignUpForm = () => {
 						placeholder="Email"
 					/>
 					{errors.email && (
-						<p className="text-main duration-300 ease-out">
+						<p className="text-main duration-300 ease-in-out">
 							Please enter a valid email address.
 						</p>
 					)}
@@ -98,12 +114,17 @@ const SignUpForm = () => {
 						</button>
 					</div>
 					{errors.password && (
-						<p className="text-main duration-300 ease-out">
+						<p className="text-main duration-300 ease-in-out">
 							Password is required.
 						</p>
 					)}
 				</div>
 			</div>
+			{errorMessage && (
+				<p className="text-main text-center duration-300 ease-in-out">
+					{errorMessage}
+				</p>
+			)}
 			<button
 				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
 				type="submit"

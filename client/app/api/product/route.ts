@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from "@/axios"
 
 interface GetProductsParams {
 	sort?: string
@@ -7,19 +7,15 @@ interface GetProductsParams {
 	totalRatings?: number
 }
 
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_URI,
-})
-
 export const getProducts = (params: GetProductsParams) =>
-	api({
+	axios({
 		url: "/product/get-all-product",
 		method: "get",
 		params,
 	})
 
 export const getDailyDeal = () =>
-	api({
+	axios({
 		url: "/product/daily-product",
 		method: "get",
 	})

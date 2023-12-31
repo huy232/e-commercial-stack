@@ -2,7 +2,10 @@
 
 import { useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
-import { useState } from "react"
+import { useCallback, useState } from "react"
+import { UserLogin, userLogin } from "@/app/api"
+import axios from "axios"
+import { passwordHashingClient } from "@/utils"
 
 const LoginForm = () => {
 	const {
@@ -12,6 +15,7 @@ const LoginForm = () => {
 	} = useForm()
 
 	const [passwordVisible, setPasswordVisible] = useState(false)
+	const [errorMessage, setErrorMessage] = useState("")
 
 	const togglePasswordVisibility = () => {
 		const passwordInput = document.getElementById(
@@ -24,10 +28,34 @@ const LoginForm = () => {
 		}
 	}
 
+	const handleLogin = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault()
+			try {
+				await handleSubmit(async (data) => {
+					const { email, password } = data as UserLogin
+					const hashPassword = await passwordHashingClient(password)
+					const response = await userLogin({
+						email,
+						password: hashPassword,
+					})
+					console.log(response)
+				})(event)
+			} catch (err: unknown) {
+				if (axios.isAxiosError(err)) {
+					setErrorMessage(err.response?.data?.message || "An error occurred")
+				} else {
+					setErrorMessage("An error occured")
+				}
+			}
+		},
+		[handleSubmit]
+	)
+
 	return (
 		<form
 			className="flex flex-col justify-center items-center"
-			onSubmit={handleSubmit((data) => console.log(data))}
+			onSubmit={handleLogin}
 		>
 			<div>
 				<div className="flex flex-col gap-2 py-2">
@@ -69,6 +97,11 @@ const LoginForm = () => {
 					)}
 				</div>
 			</div>
+			{errorMessage && (
+				<p className="text-main text-center duration-300 ease-in-out">
+					{errorMessage}
+				</p>
+			)}
 			<button
 				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
 				type="submit"

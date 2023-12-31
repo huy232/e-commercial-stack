@@ -1,13 +1,18 @@
+import { getAccessToken } from "@/utils"
 import axios from "axios"
 
 const instance = axios.create({
-	baseURL: process.env.NEXT_APP_API_URI,
+	baseURL: process.env.NEXT_PUBLIC_API_URI,
+	withCredentials: true,
 })
 
 // Add a request interceptor
 instance.interceptors.request.use(
 	function (config) {
-		// Do something before request is sent
+		const accessToken = getAccessToken()
+		if (accessToken) {
+			config.headers.Authorization = `Bearer ${accessToken}`
+		}
 		return config
 	},
 	function (error) {
@@ -21,7 +26,7 @@ instance.interceptors.response.use(
 	function (response) {
 		// Any status code that lies within the range of 2xx causes this function to trigger
 		// Do something with response data
-		return response.data
+		return response
 	},
 	function (error) {
 		// Any status codes that fall outside the range of 2xx cause this function to trigger

@@ -13,9 +13,9 @@ import crypto from "crypto"
 class UserController {
 	register = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			let { firstName, lastName, email, password, mobile } = req.body
+			let { firstName, lastName, email, password } = req.body
 
-			if (!firstName || !lastName || !email || !password || !mobile) {
+			if (!firstName || !lastName || !email || !password) {
 				res.status(400).json({
 					success: false,
 					message: "Missing inputs",
@@ -74,6 +74,12 @@ class UserController {
 			res.cookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
 				maxAge: 7 * 24 * 60 * 60 * 1000,
+			})
+
+			// Save access token to cookie
+			res.cookie("accessToken", accessToken, {
+				httpOnly: true,
+				maxAge: 1 * 24 * 60 * 60 * 1000,
 			})
 
 			res.status(200).json({

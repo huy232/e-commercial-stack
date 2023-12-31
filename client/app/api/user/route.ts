@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from "@/axios"
 
 export interface UserRegister {
 	firstName: string
@@ -12,20 +12,16 @@ export interface UserLogin {
 	password: string
 }
 
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_URI,
-})
-
-export const userRegister = (params: UserRegister) =>
-	api({
+export const userRegister = (data: UserRegister) =>
+	axios({
 		url: "/user/register",
 		method: "post",
-		params,
+		data,
 	})
 
-export const userLogin = (params: UserLogin) =>
-	api({
+export const userLogin = (data: UserLogin) =>
+	axios({
 		url: "/user/login",
 		method: "post",
-		params,
+		data,
 	})

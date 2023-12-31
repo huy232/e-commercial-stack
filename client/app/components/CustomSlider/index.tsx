@@ -91,7 +91,7 @@ const CustomSlider: FC<CustomSliderProps> = ({
 					))}
 			</div>
 			<Slider {...slickSettings} className="mt-4">
-				{products[activeTab].length > 0 &&
+				{products[activeTab] &&
 					products[activeTab].map((item: ProductType) => (
 						<Product
 							key={item._id}
