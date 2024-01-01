@@ -1,6 +1,10 @@
 import express from "express"
 import { UserController } from "../../controllers"
-import { isAdmin, verifyAccessToken } from "../../middlewares/verifyToken"
+import {
+	isAdmin,
+	verifyAccessToken,
+	verifyRefreshToken,
+} from "../../middlewares/verifyToken"
 
 const router = express.Router()
 
@@ -33,5 +37,23 @@ router.put(
 	UserController.updateUserAddress
 )
 router.put("/update-cart", verifyAccessToken, UserController.updateUserCart)
+
+router.get(
+	"/validate-refresh-token",
+	verifyRefreshToken,
+	UserController.verifyRefreshToken
+)
+
+router.get(
+	"/validate-access-token",
+	verifyAccessToken,
+	UserController.verifyAccessToken
+)
+
+router.get(
+	"/check-auth",
+	[verifyAccessToken, verifyRefreshToken],
+	UserController.checkAuth
+)
 
 export { router as userRouter }

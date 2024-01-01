@@ -1,4 +1,4 @@
-import axios from "@/axios"
+import { instance } from "@/axios"
 
 interface GetProductsParams {
 	sort?: string
@@ -8,14 +8,14 @@ interface GetProductsParams {
 }
 
 export const getProducts = (params: GetProductsParams) =>
-	axios({
+	instance({
 		url: "/product/get-all-product",
 		method: "get",
 		params,
 	})
 
 export const getDailyDeal = () =>
-	axios({
+	instance({
 		url: "/product/daily-product",
 		method: "get",
 	})

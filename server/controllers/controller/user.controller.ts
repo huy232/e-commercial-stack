@@ -74,12 +74,17 @@ class UserController {
 			res.cookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
 				maxAge: 7 * 24 * 60 * 60 * 1000,
+				sameSite: "none",
+				secure: true,
 			})
 
 			// Save access token to cookie
 			res.cookie("accessToken", accessToken, {
 				httpOnly: true,
-				maxAge: 1 * 24 * 60 * 60 * 1000,
+				// maxAge: 1 * 24 * 60 * 60 * 1000,
+				maxAge: 60 * 1000,
+				sameSite: "none",
+				secure: true,
 			})
 
 			res.status(200).json({
@@ -397,6 +402,24 @@ class UserController {
 					message: "An unexpected error occurred.",
 				})
 			}
+		}
+	)
+
+	verifyAccessToken = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			res.status(200).json({ success: true, message: "Refresh token is valid" })
+		}
+	)
+
+	verifyRefreshToken = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			res.status(200).json({ success: true, message: "Access token is valid" })
+		}
+	)
+
+	checkAuth = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			res.status(200).json({ success: true, message: "Valid user" })
 		}
 	)
 }

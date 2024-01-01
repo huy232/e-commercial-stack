@@ -2,12 +2,15 @@
 
 import { useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { UserLogin, userLogin } from "@/app/api"
 import axios from "axios"
 import { passwordHashingClient } from "@/utils"
+import { instance } from "@/axios"
+import { useRouter } from "next/navigation"
 
 const LoginForm = () => {
+	const router = useRouter()
 	const {
 		register,
 		handleSubmit,
@@ -51,6 +54,14 @@ const LoginForm = () => {
 		},
 		[handleSubmit]
 	)
+
+	useEffect(() => {
+		const checkUser = async () => {
+			const response = await instance.get("/user/check-auth")
+			console.log(response)
+		}
+		checkUser()
+	}, [router])
 
 	return (
 		<form

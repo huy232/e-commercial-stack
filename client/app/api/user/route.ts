@@ -1,4 +1,4 @@
-import axios from "@/axios"
+import { instance } from "@/axios"
 
 export interface UserRegister {
 	firstName: string
@@ -13,14 +13,14 @@ export interface UserLogin {
 }
 
 export const userRegister = (data: UserRegister) =>
-	axios({
+	instance({
 		url: "/user/register",
 		method: "post",
 		data,
 	})
 
 export const userLogin = (data: UserLogin) =>
-	axios({
+	instance({
 		url: "/user/login",
 		method: "post",
 		data,

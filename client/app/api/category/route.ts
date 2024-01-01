@@ -1,6 +1,6 @@
-import axios from "@/axios"
+import { instance } from "@/axios"
 
 export const getProductCategories = async () => {
-	const response = await axios.get("/product-category")
+	const response = await instance.get("/product-category")
 	return response.data
 }
