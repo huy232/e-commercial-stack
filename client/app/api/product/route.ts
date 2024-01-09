@@ -1,4 +1,6 @@
-import { instance } from "@/axios"
+import { BASE_URL } from "@/constant"
+import { ProductType } from "@/types"
+import { ApiResponse } from "@/types/apiResponse"
 
 interface GetProductsParams {
 	sort?: string
@@ -7,15 +9,34 @@ interface GetProductsParams {
 	totalRatings?: number
 }
 
-export const getProducts = (params: GetProductsParams) =>
-	instance({
-		url: "/product/get-all-product",
-		method: "get",
-		params,
-	})
+export const getProducts = async (
+	params: GetProductsParams
+): Promise<ApiResponse<ProductType[]>> => {
+	try {
+		const response = await fetch(`/api/product/get-all-product`, {
+			method: "GET",
+		})
 
-export const getDailyDeal = () =>
-	instance({
-		url: "/product/daily-product",
-		method: "get",
-	})
+		const responseData: ApiResponse<ProductType[]> = await response.json()
+
+		return responseData
+	} catch (error) {
+		// Handle error appropriately
+		throw error
+	}
+}
+
+export const getDailyDeal = async (): Promise<ApiResponse<ProductType[]>> => {
+	try {
+		const response = await fetch(`/api/product/daily-product`, {
+			method: "GET",
+		})
+
+		const responseData: ApiResponse<ProductType[]> = await response.json()
+
+		return responseData
+	} catch (error) {
+		// Handle error appropriately
+		throw error
+	}
+}

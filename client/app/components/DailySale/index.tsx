@@ -2,7 +2,7 @@
 
 import { getDailyDeal } from "@/app/api"
 import { AiFillStar } from "@/assets/icons"
-import { useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { CustomImage, SaleCountdown } from "@/app/components"
 import { DailyDealType } from "@/types"
 import NoProductImage from "@/assets/images/no-product-image.png"
@@ -11,7 +11,11 @@ import Link from "next/link"
 import { MdOutlineSubdirectoryArrowLeft } from "react-icons/md"
 import moment from "moment"
 
-const DailySale = () => {
+interface DailySaleProps {
+	dailySale: any
+}
+
+const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 	const [dailyDeal, setDailyDeal] = useState({
 		loading: true,
 		product: null as DailyDealType | null,
@@ -20,10 +24,9 @@ const DailySale = () => {
 
 	const fetchDealDaily = useCallback(async () => {
 		try {
-			const response = await getDailyDeal()
-			if (response.data.success) {
-				const product = response.data.dailyDeal.product
-				const expirationTime = response.data.dailyDeal.expirationTime
+			if (dailySale.data.success) {
+				const product = dailySale.data.dailyDeal.product
+				const expirationTime = dailySale.data.dailyDeal.expirationTime
 
 				setDailyDeal({
 					loading: false,
@@ -39,7 +42,11 @@ const DailySale = () => {
 				expirationTime: "",
 			})
 		}
-	}, [])
+	}, [
+		dailySale.data.dailyDeal.expirationTime,
+		dailySale.data.dailyDeal.product,
+		dailySale.data.success,
+	])
 
 	const fetchDealAtEndOfDay = useCallback(() => {
 		const now = moment()

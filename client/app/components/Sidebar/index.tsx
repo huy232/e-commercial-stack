@@ -6,28 +6,16 @@ import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/types/redux"
 import { getCategoriesAction } from "@/store/actions/asyncAction"
 
-const Sidebar: FC = () => {
-	const dispatch = useDispatch<AppDispatch>()
-	const { categories, isLoading, errorMessage } = useSelector(
-		(state: RootState) => state.app
-	)
+interface SidebarProps {
+	categories: any
+}
 
-	useEffect(() => {
-		dispatch(getCategoriesAction())
-	}, [dispatch])
-
-	if (isLoading) {
-		return <div>Loading...</div>
-	}
-
-	if (errorMessage) {
-		return <div>{errorMessage}</div>
-	}
-
-	if (categories && categories.length > 0) {
+const Sidebar: FC<SidebarProps> = ({ categories }) => {
+	const products = categories.productCategory
+	if (products) {
 		return (
 			<div className="flex flex-col">
-				{categories.map((category: CategoryType) => (
+				{products.map((category: CategoryType) => (
 					<Link
 						key={category._id}
 						href={category.slug}

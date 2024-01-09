@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
-import "./globals.css"
 import { Footer, Header, Navbar, TopHeader } from "@/app/components"
 import clsx from "clsx"
-import ReduxProvider from "./context/reduxProvider"
+import ReduxProvider from "@/app/context/reduxProvider"
+import "../app/globals.css"
 
 const poppins = Poppins({
 	subsets: ["latin"],

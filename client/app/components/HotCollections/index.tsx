@@ -6,22 +6,11 @@ import { getProductCategories, getProducts } from "@/app/api"
 import { CategoryType } from "@/types"
 import Link from "next/link"
 
-const HotCollections: FC = () => {
-	const [categories, setCategories] = useState<CategoryType[]>([])
+interface HotCollectionsProps {
+	categories: any
+}
 
-	const fetchCategories = useCallback(async () => {
-		try {
-			const response = await getProductCategories()
-			setCategories(response.productCategory)
-		} catch (error) {
-			console.error("Error fetching products:", error)
-		}
-	}, [])
-
-	useEffect(() => {
-		fetchCategories()
-	}, [fetchCategories])
-
+const HotCollections: FC<HotCollectionsProps> = ({ categories }) => {
 	return (
 		<>
 			<h3 className="uppercase text-lg font-semibold border-b-2 border-main py-2 mb-8">
@@ -29,7 +18,7 @@ const HotCollections: FC = () => {
 			</h3>
 			<div className="w-full flex-wrap gap-12 grid grid-cols-2 md:grid-cols-3">
 				{categories.length > 0 &&
-					categories.map((category) => (
+					categories.map((category: any) => (
 						<div key={category._id} className="flex">
 							<div className="w-1/2 h-[140px]">
 								<CustomImage src={category.image} alt={category.title} />
@@ -39,7 +28,7 @@ const HotCollections: FC = () => {
 									{category.title}
 								</h4>
 								<ul className="text-xs mx-2 flex flex-col">
-									{category.brand.map((eachBrand, index) => (
+									{category.brand.map((eachBrand: any, index: any) => (
 										<Link
 											href={"#"}
 											key={index}

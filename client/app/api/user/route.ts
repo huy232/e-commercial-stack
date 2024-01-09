@@ -1,5 +1,7 @@
-import { instance } from "@/axios"
+import { BASE_URL } from "@/constant"
+import { ApiResponse } from "@/types/apiResponse"
 
+// User Route
 export interface UserRegister {
 	firstName: string
 	lastName: string
@@ -12,16 +14,44 @@ export interface UserLogin {
 	password: string
 }
 
-export const userRegister = (data: UserRegister) =>
-	instance({
-		url: "/user/register",
-		method: "post",
-		data,
-	})
+export const userRegister = async (
+	data: UserRegister
+): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch("/api/user/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		})
 
-export const userLogin = (data: UserLogin) =>
-	instance({
-		url: "/user/login",
-		method: "post",
-		data,
-	})
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
+		// Handle error appropriately
+		throw error
+	}
+}
+
+export const userLogin = async (
+	data: UserLogin
+): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch("/api/user/login", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		})
+
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
+		// Handle error appropriately
+		throw error
+	}
+}

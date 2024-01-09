@@ -5,3 +5,9 @@ export type CategoryType = {
 	slug: string
 	image: string
 }
+
+export interface ProductCategory {
+	id: number
+	name: string
+	sort: string
+}
