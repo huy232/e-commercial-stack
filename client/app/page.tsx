@@ -13,6 +13,7 @@ import {
 import { GetServerSideProps } from "next"
 import { getDailyDeal, getProductCategories, getProducts } from "@/app/api"
 import { ProductCategory } from "@/types"
+
 // const productCategories: ProductCategory[] = productCategoriesResponse.data
 // const dailyDeal = await getDailyDeal()
 // const featureProducts = await getProducts({
@@ -29,18 +30,29 @@ import { ProductCategory } from "@/types"
 
 export default async function Home() {
 	const productCategories = await getProductCategories()
+	const dailyDeal = await getDailyDeal()
+	const fetchProducts = async (tabId: number, sort: string) => {
+		"use server"
+		try {
+			const response = await getProducts({ sort })
+			return response.data
+		} catch (error) {
+			console.error("Error fetching products:", error)
+			return []
+		}
+	}
 
 	return (
 		<main className="w-main">
 			<div className="flex">
 				<div className="w-[25%] flex flex-col gap-5 flex-auto">
 					<Sidebar categories={productCategories} />
-					{/* <DailySale dailySale={dailyDeal} /> */}
+					<DailySale dailySale={dailyDeal} />
 				</div>
-				{/* <div className="w-[75%] flex flex-col gap-5 flex-auto pl-5">
+				<div className="w-[75%] flex flex-col gap-5 flex-auto pl-5">
 					<Banner />
-					<Seller />
-				</div> */}
+					<Seller fetchProducts={fetchProducts} />
+				</div>
 			</div>
 			{/* <div className="my-8">
 				<FeatureProducts />

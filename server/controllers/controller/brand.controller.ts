@@ -11,7 +11,7 @@ class BrandController {
 				message: response
 					? "Success created brand"
 					: "Something went wrong while created brand",
-				createdBrand: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -24,7 +24,7 @@ class BrandController {
 				message: response
 					? "Successfully get brand"
 					: "Something went wrong while getting brand",
-				brands: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -41,7 +41,7 @@ class BrandController {
 				message: response
 					? "Success update brand"
 					: "Something went wrong while update brand",
-				updatedBrand: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -56,7 +56,7 @@ class BrandController {
 				message: response
 					? "Success delete a brand"
 					: "Something went wrong while delete brand",
-				deletedBrand: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)

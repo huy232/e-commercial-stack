@@ -11,7 +11,7 @@ class ProductCategoryController {
 				message: response
 					? "Success created category"
 					: "Something went wrong while created category",
-				createdProductCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -24,7 +24,7 @@ class ProductCategoryController {
 				message: response
 					? "Successfully get category"
 					: "Something went wrong while getting category",
-				productCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -43,7 +43,7 @@ class ProductCategoryController {
 				message: response
 					? "Success update category"
 					: "Something went wrong while update category",
-				updatedCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -60,7 +60,7 @@ class ProductCategoryController {
 				message: response
 					? "Success delete a category"
 					: "Something went wrong while delete category",
-				deletedCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)

@@ -4,9 +4,12 @@ import { CustomImage } from "@/app/components"
 import { ProductType } from "@/types/product"
 import { BannerLeft, BannerRight } from "@/assets/images"
 import { CustomSlider } from "@/app/components"
-import { getProducts } from "@/app/api"
 
-const Seller: FC = () => {
+interface SellerProps {
+	fetchProducts: (tabId: number, sort: string) => Promise<ProductType[] | null>
+}
+
+const Seller: FC<SellerProps> = ({ fetchProducts }) => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Best sellers", sort: "-sold", markLabel: "Trending" },
@@ -20,24 +23,40 @@ const Seller: FC = () => {
 		[2]: [],
 	})
 
-	const fetchProducts = useCallback(async (tabId: number, sort: string) => {
-		try {
-			const response = await getProducts({ sort })
-			setProducts((prevProducts) => ({
-				...prevProducts,
-				[tabId]: response.data.products,
-			}))
-		} catch (error) {
-			console.error("Error fetching products:", error)
-		}
-	}, [])
+	// const fetchProducts = useCallback(async (tabId: number, sort: string) => {
+	// 	try {
+	// 		const response = await getProducts({ sort })
+	// 		console.log(response)
+	// 		setProducts((prevProducts) => ({
+	// 			...prevProducts,
+	// 			[tabId]: response.data,
+	// 		}))
+	// 	} catch (error) {
+	// 		console.error("Error fetching products:", error)
+	// 	}
+	// }, [])
+
+	const fetchProductsComponent = useCallback(
+		async (tabId: number, sort: string) => {
+			try {
+				const data = await fetchProducts(tabId, sort)
+				setProducts((prevProducts) => ({
+					...prevProducts,
+					[tabId]: data || [],
+				}))
+			} catch (error) {
+				console.error("Error fetching products:", error)
+			}
+		},
+		[fetchProducts]
+	)
 
 	return (
 		<div className="w-full">
 			<CustomSlider
 				tabs={tabs}
 				products={products}
-				fetchProducts={fetchProducts}
+				fetchProducts={fetchProductsComponent}
 				initialActiveTab={1}
 				supportHover={true}
 			/>

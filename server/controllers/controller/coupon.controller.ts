@@ -26,7 +26,7 @@ class CouponController {
 				message: response
 					? "Success created a coupon"
 					: "Something went wrong while creating a coupon",
-				createdCoupon: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -39,7 +39,7 @@ class CouponController {
 				message: response
 					? "Success getting coupons"
 					: "Something went wrong while getting coupons",
-				coupons: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -74,7 +74,7 @@ class CouponController {
 				message: response
 					? "Success update coupon"
 					: "Something went wrong while update coupon",
-				updatedCoupon: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -90,7 +90,7 @@ class CouponController {
 				message: response
 					? "Success delete coupon"
 					: "Something went wrong while delete coupon",
-				deletedCoupon: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)

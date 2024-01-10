@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/constant"
+import { API } from "@/constant"
 import { ApiResponse } from "@/types/apiResponse"
 
 // User Route
@@ -18,7 +18,7 @@ export const userRegister = async (
 	data: UserRegister
 ): Promise<ApiResponse<string>> => {
 	try {
-		const response = await fetch("/api/user/register", {
+		const response = await fetch(`${API}/user/register`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const userLogin = async (
 	data: UserLogin
 ): Promise<ApiResponse<string>> => {
 	try {
-		const response = await fetch("/api/user/login", {
+		const response = await fetch(`${API}/api/user/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

@@ -47,13 +47,13 @@ class OrderController {
 				res.json({
 					success: true,
 					message: "Success created user cart",
-					createdOrder: response,
+					data: response,
 				})
 			} else {
 				res.json({
 					success: false,
 					message: "Something went wrong while creating user cart",
-					createdOrder: {},
+					data: {},
 				})
 			}
 		}
@@ -74,7 +74,7 @@ class OrderController {
 
 		res.json({
 			success: response ? true : false,
-			response: response ? response : {},
+			data: response ? response : {},
 		})
 	})
 
@@ -85,7 +85,7 @@ class OrderController {
 
 			res.json({
 				success: response ? true : false,
-				response: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -95,7 +95,7 @@ class OrderController {
 
 		res.json({
 			success: response ? true : false,
-			response: response ? response : {},
+			data: response ? response : {},
 		})
 	})
 }

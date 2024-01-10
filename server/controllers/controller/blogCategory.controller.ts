@@ -11,7 +11,7 @@ class BlogCategoryController {
 				message: response
 					? "Success created blog category"
 					: "Something went wrong while created blog category",
-				createdBlogCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -24,7 +24,7 @@ class BlogCategoryController {
 				message: response
 					? "Successfully get blog category"
 					: "Something went wrong while getting blog category",
-				blogCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -43,7 +43,7 @@ class BlogCategoryController {
 				message: response
 					? "Success update blog category"
 					: "Something went wrong while update blog category",
-				updatedCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -58,7 +58,7 @@ class BlogCategoryController {
 				message: response
 					? "Success delete a blog category"
 					: "Something went wrong while delete blog category",
-				deletedCategory: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)

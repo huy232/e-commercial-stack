@@ -28,7 +28,7 @@ class BlogController {
 				message: response
 					? "Success created blog"
 					: "Something went wrong while created blog",
-				createdBlog: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -47,7 +47,7 @@ class BlogController {
 				message: response
 					? "Successfully update blog"
 					: "Something went wrong while updating blog",
-				updatedBlog: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -60,7 +60,7 @@ class BlogController {
 				message: response
 					? "Successfully get blogs"
 					: "Something went wrong while get blogs",
-				blogs: response ? response : {},
+				data: response ? response : {},
 			})
 		}
 	)
@@ -120,7 +120,7 @@ class BlogController {
 
 				res.json({
 					success: true,
-					message: updatedBlog,
+					data: updatedBlog,
 				})
 			}
 		}
@@ -140,7 +140,7 @@ class BlogController {
 		res.json({
 			success: true,
 			message: "Success get blog",
-			blog,
+			data: blog,
 		})
 	})
 
@@ -151,7 +151,7 @@ class BlogController {
 			res.json({
 				success: true,
 				message: "Success deleting a blog",
-				deletedBlog: blog,
+				data: blog,
 			})
 		}
 	)
@@ -177,7 +177,7 @@ class BlogController {
 					message: response
 						? "Uploaded blog image"
 						: "Failed to upload blog image",
-					updatedBlog: response ? response : {},
+					data: response ? response : {},
 				})
 			} catch (error) {
 				console.error("Error uploading image:", error)

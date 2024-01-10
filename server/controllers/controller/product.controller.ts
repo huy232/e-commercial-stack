@@ -28,7 +28,7 @@ class ProductController {
 				message: newProduct
 					? "Success created product"
 					: "Cannot create new product",
-				product: newProduct ? newProduct : {},
+				data: newProduct ? newProduct : {},
 			})
 		}
 	)
@@ -42,7 +42,7 @@ class ProductController {
 				message: product
 					? "Successfully get a product"
 					: "Cannot find a product",
-				product: product ? product : {},
+				data: product ? product : {},
 			})
 		}
 	)
@@ -90,11 +90,11 @@ class ProductController {
 
 				res.status(200).json({
 					success: response ? true : false,
-					counts,
 					message: response
 						? "Successfully query all products"
 						: "Something went wrong while finding all products",
-					products: response ? response : {},
+					data: response ? response : {},
+					counts,
 				})
 			} catch (err: any) {
 				res.status(500).json({
@@ -122,7 +122,7 @@ class ProductController {
 				message: updatedProduct
 					? "Successfully update a product"
 					: "Cannot update a product",
-				product: updatedProduct ? updatedProduct : {},
+				data: updatedProduct ? updatedProduct : {},
 			})
 		}
 	)
@@ -139,7 +139,7 @@ class ProductController {
 				message: deletedProduct
 					? "Successfully delete a product"
 					: "Cannot delete a product",
-				product: deletedProduct ? deletedProduct : {},
+				data: deletedProduct ? deletedProduct : {},
 			})
 		}
 	)
@@ -193,7 +193,7 @@ class ProductController {
 			res.status(200).json({
 				status: true,
 				message: "Success update rating",
-				updatedProduct,
+				data: updatedProduct,
 			})
 		}
 	)
@@ -220,7 +220,7 @@ class ProductController {
 					message: response
 						? "Uploaded all product images"
 						: "Failed to upload product images",
-					updatedProduct: response ? response : {},
+					data: response ? response : {},
 				})
 			} catch (error) {
 				console.error("Error uploading image:", error)
@@ -243,7 +243,8 @@ class ProductController {
 				res.json({
 					success: true,
 					message: "Fetch daily deal from cache",
-					dailyDeal: cachedDeal,
+					data: cachedDeal.product,
+					expirationTime: cachedDeal.expirationTime,
 				})
 				return
 			}
@@ -265,14 +266,14 @@ class ProductController {
 				res.json({
 					success: true,
 					message: "Fetch daily deal",
-					dailyDeal: randomProduct[0],
+					data: randomProduct[0],
 					expirationTime,
 				})
 			} else {
 				res.json({
 					success: false,
 					message: "Failed to fetch daily deal",
-					dailyDeal: {},
+					data: {},
 					expirationTime: moment().endOf("day").toISOString(),
 				})
 			}

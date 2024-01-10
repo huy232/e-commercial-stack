@@ -1,6 +1,5 @@
-import { BASE_URL } from "@/constant"
-import { ProductType } from "@/types"
-import { ApiResponse } from "@/types/apiResponse"
+import { API } from "@/constant"
+import { ProductType, ApiResponse } from "@/types"
 
 interface GetProductsParams {
 	sort?: string
@@ -13,7 +12,7 @@ export const getProducts = async (
 	params: GetProductsParams
 ): Promise<ApiResponse<ProductType[]>> => {
 	try {
-		const response = await fetch(`/api/product/get-all-product`, {
+		const response = await fetch(`${API}/product/get-all-product`, {
 			method: "GET",
 		})
 
@@ -28,7 +27,7 @@ export const getProducts = async (
 
 export const getDailyDeal = async (): Promise<ApiResponse<ProductType[]>> => {
 	try {
-		const response = await fetch(`/api/product/daily-product`, {
+		const response = await fetch(`${API}/product/daily-product`, {
 			method: "GET",
 		})
 

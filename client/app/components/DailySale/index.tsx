@@ -24,9 +24,10 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 
 	const fetchDealDaily = useCallback(async () => {
 		try {
-			if (dailySale.data.success) {
-				const product = dailySale.data.dailyDeal.product
-				const expirationTime = dailySale.data.dailyDeal.expirationTime
+			if (dailySale.success) {
+				console.log(dailySale)
+				const product = dailySale.data
+				const expirationTime = dailySale.expirationTime
 
 				setDailyDeal({
 					loading: false,
@@ -42,11 +43,7 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 				expirationTime: "",
 			})
 		}
-	}, [
-		dailySale.data.dailyDeal.expirationTime,
-		dailySale.data.dailyDeal.product,
-		dailySale.data.success,
-	])
+	}, [dailySale])
 
 	const fetchDealAtEndOfDay = useCallback(() => {
 		const now = moment()

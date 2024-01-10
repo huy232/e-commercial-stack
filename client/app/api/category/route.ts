@@ -1,16 +1,13 @@
-import { ProductCategory } from "@/types"
-import { ApiResponse } from "@/types/apiResponse"
+import { API } from "@/constant"
+import { ProductCategory, ApiResponse } from "@/types"
 
 export const getProductCategories = async (): Promise<
 	ApiResponse<ProductCategory[]>
 > => {
 	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_API_URI}/product-category`,
-			{
-				method: "GET",
-			}
-		)
+		const response = await fetch(`${API}/product-category`, {
+			method: "GET",
+		})
 		if (!response.ok) {
 			throw new Error(
 				`Failed to fetch product categories. Status: ${response.status}`

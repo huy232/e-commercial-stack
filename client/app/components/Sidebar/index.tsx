@@ -11,7 +11,8 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ categories }) => {
-	const products = categories.productCategory
+	console.log(categories)
+	const products = categories.data
 	if (products) {
 		return (
 			<div className="flex flex-col">
