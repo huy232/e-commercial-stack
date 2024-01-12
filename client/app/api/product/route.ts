@@ -12,7 +12,13 @@ export const getProducts = async (
 	params: GetProductsParams
 ): Promise<ApiResponse<ProductType[]>> => {
 	try {
-		const response = await fetch(`${API}/product/get-all-product`, {
+		const queryParamsArray: [string, string][] = params
+			? Object.entries(params).map(([key, value]) => [key, value.toString()])
+			: []
+		const queryParams = new URLSearchParams(queryParamsArray)
+		const url = `${API}/product/get-all-product?${queryParams.toString()}`
+
+		const response = await fetch(url, {
 			method: "GET",
 		})
 

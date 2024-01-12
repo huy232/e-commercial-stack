@@ -25,7 +25,6 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 	const fetchDealDaily = useCallback(async () => {
 		try {
 			if (dailySale.success) {
-				console.log(dailySale)
 				const product = dailySale.data
 				const expirationTime = dailySale.expirationTime
 

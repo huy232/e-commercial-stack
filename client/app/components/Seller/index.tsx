@@ -23,19 +23,6 @@ const Seller: FC<SellerProps> = ({ fetchProducts }) => {
 		[2]: [],
 	})
 
-	// const fetchProducts = useCallback(async (tabId: number, sort: string) => {
-	// 	try {
-	// 		const response = await getProducts({ sort })
-	// 		console.log(response)
-	// 		setProducts((prevProducts) => ({
-	// 			...prevProducts,
-	// 			[tabId]: response.data,
-	// 		}))
-	// 	} catch (error) {
-	// 		console.error("Error fetching products:", error)
-	// 	}
-	// }, [])
-
 	const fetchProductsComponent = useCallback(
 		async (tabId: number, sort: string) => {
 			try {

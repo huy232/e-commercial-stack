@@ -11,7 +11,6 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ categories }) => {
-	console.log(categories)
 	const products = categories.data
 	if (products) {
 		return (
