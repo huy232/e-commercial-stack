@@ -3,9 +3,10 @@ import nodemailer from "nodemailer"
 interface MailParams {
 	email: string
 	html: string
+	subject: string
 }
 
-const sendMail = async ({ email, html }: MailParams) => {
+const sendMail = async ({ email, html, subject }: MailParams) => {
 	try {
 		const transporter = nodemailer.createTransport({
 			host: "smtp.gmail.com",
@@ -20,7 +21,7 @@ const sendMail = async ({ email, html }: MailParams) => {
 		const info = await transporter.sendMail({
 			from: '"E-commercial Takama" <no-reply@takama.com>', // sender address
 			to: email, // list of receivers
-			subject: "Forgot password", // Subject line
+			subject: subject, // Subject line
 			html: html, // html body
 		})
 

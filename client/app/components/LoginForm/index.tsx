@@ -1,16 +1,12 @@
 "use client"
 import { useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
-import { FC, useCallback, useState } from "react"
-import { UserLogin } from "@/app/api"
+import { FC, useCallback, useEffect, useState } from "react"
+import { UserLogin, checkUserLogin, userLogin } from "@/app/api"
 import { passwordHashingClient } from "@/utils"
 import { useRouter } from "next/navigation"
 
-interface LoginFormProps {
-	login: any
-}
-
-const LoginForm: FC<LoginFormProps> = ({ login }) => {
+const LoginForm: FC = () => {
 	const router = useRouter()
 
 	const {
@@ -32,6 +28,14 @@ const LoginForm: FC<LoginFormProps> = ({ login }) => {
 			setPasswordVisible(!passwordVisible)
 		}
 	}
+
+	const login = useCallback(async (email: string, hashPassword: string) => {
+		const response = await userLogin({
+			email,
+			password: hashPassword,
+		})
+		return response
+	}, [])
 
 	const handleLogin = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -56,6 +60,18 @@ const LoginForm: FC<LoginFormProps> = ({ login }) => {
 		},
 		[handleSubmit, login]
 	)
+
+	useEffect(() => {
+		const checkLogin = async () => {
+			const loggedIn = await checkUserLogin()
+
+			if (loggedIn.success) {
+				router.push("/")
+			}
+		}
+
+		checkLogin()
+	}, [router])
 
 	return (
 		<form

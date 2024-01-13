@@ -37,23 +37,21 @@ router.put(
 	UserController.updateUserAddress
 )
 router.put("/update-cart", verifyAccessToken, UserController.updateUserCart)
-
 router.get(
 	"/validate-refresh-token",
 	verifyRefreshToken,
 	UserController.verifyRefreshToken
 )
-
 router.get(
 	"/validate-access-token",
 	verifyAccessToken,
 	UserController.verifyAccessToken
 )
-
 router.get(
 	"/check-auth",
 	[verifyAccessToken, verifyRefreshToken],
 	UserController.checkAuth
 )
+router.get("/complete-registration", UserController.verifyRegister)
 
 export { router as userRouter }

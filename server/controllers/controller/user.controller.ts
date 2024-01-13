@@ -28,16 +28,86 @@ class UserController {
 				throw new Error("User has existed")
 			}
 
-			const response = await User.create({
+			const newUser = new User({
 				...req.body,
 			})
 
-			res.status(200).json({
-				success: response ? true : false,
-				message: response
-					? "Register successfully"
-					: "Something went wrong while registering",
-			})
+			const token = jwt.sign(
+				{
+					id: newUser.id,
+					email: newUser.email,
+				},
+				process.env.JWT_SECRET as string,
+				{
+					expiresIn: "15m",
+				}
+			)
+
+			const registrationUrl = `${process.env.URL_SERVER}/api/user/complete-registration?token=${token}`
+			const emailHtml = `
+      <p>Click the following link to complete your registration:</p>
+      <a href="${registrationUrl}">${registrationUrl}</a>
+    `
+
+			try {
+				await sendMail({
+					email: newUser.email,
+					html: emailHtml,
+					subject: "Verify account",
+				})
+				res.status(200).json({
+					success: true,
+					message: "Registration email sent successfully. Check your inbox.",
+				})
+			} catch (err) {
+				res.status(500).json({
+					success: false,
+					message: "Something went wrong with verify email.",
+				})
+			}
+		}
+	)
+
+	verifyRegister = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			const { token } = req.query
+
+			if (!token) {
+				res.status(400).json({
+					success: false,
+					message: "Token is missing in the request.",
+				})
+				return
+			}
+
+			try {
+				// Decode and verify the token
+				const decodedToken = jwt.verify(
+					token as string,
+					process.env.JWT_SECRET as string
+				)
+
+				// Check if the decoded token contains the required information (e.g., id, email)
+				const { id, email } = decodedToken as { id: string; email: string }
+
+				// Proceed with user creation or any other actions based on the decoded information
+				const newUser = await User.create({
+					id,
+					email,
+					// Include any other properties you want to save in the database
+				})
+
+				res.status(200).json({
+					success: true,
+					message: "User created successfully.",
+					user: newUser,
+				})
+			} catch (error) {
+				res.status(400).json({
+					success: false,
+					message: "Invalid or expired token.",
+				})
+			}
 		}
 	)
 
@@ -185,6 +255,7 @@ class UserController {
 			const data = {
 				email: email as string,
 				html,
+				subject: "Forgot password",
 			}
 			const response = await sendMail(data)
 			res.status(200).json({

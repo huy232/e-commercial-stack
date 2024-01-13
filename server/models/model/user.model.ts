@@ -25,6 +25,7 @@ interface IUser extends Document {
 	passwordResetExpired?: string
 	createdAt: Date
 	updatedAt: Date
+	registerToken: string
 
 	createPasswordChangedToken(): string
 	isCorrectPassword(password: string): Promise<boolean>
@@ -94,6 +95,9 @@ var userSchema = new mongoose.Schema<IUser>(
 			type: String,
 		},
 		passwordResetExpired: {
+			type: String,
+		},
+		registerToken: {
 			type: String,
 		},
 	},
