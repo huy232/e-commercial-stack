@@ -4,7 +4,11 @@ import { ProductType } from "@/types/product"
 import { CustomSlider } from "@/app/components"
 import { getProducts } from "@/app/api"
 
-const NewArrivals: FC = () => {
+interface NewArrivalsProps {
+	fetchProducts: any
+}
+
+const NewArrivals: FC<NewArrivalsProps> = ({ fetchProducts }) => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Smartphone", sort: "-sold" },
@@ -20,24 +24,27 @@ const NewArrivals: FC = () => {
 		[3]: [],
 	})
 
-	const fetchProducts = useCallback(async (tabId: number, sort: string) => {
-		try {
-			const response = await getProducts({ sort })
-			setProducts((prevProducts) => ({
-				...prevProducts,
-				[tabId]: response.data.products,
-			}))
-		} catch (error) {
-			console.error("Error fetching products:", error)
-		}
-	}, [])
+	const fetchProductsComponent = useCallback(
+		async (tabId: number, sort: string) => {
+			try {
+				const data = await fetchProducts(tabId, sort)
+				setProducts((prevProducts) => ({
+					...prevProducts,
+					[tabId]: data || [],
+				}))
+			} catch (error) {
+				console.error("Error fetching products:", error)
+			}
+		},
+		[fetchProducts]
+	)
 
 	return (
 		<div className="w-full">
 			<CustomSlider
 				tabs={tabs}
 				products={products}
-				fetchProducts={fetchProducts}
+				fetchProducts={fetchProductsComponent}
 				initialActiveTab={1}
 				headingClassName="justify-end"
 				headingTabClassName="text-xs"

@@ -1,4 +1,3 @@
-"use client"
 import { getProducts } from "@/app/api"
 import { ProductType } from "@/types"
 import { FC, useCallback, useEffect, useState } from "react"
@@ -10,31 +9,19 @@ import {
 	BottomBanner4,
 } from "@/assets/images"
 
-const FeatureProducts: FC = () => {
-	const [products, setProducts] = useState<ProductType[] | null>(null)
+interface FeatureProductsProps {
+	featureProducts: any
+}
 
-	const fetchProducts = useCallback(async () => {
-		try {
-			const response = await getProducts({ limit: 9, page: 1, totalRatings: 5 })
-			if (response.data.success) {
-				setProducts(response.data.products)
-			}
-		} catch (error) {
-			console.error("Error fetching feature products:", error)
-		}
-	}, [])
-
-	useEffect(() => {
-		fetchProducts()
-	}, [fetchProducts])
+const FeatureProducts: FC<FeatureProductsProps> = ({ featureProducts }) => {
 	return (
 		<div className="w-full">
 			<h3 className="uppercase text-lg font-semibold py-[15px] border-b-2 border-main">
 				Feature products
 			</h3>
 			<div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-14">
-				{products ? (
-					products.map((product) => (
+				{featureProducts.data ? (
+					featureProducts.data.map((product: ProductType) => (
 						<ProductCard key={product._id} product={product} />
 					))
 				) : (

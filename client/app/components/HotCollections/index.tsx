@@ -17,8 +17,8 @@ const HotCollections: FC<HotCollectionsProps> = ({ categories }) => {
 				Hot collections
 			</h3>
 			<div className="w-full flex-wrap gap-12 grid grid-cols-2 md:grid-cols-3">
-				{categories.length > 0 &&
-					categories.map((category: any) => (
+				{categories.data.length > 0 &&
+					categories.data.map((category: any) => (
 						<div key={category._id} className="flex">
 							<div className="w-1/2 h-[140px]">
 								<CustomImage src={category.image} alt={category.title} />

@@ -237,7 +237,7 @@ class ProductController {
 	): Promise<void> => {
 		try {
 			let cachedDeal = ProductController.cachedDailyDeal
-
+			res.setHeader("Cache-Control", "no-store")
 			// Check if the cached deal exists and is not expired
 			if (cachedDeal && moment().isBefore(moment(cachedDeal.expirationTime))) {
 				res.json({

@@ -20,6 +20,7 @@ export const userRegister = async (
 	try {
 		const response = await fetch(`${API}/user/register`, {
 			method: "POST",
+			credentials: "include",
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -30,7 +31,6 @@ export const userRegister = async (
 
 		return responseData
 	} catch (error) {
-		// Handle error appropriately
 		throw error
 	}
 }
@@ -39,8 +39,9 @@ export const userLogin = async (
 	data: UserLogin
 ): Promise<ApiResponse<string>> => {
 	try {
-		const response = await fetch(`${API}/api/user/login`, {
+		const response = await fetch(`${API}/user/login`, {
 			method: "POST",
+			credentials: "include",
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -51,7 +52,24 @@ export const userLogin = async (
 
 		return responseData
 	} catch (error) {
-		// Handle error appropriately
+		throw error
+	}
+}
+
+export const checkUserLogin = async (): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch(`${API}/user/check-auth`, {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
 		throw error
 	}
 }

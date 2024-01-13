@@ -26,7 +26,6 @@ export const getProducts = async (
 
 		return responseData
 	} catch (error) {
-		// Handle error appropriately
 		throw error
 	}
 }
@@ -35,13 +34,13 @@ export const getDailyDeal = async (): Promise<ApiResponse<ProductType[]>> => {
 	try {
 		const response = await fetch(`${API}/product/daily-product`, {
 			method: "GET",
+			cache: "no-cache",
 		})
 
 		const responseData: ApiResponse<ProductType[]> = await response.json()
 
 		return responseData
 	} catch (error) {
-		// Handle error appropriately
 		throw error
 	}
 }

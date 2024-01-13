@@ -1,14 +1,35 @@
+import { checkUserLogin, userLogin } from "@/app/api"
 import { LoginForm } from "@/app/components"
 import { path } from "@/utils"
 import Link from "next/link"
 
-export default function Login() {
+export default async function Login() {
+	const loggedIn = await checkUserLogin()
+	if (loggedIn.success) {
+		console.log("Print here")
+		return {
+			redirect: {
+				destination: "/",
+				permanent: false,
+			},
+		}
+	}
+
+	const login = async (email: string, hashPassword: string) => {
+		"use server"
+		const response = await userLogin({
+			email,
+			password: hashPassword,
+		})
+		return response
+	}
+
 	return (
 		<section className="flex flex-col items-center justify-center h-full">
 			<h2 className="text-center font-bold uppercase">
 				Log in to your account
 			</h2>
-			<LoginForm />
+			<LoginForm login={login} />
 			<div className="flex flex-col text-center">
 				<span>
 					Don&apos;t have an account?{" "}

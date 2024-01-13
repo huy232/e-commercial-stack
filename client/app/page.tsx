@@ -41,6 +41,11 @@ export default async function Home() {
 			return []
 		}
 	}
+	const featureProducts = await getProducts({
+		limit: 9,
+		page: 1,
+		totalRatings: 5,
+	})
 
 	return (
 		<main className="w-main">
@@ -54,18 +59,18 @@ export default async function Home() {
 					<Seller fetchProducts={fetchProducts} />
 				</div>
 			</div>
-			{/* <div className="my-8">
-				<FeatureProducts />
+			<div className="my-8">
+				<FeatureProducts featureProducts={featureProducts} />
 			</div>
 			<div className="my-8">
-				<NewArrivals />
+				<NewArrivals fetchProducts={fetchProducts} />
 			</div>
 			<div className="my-8">
 				<HotCollections categories={productCategories} />
 			</div>
 			<div className="my-8">
 				<Blog />
-			</div> */}
+			</div>
 		</main>
 	)
 }

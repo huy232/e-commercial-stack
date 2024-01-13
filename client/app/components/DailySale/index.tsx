@@ -46,19 +46,20 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 
 	const fetchDealAtEndOfDay = useCallback(() => {
 		const now = moment()
-		const endOfDay = moment().endOf("day")
-		const timeUntilEndOfDay = endOfDay.diff(now)
+		const timeUntilEndOfDay = moment(dailyDeal.expirationTime).diff(now)
 
 		setTimeout(() => {
 			fetchDealDaily()
 			fetchDealAtEndOfDay()
 		}, timeUntilEndOfDay)
-	}, [fetchDealDaily])
+	}, [dailyDeal.expirationTime, fetchDealDaily])
 
 	useEffect(() => {
 		fetchDealDaily()
-		fetchDealAtEndOfDay()
-	}, [fetchDealAtEndOfDay, fetchDealDaily])
+		if (dailyDeal.expirationTime) {
+			fetchDealAtEndOfDay()
+		}
+	}, [dailyDeal.expirationTime, fetchDealAtEndOfDay, fetchDealDaily])
 
 	return (
 		<div className="border w-full flex-auto">

@@ -1,16 +1,18 @@
 "use client"
-
 import { useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
-import { useCallback, useEffect, useState } from "react"
-import { UserLogin, userLogin } from "@/app/api"
-import axios from "axios"
+import { FC, useCallback, useState } from "react"
+import { UserLogin } from "@/app/api"
 import { passwordHashingClient } from "@/utils"
-import { instance } from "@/axios"
 import { useRouter } from "next/navigation"
 
-const LoginForm = () => {
+interface LoginFormProps {
+	login: any
+}
+
+const LoginForm: FC<LoginFormProps> = ({ login }) => {
 	const router = useRouter()
+
 	const {
 		register,
 		handleSubmit,
@@ -38,30 +40,22 @@ const LoginForm = () => {
 				await handleSubmit(async (data) => {
 					const { email, password } = data as UserLogin
 					const hashPassword = await passwordHashingClient(password)
-					const response = await userLogin({
-						email,
-						password: hashPassword,
-					})
-					console.log(response)
+					const response = await login(email, hashPassword)
+
+					if (!response.success) {
+						const responseErrorMessage =
+							response.message || "An error occured while login"
+						setErrorMessage(responseErrorMessage)
+					} else {
+						console.log(response)
+					}
 				})(event)
-			} catch (err: unknown) {
-				if (axios.isAxiosError(err)) {
-					setErrorMessage(err.response?.data?.message || "An error occurred")
-				} else {
-					setErrorMessage("An error occured")
-				}
+			} catch (error) {
+				setErrorMessage("An error occured while login due to server")
 			}
 		},
-		[handleSubmit]
+		[handleSubmit, login]
 	)
-
-	useEffect(() => {
-		const checkUser = async () => {
-			const response = await instance.get("/user/check-auth")
-			console.log(response)
-		}
-		checkUser()
-	}, [router])
 
 	return (
 		<form
