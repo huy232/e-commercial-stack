@@ -41,11 +41,10 @@ class UserController {
 					expiresIn: "15m",
 				}
 			)
-			console.log("Token generated at:", new Date())
 
 			const registrationUrl = `${
-				process.env.URL_SERVER
-			}/api/user/complete-registration?token=${encodeURIComponent(token)}`
+				process.env.URL_FRONTEND
+			}/complete-registration?token=${encodeURIComponent(token)}`
 			const emailHtml = `
       <p>Click the following link to complete your registration:</p>
       <a href="${registrationUrl}">${registrationUrl}</a>
@@ -86,25 +85,49 @@ class UserController {
 					token as string,
 					process.env.JWT_SECRET as string
 				)
-				if (typeof decodedToken === "object" && decodedToken.exp) {
-					console.log("Token expires at:", new Date(decodedToken.exp * 1000))
-				} else {
-					console.log("Token does not have an expiration time.")
-				}
 				const userData = decodedToken as Record<string, any>
 				const { firstName, lastName, email, password } = userData
-				await User.create({
+				const createdUser = await User.create({
 					firstName,
 					lastName,
 					email,
 					password,
 				})
+
+				const accessToken = generateAccessToken(
+					createdUser._id,
+					createdUser.role
+				)
+				const newRefreshToken = generateRefreshToken(createdUser._id)
+
+				// Save refresh token to database
+				await User.findByIdAndUpdate(
+					createdUser._id,
+					{ refreshToken: newRefreshToken },
+					{ new: true }
+				)
+
+				// Set refresh token cookie
+				res.cookie("refreshToken", newRefreshToken, {
+					httpOnly: true,
+					maxAge: 7 * 24 * 60 * 60 * 1000,
+					sameSite: "none",
+					secure: true,
+				})
+
+				// Set access token cookie
+				res.cookie("accessToken", accessToken, {
+					httpOnly: true,
+					maxAge: 60 * 1000,
+					sameSite: "none",
+					secure: true,
+				})
+
 				res.status(200).json({
 					success: true,
 					message: "User created successfully.",
 				})
 			} catch (error) {
-				console.log(error)
 				res.status(400).json({
 					success: false,
 					message: "Invalid or expired token.",
@@ -229,6 +252,7 @@ class UserController {
 			)
 
 			res.clearCookie("refreshToken", { httpOnly: true, secure: true })
+			res.clearCookie("accessToken", { httpOnly: true, secure: true })
 			res.status(200).json({
 				success: true,
 				message: "Successfully logout",

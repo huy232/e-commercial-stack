@@ -52,6 +52,6 @@ router.get(
 	[verifyAccessToken, verifyRefreshToken],
 	UserController.checkAuth
 )
-router.get("/complete-registration", UserController.verifyRegister)
+router.post("/complete-registration", UserController.verifyRegister)
 
 export { router as userRouter }

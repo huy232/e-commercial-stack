@@ -1,5 +1,5 @@
+import { ApiResponse } from "@/types"
 import { API } from "@/constant"
-import { ApiResponse } from "@/types/apiResponse"
 
 // User Route
 export interface UserRegister {
@@ -86,6 +86,27 @@ export const userLogout = async (): Promise<ApiResponse<string>> => {
 
 		const responseData: ApiResponse<string> = await response.json()
 
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const verifyAccount = async (
+	token: string
+): Promise<ApiResponse<string>> => {
+	try {
+		const url = new URL(`${API}/user/complete-registration`)
+		url.searchParams.append("token", token)
+
+		const response = await fetch(url.toString(), {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+		const responseData: ApiResponse<string> = await response.json()
 		return responseData
 	} catch (error) {
 		throw error
