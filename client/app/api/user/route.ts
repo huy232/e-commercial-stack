@@ -73,3 +73,21 @@ export const checkUserLogin = async (): Promise<ApiResponse<string>> => {
 		throw error
 	}
 }
+
+export const userLogout = async (): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch(`${API}/user/logout`, {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}

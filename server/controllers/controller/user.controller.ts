@@ -34,16 +34,18 @@ class UserController {
 
 			const token = jwt.sign(
 				{
-					id: newUser.id,
-					email: newUser.email,
+					...req.body,
 				},
 				process.env.JWT_SECRET as string,
 				{
 					expiresIn: "15m",
 				}
 			)
+			console.log("Token generated at:", new Date())
 
-			const registrationUrl = `${process.env.URL_SERVER}/api/user/complete-registration?token=${token}`
+			const registrationUrl = `${
+				process.env.URL_SERVER
+			}/api/user/complete-registration?token=${encodeURIComponent(token)}`
 			const emailHtml = `
       <p>Click the following link to complete your registration:</p>
       <a href="${registrationUrl}">${registrationUrl}</a>
@@ -71,7 +73,6 @@ class UserController {
 	verifyRegister = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { token } = req.query
-
 			if (!token) {
 				res.status(400).json({
 					success: false,
@@ -81,28 +82,29 @@ class UserController {
 			}
 
 			try {
-				// Decode and verify the token
 				const decodedToken = jwt.verify(
 					token as string,
 					process.env.JWT_SECRET as string
 				)
-
-				// Check if the decoded token contains the required information (e.g., id, email)
-				const { id, email } = decodedToken as { id: string; email: string }
-
-				// Proceed with user creation or any other actions based on the decoded information
-				const newUser = await User.create({
-					id,
+				if (typeof decodedToken === "object" && decodedToken.exp) {
+					console.log("Token expires at:", new Date(decodedToken.exp * 1000))
+				} else {
+					console.log("Token does not have an expiration time.")
+				}
+				const userData = decodedToken as Record<string, any>
+				const { firstName, lastName, email, password } = userData
+				await User.create({
+					firstName,
+					lastName,
 					email,
-					// Include any other properties you want to save in the database
+					password,
 				})
-
 				res.status(200).json({
 					success: true,
 					message: "User created successfully.",
-					user: newUser,
 				})
 			} catch (error) {
+				console.log(error)
 				res.status(400).json({
 					success: false,
 					message: "Invalid or expired token.",

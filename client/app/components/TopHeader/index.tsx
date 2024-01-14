@@ -1,7 +1,14 @@
+"use client"
 import Link from "next/link"
 import { path } from "@/utils"
+import { userLogout } from "@/app/api"
 
 const TopHeader = () => {
+	const handleLogout = async () => {
+		const response = await userLogout()
+		console.log(response)
+	}
+
 	return (
 		<div className="h-[40px] w-full bg-main flex items-center justify-center">
 			<div className="w-main flex items-center justify-between text-xs text-white">
@@ -12,6 +19,7 @@ const TopHeader = () => {
 				>
 					Sign In or Create Account
 				</Link>
+				<button onClick={handleLogout}>Log out</button>
 			</div>
 		</div>
 	)
