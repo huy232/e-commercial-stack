@@ -10,23 +10,7 @@ import {
 	HotCollections,
 	Blog,
 } from "@/app/components"
-import { GetServerSideProps } from "next"
 import { getDailyDeal, getProductCategories, getProducts } from "@/app/api"
-import { ProductCategory } from "@/types"
-
-// const productCategories: ProductCategory[] = productCategoriesResponse.data
-// const dailyDeal = await getDailyDeal()
-// const featureProducts = await getProducts({
-// 	limit: 9,
-// 	page: 1,
-// 	totalRatings: 5,
-// })
-// const newArrivals = await Promise.all(
-// 	productCategories.map(async (category) => {
-// 		const products = await getProducts({ sort: category.sort })
-// 		return { categoryId: category.id, products }
-// 	})
-// )
 
 export default async function Home() {
 	const productCategories = await getProductCategories()

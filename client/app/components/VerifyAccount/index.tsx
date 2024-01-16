@@ -50,7 +50,9 @@ const VerifyAccount: FC = () => {
 			{successVerify && (
 				<div className="flex flex-col gap-2 items-center">
 					<span className="text-teal-500 italic">{errorMessage}</span>
-					<span>Please try sign up again.</span>
+					<span>
+						Your account has verified, you can proceed to shopping now.
+					</span>
 					<Link
 						className="border-2 border-teal-500 p-1 rounded hover:bg-teal-500 hover:text-white duration-300 ease-linear"
 						href={"/"}
