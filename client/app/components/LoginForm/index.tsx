@@ -51,7 +51,7 @@ const LoginForm: FC = () => {
 							response.message || "An error occured while login"
 						setErrorMessage(responseErrorMessage)
 					} else {
-						console.log(response)
+						console.log("Prin this handle login success: ", response)
 					}
 				})(event)
 			} catch (error) {
@@ -63,11 +63,7 @@ const LoginForm: FC = () => {
 
 	useEffect(() => {
 		const checkLogin = async () => {
-			const loggedIn = await checkUserLogin()
-
-			if (loggedIn.success) {
-				router.push("/")
-			}
+			const loggedIn = await checkUserLogin(document.cookie)
 		}
 
 		checkLogin()
