@@ -4,11 +4,8 @@ import { BiShow, BiHide } from "@/assets/icons"
 import { FC, useCallback, useEffect, useState } from "react"
 import { UserLogin, checkUserLogin, userLogin } from "@/app/api"
 import { passwordHashingClient } from "@/utils"
-import { useRouter } from "next/navigation"
 
 const LoginForm: FC = () => {
-	const router = useRouter()
-
 	const {
 		register,
 		handleSubmit,
@@ -60,14 +57,6 @@ const LoginForm: FC = () => {
 		},
 		[handleSubmit, login]
 	)
-
-	useEffect(() => {
-		const checkLogin = async () => {
-			const loggedIn = await checkUserLogin(document.cookie)
-		}
-
-		checkLogin()
-	}, [router])
 
 	return (
 		<form

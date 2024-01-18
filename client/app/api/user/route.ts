@@ -115,3 +115,45 @@ export const verifyAccount = async (
 		throw error
 	}
 }
+
+export const forgotPassword = async (
+	email: string
+): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch(`${API}/user/forgot-password`, {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email }),
+		})
+
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const resetPassword = async (
+	password: string
+): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch(`${API}/user/reset-password`, {
+			method: "PUT",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ password }),
+		})
+
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
