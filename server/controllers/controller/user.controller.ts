@@ -43,7 +43,7 @@ class UserController {
 			)
 
 			const registrationUrl = `${
-				process.env.URL_FRONTEND
+				process.env.URL_CLIENT
 			}/complete-registration?token=${encodeURIComponent(token)}`
 			const emailHtml = `
       <p>Click the following link to complete your registration:</p>
@@ -262,32 +262,42 @@ class UserController {
 
 	forgotPassword = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const { email } = req.query
-			if (!email) {
-				throw new Error("Missing email")
-			}
-			const user = await User.findOne({ email })
-			if (!user) {
-				throw new Error("User not found")
-			}
-			const resetToken = user.createPasswordChangedToken()
-			await user.save()
+			try {
+				const { email } = req.body
+				if (!email) {
+					throw new Error("Missing email")
+				}
+				const user = await User.findOne({ email })
+				if (!user) {
+					throw new Error("User not found")
+				}
+				const resetToken = user.createPasswordChangedToken()
+				await user.save()
 
-			const html = `Xin vui lòng nhấn vào đường dẫn bên dưới để thay đổi mật khẩu. Đường dẫn có hiệu lực từ lúc nhận tin nhắn cho đến 15 phút sau. 
+				const html = `Xin vui lòng nhấn vào đường dẫn bên dưới để thay đổi mật khẩu. Đường dẫn có hiệu lực từ lúc nhận tin nhắn cho đến 15 phút sau. 
 			<a 
-			href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}
+			href=${process.env.URL_CLIENT}/reset-password?token=${encodeURIComponent(
+					resetToken
+				)}
 			>Quên mật khẩu</a>`
 
-			const data = {
-				email: email as string,
-				html,
-				subject: "Forgot password",
+				const data = {
+					email: email as string,
+					html,
+					subject: "Forgot password",
+				}
+				await sendMail(data)
+				res.status(200).json({
+					success: true,
+					message: "Verify your password resetting in the mail.",
+				})
+			} catch (err) {
+				res.status(401).json({
+					success: true,
+					message:
+						"Something went wrong while trying to resetting the password. Try again!",
+				})
 			}
-			const response = await sendMail(data)
-			res.status(200).json({
-				success: true,
-				response,
-			})
 		}
 	)
 

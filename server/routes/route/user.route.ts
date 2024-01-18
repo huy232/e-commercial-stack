@@ -13,7 +13,7 @@ router.post("/login", UserController.login)
 router.get("/current", verifyAccessToken, UserController.getCurrentUser)
 router.post("/refresh-token", UserController.refreshAccessToken)
 router.post("/logout", UserController.logout)
-router.get("/forgot-password", UserController.forgotPassword)
+router.post("/forgot-password", UserController.forgotPassword)
 router.put("/reset-password", UserController.resetPassword)
 router.get(
 	"/get-all-users",
