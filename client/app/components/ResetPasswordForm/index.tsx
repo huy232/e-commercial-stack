@@ -1,14 +1,21 @@
 "use client"
-import { useState } from "react"
+import { FC, useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { resetPassword } from "@/app/api"
+import { BiHide, BiShow } from "@/assets/icons"
+import Link from "next/link"
+import { passwordHashingClient, path } from "@/utils"
 
 type ResetPasswordFormData = {
 	password: string
 	confirmPassword: string
 }
 
-const ResetPasswordForm = () => {
+interface ResetPasswordFormProps {
+	token: string
+}
+
+const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 	const {
 		register,
 		handleSubmit,
@@ -18,6 +25,7 @@ const ResetPasswordForm = () => {
 
 	const [errorMessage, setErrorMessage] = useState("")
 	const [showPassword, setShowPassword] = useState(false)
+	const [confirm, setConfirm] = useState(false)
 
 	const handleResetPassword: SubmitHandler<ResetPasswordFormData> = async (
 		data
@@ -27,28 +35,42 @@ const ResetPasswordForm = () => {
 
 			if (password !== confirmPassword) {
 				setErrorMessage("Passwords do not match")
+				setConfirm(false)
 				return
 			}
-
-			const response = await resetPassword(password)
+			const hashPassword = await passwordHashingClient(confirmPassword)
+			const response = await resetPassword(hashPassword, token)
 
 			if (!response.success) {
 				const responseErrorMessage =
 					response.message || "An error occurred while resetting the password"
 				setErrorMessage(responseErrorMessage)
+				setConfirm(false)
 			} else {
 				setErrorMessage("")
 				console.log("Password reset successful: ", response)
-				// Optionally, you can redirect the user or perform other actions on success
+				setConfirm(true)
 			}
 		} catch (error) {
 			setErrorMessage(
 				"An error occurred while resetting the password due to server"
 			)
+			setConfirm(false)
 		}
 	}
 
-	return (
+	return confirm ? (
+		<div className="flex flex-col justify-center items-center">
+			<p>
+				Successfully resetting your password, you can now try to login again
+			</p>
+			<Link href={path.LOGIN}>
+				<button className="duration-300 ease-linear border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1">
+					Login
+				</button>
+			</Link>
+		</div>
+	) : (
 		<form
 			className="flex flex-col justify-center items-center"
 			onSubmit={handleSubmit(handleResetPassword)}
@@ -56,7 +78,7 @@ const ResetPasswordForm = () => {
 			<div>
 				<div className="flex flex-col gap-2 py-2">
 					<label className="text-md font-medium">Password</label>
-					<div className="relative">
+					<div className="flex items-center justify-center gap-4">
 						<input
 							className="rounded p-1"
 							type={showPassword ? "text" : "password"}
@@ -64,10 +86,11 @@ const ResetPasswordForm = () => {
 							placeholder="Password"
 						/>
 						<button
-							className="absolute right-0 top-0 mt-2 mr-2"
+							className="duration-300 ease-in-out"
+							type="button"
 							onClick={() => setShowPassword(!showPassword)}
 						>
-							{showPassword ? "Hide" : "Show"}
+							{showPassword ? <BiHide /> : <BiShow />}
 						</button>
 					</div>
 					{errors.password && (
@@ -80,7 +103,7 @@ const ResetPasswordForm = () => {
 					<label className="text-md font-medium">Confirm Password</label>
 					<input
 						className="rounded p-1"
-						type="password"
+						type={showPassword ? "text" : "password"}
 						{...register("confirmPassword", {
 							required: true,
 							validate: (value) => value === watch("password"),
@@ -94,17 +117,25 @@ const ResetPasswordForm = () => {
 					)}
 				</div>
 			</div>
-			{errorMessage && (
-				<p className="text-main text-center duration-300 ease-in-out">
-					{errorMessage}
-				</p>
+			{errorMessage ? (
+				<div>
+					<p className="text-main text-center duration-300 ease-in-out">
+						{errorMessage}
+					</p>
+					<Link href={path.FORGOT_PASSWORD}>
+						<button className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white duration-300 ease-in-out p-1 rounded">
+							Try reset your password again
+						</button>
+					</Link>
+				</div>
+			) : (
+				<button
+					className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
+					type="submit"
+				>
+					Submit
+				</button>
 			)}
-			<button
-				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
-				type="submit"
-			>
-				Submit
-			</button>
 		</form>
 	)
 }

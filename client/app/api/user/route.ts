@@ -138,7 +138,8 @@ export const forgotPassword = async (
 }
 
 export const resetPassword = async (
-	password: string
+	password: string,
+	token: string
 ): Promise<ApiResponse<string>> => {
 	try {
 		const response = await fetch(`${API}/user/reset-password`, {
@@ -147,7 +148,7 @@ export const resetPassword = async (
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ password }),
+			body: JSON.stringify({ password, token }),
 		})
 
 		const responseData: ApiResponse<string> = await response.json()

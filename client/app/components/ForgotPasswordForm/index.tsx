@@ -12,6 +12,7 @@ const ForgotPasswordForm = () => {
 	} = useForm()
 
 	const [errorMessage, setErrorMessage] = useState("")
+	const [confirm, setConfirm] = useState(false)
 
 	const handleForgotPassword = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -25,8 +26,10 @@ const ForgotPasswordForm = () => {
 						const responseErrorMessage =
 							response.message || "An error occured while resetting password"
 						setErrorMessage(responseErrorMessage)
+						setConfirm(false)
 					} else {
 						setErrorMessage("")
+						setConfirm(true)
 						console.log("Print this handle login success: ", response)
 					}
 				})(event)
@@ -34,12 +37,19 @@ const ForgotPasswordForm = () => {
 				setErrorMessage(
 					"An error occured while resetting password due to server"
 				)
+				setConfirm(false)
 			}
 		},
 		[handleSubmit]
 	)
 
-	return (
+	return confirm ? (
+		<div className="flex flex-col justify-center items-center">
+			<p className="text-teal-500">
+				Please check your mail box for resetting password information.
+			</p>
+		</div>
+	) : (
 		<form
 			className="flex flex-col justify-center items-center"
 			onSubmit={handleForgotPassword}
