@@ -10,3 +10,22 @@ export interface ApiResponseProductCategories {
 	data: ProductCategory[]
 	error?: string
 }
+
+export interface ApiResponseLogin {
+	success: boolean
+	message?: string
+	accessToken?: string
+	userData?: {
+		id: string
+		_v: number
+		updatedAt: Date
+		passwordChangedAt: Number
+		lastName: string
+		isBlocked: boolean
+		firstName: string
+		email: string
+		createdAt: Date
+		cart: []
+		address: []
+	}
+}

@@ -2,9 +2,9 @@
 import { FC, useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { resetPassword } from "@/app/api"
-import { BiHide, BiShow } from "@/assets/icons"
 import Link from "next/link"
 import { passwordHashingClient, path } from "@/utils"
+import { InputField } from "@/app/components"
 
 type ResetPasswordFormData = {
 	password: string
@@ -76,47 +76,26 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 			onSubmit={handleSubmit(handleResetPassword)}
 		>
 			<div>
-				<div className="flex flex-col gap-2 py-2">
-					<label className="text-md font-medium">Password</label>
-					<div className="flex items-center justify-center gap-4">
-						<input
-							className="rounded p-1"
-							type={showPassword ? "text" : "password"}
-							{...register("password", { required: true })}
-							placeholder="Password"
-						/>
-						<button
-							className="duration-300 ease-in-out"
-							type="button"
-							onClick={() => setShowPassword(!showPassword)}
-						>
-							{showPassword ? <BiHide /> : <BiShow />}
-						</button>
-					</div>
-					{errors.password && (
-						<p className="text-main duration-300 ease-out">
-							Please enter a valid password.
-						</p>
-					)}
-				</div>
-				<div className="flex flex-col gap-2 py-2">
-					<label className="text-md font-medium">Confirm Password</label>
-					<input
-						className="rounded p-1"
-						type={showPassword ? "text" : "password"}
-						{...register("confirmPassword", {
-							required: true,
-							validate: (value) => value === watch("password"),
-						})}
-						placeholder="Confirm Password"
-					/>
-					{errors.confirmPassword && (
-						<p className="text-main duration-300 ease-out">
-							Passwords do not match.
-						</p>
-					)}
-				</div>
+				<InputField
+					label="Password"
+					name="password"
+					type={showPassword ? "text" : "password"}
+					register={register}
+					required
+					errorMessage={errors.password && "Please enter a valid password."}
+				/>
+
+				<InputField
+					label="Confirm Password"
+					name="confirmPassword"
+					type={showPassword ? "text" : "password"}
+					register={register}
+					required
+					validate={(value) => value === watch("password")}
+					errorMessage={errors.confirmPassword && "Passwords do not match."}
+				/>
 			</div>
+
 			{errorMessage ? (
 				<div>
 					<p className="text-main text-center duration-300 ease-in-out">

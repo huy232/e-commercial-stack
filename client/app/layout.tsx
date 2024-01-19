@@ -28,16 +28,16 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<ReduxProvider>
-			<html lang="en">
-				<body className={bodyClassName}>
+		<html lang="en">
+			<body className={bodyClassName}>
+				<ReduxProvider>
 					<TopHeader />
 					<Header />
 					<Navbar />
 					<div className="w-main flex-grow">{children}</div>
 					<Footer />
-				</body>
-			</html>
-		</ReduxProvider>
+				</ReduxProvider>
+			</body>
+		</html>
 	)
 }

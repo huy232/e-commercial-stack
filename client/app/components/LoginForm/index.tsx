@@ -1,30 +1,22 @@
 "use client"
+import { FC, useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
-import { BiShow, BiHide } from "@/assets/icons"
-import { FC, useCallback, useEffect, useState } from "react"
-import { UserLogin, checkUserLogin, userLogin } from "@/app/api"
 import { passwordHashingClient } from "@/utils"
+import { UserLogin, userLogin, userLogout } from "@/app/api"
+import { InputField } from "@/app/components" // Import the InputField component
+import { useRouter } from "next/navigation"
+import { loginSuccess } from "@/store/slices/authSlice"
+import { useDispatch } from "react-redux"
 
 const LoginForm: FC = () => {
+	const dispatch = useDispatch()
+	const router = useRouter()
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm()
-
-	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [errorMessage, setErrorMessage] = useState("")
-
-	const togglePasswordVisibility = () => {
-		const passwordInput = document.getElementById(
-			"password"
-		) as HTMLInputElement
-
-		if (passwordInput) {
-			passwordInput.type = passwordVisible ? "password" : "text"
-			setPasswordVisible(!passwordVisible)
-		}
-	}
 
 	const login = useCallback(async (email: string, hashPassword: string) => {
 		const response = await userLogin({
@@ -35,79 +27,62 @@ const LoginForm: FC = () => {
 	}, [])
 
 	const handleLogin = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault()
-			try {
-				await handleSubmit(async (data) => {
-					const { email, password } = data as UserLogin
-					const hashPassword = await passwordHashingClient(password)
-					const response = await login(email, hashPassword)
+		async (data: any) => {
+			const { email, password } = data as UserLogin
+			const hashPassword = await passwordHashingClient(password)
 
-					if (!response.success) {
-						const responseErrorMessage =
-							response.message || "An error occured while login"
-						setErrorMessage(responseErrorMessage)
-					} else {
-						console.log("Prin this handle login success: ", response)
-					}
-				})(event)
+			try {
+				const response = await login(email, hashPassword)
+
+				if (!response.success) {
+					const responseErrorMessage =
+						response.message || "An error occurred while login"
+					setErrorMessage(responseErrorMessage)
+				} else {
+					console.log("Print this handle login success: ", response)
+					dispatch(loginSuccess(response.userData))
+					router.push("/")
+					router.refresh()
+				}
 			} catch (error) {
-				setErrorMessage("An error occured while login due to server")
+				setErrorMessage("An error occurred while login due to server")
 			}
 		},
-		[handleSubmit, login]
+		[dispatch, login, router]
 	)
 
 	return (
 		<form
 			className="flex flex-col justify-center items-center"
-			onSubmit={handleLogin}
+			onSubmit={handleSubmit(handleLogin)}
 		>
 			<div>
-				<div className="flex flex-col gap-2 py-2">
-					<label className="text-md font-medium">Email</label>
-					<input
-						className="rounded p-1"
-						{...register("email", { required: true, pattern: /^\S+@\S+$/i })}
-						placeholder="Email"
-					/>
-					{errors.email && (
-						<p className="text-main duration-300 ease-out">
-							Please enter a valid email address.
-						</p>
-					)}
-				</div>
+				<InputField
+					label="Email"
+					name="email"
+					register={register}
+					required
+					pattern={/^\S+@\S+$/i}
+					errorMessage={errors.email && "Please enter a valid email address."}
+				/>
 
-				<div className="flex flex-col gap-2 py-2">
-					<label className="text-md font-medium">Password</label>
-					<div className="flex items-center justify-center gap-4">
-						<input
-							className="rounded p-1"
-							id="password"
-							type={passwordVisible ? "text" : "password"}
-							{...register("password", { required: true })}
-							placeholder="Password"
-						/>
-						<button
-							className="duration-300 ease-in-out"
-							type="button"
-							onClick={togglePasswordVisibility}
-						>
-							{passwordVisible ? <BiHide /> : <BiShow />}
-						</button>
-					</div>
-					{errors.password && (
-						<p className="text-main duration-300 ease-out">
-							Password is required.
-						</p>
-					)}
-				</div>
+				<InputField
+					label="Password"
+					name="password"
+					type="password"
+					register={register}
+					required
+					togglePassword
+					errorMessage={errors.password && "Password is required."}
+				/>
 			</div>
+
 			{errorMessage && (
 				<p className="text-main text-center duration-300 ease-in-out">
 					{errorMessage}
 				</p>
 			)}
+
 			<button
 				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
 				type="submit"
@@ -117,4 +92,5 @@ const LoginForm: FC = () => {
 		</form>
 	)
 }
+
 export default LoginForm

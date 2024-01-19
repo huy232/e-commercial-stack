@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/types"
+import { ApiResponse, ApiResponseLogin } from "@/types"
 import { API } from "@/constant"
 
 // User Route
@@ -35,9 +35,7 @@ export const userRegister = async (
 	}
 }
 
-export const userLogin = async (
-	data: UserLogin
-): Promise<ApiResponse<string>> => {
+export const userLogin = async (data: UserLogin): Promise<ApiResponseLogin> => {
 	try {
 		const response = await fetch(`${API}/user/login`, {
 			method: "POST",
@@ -48,7 +46,7 @@ export const userLogin = async (
 			body: JSON.stringify(data),
 		})
 
-		const responseData: ApiResponse<string> = await response.json()
+		const responseData: ApiResponseLogin = await response.json()
 
 		return responseData
 	} catch (error) {
@@ -153,6 +151,23 @@ export const resetPassword = async (
 
 		const responseData: ApiResponse<string> = await response.json()
 
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const getCurrentUser = async (): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch(`${API}/user/current`, {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+
+		const responseData: ApiResponse<string> = await response.json()
 		return responseData
 	} catch (error) {
 		throw error

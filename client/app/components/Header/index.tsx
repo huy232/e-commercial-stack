@@ -1,12 +1,8 @@
-import {
-	BsHandbagFill,
-	FaUserCircle,
-	MdEmail,
-	RiPhoneFill,
-} from "@/assets/icons"
+import { BsHandbagFill, MdEmail, RiPhoneFill } from "@/assets/icons"
 import { path } from "@/utils/"
 import Link from "next/link"
 import { FC } from "react"
+import { User } from "@/app/components"
 
 const Header: FC = () => {
 	return (
@@ -43,7 +39,7 @@ const Header: FC = () => {
 					<span>0 item(s)</span>
 				</div>
 				<div className="flex items-center justify-center gap-2 px-6">
-					<FaUserCircle size={24} />
+					<User />
 				</div>
 			</div>
 		</div>

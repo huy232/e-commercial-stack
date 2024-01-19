@@ -2,11 +2,14 @@
 import Link from "next/link"
 import { path } from "@/utils"
 import { userLogout } from "@/app/api"
+import { useDispatch } from "react-redux"
+import { logout } from "@/store/slices/authSlice"
 
 const TopHeader = () => {
+	const dispatch = useDispatch()
 	const handleLogout = async () => {
-		const response = await userLogout()
-		console.log(response)
+		await userLogout()
+		dispatch(logout())
 	}
 
 	return (

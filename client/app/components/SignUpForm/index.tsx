@@ -1,12 +1,11 @@
 "use client"
 
 import { useForm } from "react-hook-form"
-import { BiShow, BiHide } from "@/assets/icons"
 import { useState, useCallback } from "react"
 import { UserRegister, userRegister } from "@/app/api"
 import axios from "axios"
 import { passwordHashingClient, path } from "@/utils"
-import { SignUpComplete } from "@/app/components"
+import { InputField, SignUpComplete } from "@/app/components"
 import Link from "next/link"
 
 const SignUpForm = () => {
@@ -15,20 +14,8 @@ const SignUpForm = () => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm()
-	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [errorMessage, setErrorMessage] = useState("")
 	const [showSignUpComplete, setShowSignUpComplete] = useState(false)
-
-	const togglePasswordVisibility = () => {
-		const passwordInput = document.getElementById(
-			"password"
-		) as HTMLInputElement
-
-		if (passwordInput) {
-			passwordInput.type = passwordVisible ? "password" : "text"
-			setPasswordVisible(!passwordVisible)
-		}
-	}
 
 	const handleRegister = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -65,64 +52,38 @@ const SignUpForm = () => {
 				onSubmit={handleRegister}
 			>
 				<div>
-					<div className="flex flex-col gap-2 py-2">
-						<label className="text-md font-medium">First name</label>
-						<input
-							className="rounded p-1"
-							{...register("firstName", { required: true })}
-							placeholder="First name"
-						/>
-						<label className="text-md font-medium">Last name</label>
-						<input
-							className="rounded p-1"
-							{...register("lastName", { required: true })}
-							placeholder="Last name"
-						/>
-						{(errors.firstName || errors.lastName) && (
-							<p className="text-main duration-300 ease-in-out">
-								Please enter your name.
-							</p>
-						)}
-					</div>
-
-					<div className="flex flex-col gap-2 py-2">
-						<label className="text-md font-medium">Email</label>
-						<input
-							className="rounded p-1"
-							{...register("email", { required: true, pattern: /^\S+@\S+$/i })}
-							placeholder="Email"
-						/>
-						{errors.email && (
-							<p className="text-main duration-300 ease-in-out">
-								Please enter a valid email address.
-							</p>
-						)}
-					</div>
-
-					<div className="flex flex-col gap-2 py-2">
-						<label className="text-md font-medium">Password</label>
-						<div className="flex items-center justify-center gap-4">
-							<input
-								className="rounded p-1"
-								id="password"
-								type={passwordVisible ? "text" : "password"}
-								{...register("password", { required: true })}
-								placeholder="Password"
-							/>
-							<button
-								className="duration-300 ease-in-out"
-								type="button"
-								onClick={togglePasswordVisibility}
-							>
-								{passwordVisible ? <BiHide /> : <BiShow />}
-							</button>
-						</div>
-						{errors.password && (
-							<p className="text-main duration-300 ease-in-out">
-								Password is required.
-							</p>
-						)}
-					</div>
+					<InputField
+						label="First name"
+						name="firstName"
+						register={register}
+						required
+						errorMessage={
+							(errors.firstName || errors.lastName) && "Please enter your name."
+						}
+					/>
+					<InputField
+						label="Last name"
+						name="lastName"
+						register={register}
+						required
+					/>
+					<InputField
+						label="Email"
+						name="email"
+						register={register}
+						required
+						pattern={/^\S+@\S+$/i}
+						errorMessage={errors.email && "Please enter a valid email address."}
+					/>
+					<InputField
+						label="Password"
+						name="password"
+						type="password"
+						register={register}
+						required
+						togglePassword
+						errorMessage={errors.password && "Password is required."}
+					/>
 				</div>
 				{errorMessage && (
 					<p className="text-main text-center duration-300 ease-in-out">
