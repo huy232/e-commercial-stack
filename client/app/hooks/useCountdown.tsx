@@ -8,10 +8,7 @@ interface UseCountdownProps {
 	onExpiration: () => void
 }
 
-export const useCountdown = ({
-	expirationTime,
-	onExpiration,
-}: UseCountdownProps) => {
+const useCountdown = ({ expirationTime, onExpiration }: UseCountdownProps) => {
 	const [timeRemaining, setTimeRemaining] = useState(
 		moment.duration(moment(expirationTime).diff(moment()))
 	)
@@ -25,7 +22,6 @@ export const useCountdown = ({
 			const newTimeRemaining = moment.duration(expiration.diff(now))
 
 			if (newTimeRemaining.asMilliseconds() <= 0) {
-				// If time has expired, trigger the provided callback
 				clearInterval(intervalId)
 				onExpiration()
 			}
@@ -42,3 +38,5 @@ export const useCountdown = ({
 
 	return timeRemaining
 }
+
+export default useCountdown

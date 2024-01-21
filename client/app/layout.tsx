@@ -31,7 +31,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={bodyClassName}>
 				<ReduxProvider>
-					<TopHeader />
+					{/* <TopHeader /> */}
 					<Header />
 					<Navbar />
 					<div className="w-main flex-grow">{children}</div>
