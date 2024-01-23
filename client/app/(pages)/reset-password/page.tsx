@@ -19,7 +19,7 @@ export default function ResetPassword(props: Props) {
 					</span>
 					<span>Try resetting password again.</span>
 					<Link
-						className="border-2 border-rose-500 p-1 rounded hover:bg-rose-500 hover:text-white duration-300 ease-linear"
+						className="border-2 border-rose-500 p-1 rounded hover:bg-rose-500 hover:text-white hover-effect"
 						href={"/forgot-password"}
 					>
 						Sign up

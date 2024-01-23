@@ -35,15 +35,31 @@ class ProductController {
 
 	getProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const { product_id } = req.params
-			const product = await Product.findById(product_id)
-			res.status(200).json({
-				success: product ? true : false,
-				message: product
-					? "Successfully get a product"
-					: "Cannot find a product",
-				data: product ? product : {},
-			})
+			const { product_slug } = req.params
+
+			try {
+				const product = await Product.findOne({ slug: product_slug })
+
+				if (product) {
+					res.status(200).json({
+						success: true,
+						message: "Successfully get a product",
+						data: product,
+					})
+				} else {
+					res.status(404).json({
+						success: false,
+						message: "Cannot find a product with the specified slug",
+						data: {},
+					})
+				}
+			} catch (error) {
+				res.status(500).json({
+					success: false,
+					message: "Internal Server Error",
+					data: {},
+				})
+			}
 		}
 	)
 

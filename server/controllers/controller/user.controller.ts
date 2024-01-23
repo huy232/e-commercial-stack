@@ -9,10 +9,23 @@ import { AuthenticatedRequest } from "../../types/user"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { sendMail } from "../../utils/sendMail"
 import crypto from "crypto"
+import * as Validators from "../../validators/userValidators"
+import { validationResult } from "express-validator"
 
 class UserController {
-	register = asyncHandler(
-		async (req: Request, res: Response): Promise<void> => {
+	register = async (req: Request, res: Response): Promise<void> => {
+		try {
+			await Promise.all(
+				Validators.validateRegisterUser.map((validation) => validation.run(req))
+			)
+
+			const validationErrors = validationResult(req)
+
+			if (!validationErrors.isEmpty()) {
+				res.status(400).json({ errors: validationErrors.array() })
+				return
+			}
+
 			let { firstName, lastName, email, password } = req.body
 
 			if (!firstName || !lastName || !email || !password) {
@@ -24,8 +37,13 @@ class UserController {
 			}
 
 			const user = await User.findOne({ email })
+
 			if (user) {
-				throw new Error("User has existed")
+				res.status(400).json({
+					success: false,
+					message: "User already exists",
+				})
+				return
 			}
 
 			const newUser = new User({
@@ -45,10 +63,11 @@ class UserController {
 			const registrationUrl = `${
 				process.env.URL_CLIENT
 			}/complete-registration?token=${encodeURIComponent(token)}`
+
 			const emailHtml = `
-      <p>Click the following link to complete your registration:</p>
-      <a href="${registrationUrl}">${registrationUrl}</a>
-    `
+        <p>Click the following link to complete your registration:</p>
+        <a href="${registrationUrl}">${registrationUrl}</a>
+      `
 
 			try {
 				await sendMail({
@@ -56,18 +75,30 @@ class UserController {
 					html: emailHtml,
 					subject: "Verify account",
 				})
+
 				res.status(200).json({
 					success: true,
 					message: "Registration email sent successfully. Check your inbox.",
 				})
+
+				return
 			} catch (err) {
 				res.status(500).json({
 					success: false,
 					message: "Something went wrong with verify email.",
 				})
+
+				return
 			}
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Unexpected error during validation.",
+			})
+
+			return
 		}
-	)
+	}
 
 	verifyRegister = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
@@ -136,62 +167,75 @@ class UserController {
 		}
 	)
 
-	login = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-		let { email, password } = req.body
+	login = async (req: Request, res: Response): Promise<void> => {
+		try {
+			// Validate inputs
+			Validators.validateLogin.forEach((validation) => validation.run(req))
+			Validators.runValidation(req, res, async () => {
+				// Continue with login logic
+				let { email, password } = req.body
 
-		if (!email || !password) {
-			res.status(400).json({
+				const user = await User.findOne({ email })
+
+				if (!user) {
+					res.status(400).json({
+						success: false,
+						message: "User does not exist",
+					})
+					return
+				}
+
+				const passwordCheck = await user.isCorrectPassword(password)
+
+				if (passwordCheck) {
+					const userData = user.toObject()
+					const { password, role, refreshToken, ...rest } = userData
+					const accessToken = generateAccessToken(userData._id, role)
+					const newRefreshToken = generateRefreshToken(userData._id)
+
+					// Save refresh token to database
+					await User.findByIdAndUpdate(
+						userData._id,
+						{ refreshToken: newRefreshToken },
+						{ new: true }
+					)
+
+					// Save refresh token to cookie
+					res.cookie("refreshToken", newRefreshToken, {
+						httpOnly: true,
+						maxAge: 7 * 24 * 60 * 60 * 1000,
+						sameSite: "none",
+						secure: true,
+					})
+
+					// Save access token to cookie
+					res.cookie("accessToken", accessToken, {
+						httpOnly: true,
+						maxAge: 60 * 1000,
+						sameSite: "none",
+						secure: true,
+					})
+
+					res.status(200).json({
+						success: true,
+						message: "Login successfully",
+						userData: { ...rest },
+						accessToken,
+					})
+				} else {
+					res.status(400).json({
+						success: false,
+						message: "Invalid credentials",
+					})
+				}
+			})
+		} catch (error) {
+			res.status(500).json({
 				success: false,
-				message: "Missing inputs",
+				message: "Unexpected error during login.",
 			})
-			return
 		}
-
-		const user = await User.findOne({ email })
-		if (!user) {
-			throw new Error("User does not exist")
-		}
-
-		const passwordCheck = await user.isCorrectPassword(password)
-
-		if (passwordCheck) {
-			const userData = user.toObject()
-			const { password, role, refreshToken, ...rest } = userData
-			const accessToken = generateAccessToken(userData._id, role)
-			const newRefreshToken = generateRefreshToken(userData._id)
-			// Save refresh token to database
-			await User.findByIdAndUpdate(
-				userData._id,
-				{ refreshToken: newRefreshToken },
-				{ new: true }
-			)
-			// Save refresh token to cookie
-			res.cookie("refreshToken", newRefreshToken, {
-				httpOnly: true,
-				maxAge: 7 * 24 * 60 * 60 * 1000,
-				sameSite: "none",
-				secure: true,
-			})
-
-			// Save access token to cookie
-			res.cookie("accessToken", accessToken, {
-				httpOnly: true,
-				// maxAge: 1 * 24 * 60 * 60 * 1000,
-				maxAge: 60 * 1000,
-				sameSite: "none",
-				secure: true,
-			})
-
-			res.status(200).json({
-				success: true,
-				message: "Login successfully",
-				userData: { ...rest },
-				accessToken,
-			})
-		} else {
-			throw new Error("Invalid credentials")
-		}
-	})
+	}
 
 	getCurrentUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -292,11 +336,20 @@ class UserController {
 					message: "Verify your password resetting in the mail.",
 				})
 			} catch (err) {
-				res.status(401).json({
-					success: true,
-					message:
-						"Something went wrong while trying to resetting the password. Try again!",
-				})
+				if (err instanceof Error) {
+					res.status(401).json({
+						success: false,
+						message:
+							err.message ||
+							"Something went wrong while trying to resetting the password. Try again!",
+					})
+				} else {
+					res.status(401).json({
+						success: false,
+						message:
+							"Something went wrong while trying to resetting the password. Try again!",
+					})
+				}
 			}
 		}
 	)
@@ -526,6 +579,7 @@ class UserController {
 
 	checkAuth = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			console.log(req.user)
 			res.status(200).json({ success: true, message: "Valid user" })
 		}
 	)

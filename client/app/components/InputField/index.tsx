@@ -14,6 +14,29 @@ interface InputFieldProps {
 	placeholder?: string
 	togglePassword?: boolean
 	validate?: (value: string) => boolean | string
+	minLength?: number
+
+	validateType?:
+		| "email"
+		| "noSpaceNoNumber"
+		| "onlyWords"
+		| "onlyNumbers"
+		| "password"
+		| "custom"
+		| undefined
+}
+type ValidationPattern = RegExp | undefined
+
+const validateTypePatterns: Record<
+	NonNullable<InputFieldProps["validateType"]>,
+	ValidationPattern
+> = {
+	email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+	noSpaceNoNumber: /^[^\s0-9]+$/,
+	onlyWords: /^[A-Za-z\s]+$/,
+	onlyNumbers: /^[0-9]+$/,
+	password: /^[^\s]+$/,
+	custom: undefined,
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -27,12 +50,21 @@ const InputField: React.FC<InputFieldProps> = ({
 	placeholder,
 	togglePassword = false,
 	validate,
+	minLength,
+	validateType,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
 	const togglePasswordVisibility = () => {
 		setPasswordVisible(!passwordVisible)
 	}
+
+	const selectedPattern =
+		validateType !== undefined
+			? validateTypePatterns[
+					validateType as NonNullable<InputFieldProps["validateType"]>
+			  ]
+			: undefined
 
 	return (
 		<div className="w-[320px]">
@@ -45,12 +77,24 @@ const InputField: React.FC<InputFieldProps> = ({
 							type={
 								togglePassword ? (passwordVisible ? "text" : "password") : type
 							}
-							{...register(name, { required, pattern, validate })}
+							{...register(name, {
+								required,
+								pattern: selectedPattern,
+								validate: (value) => {
+									if (minLength && value.length < minLength) {
+										return `Password must be at least ${minLength} characters`
+									}
+									if (validate) {
+										return validate(value)
+									}
+									return true
+								},
+							})}
 							placeholder={placeholder}
 						/>
 						{togglePassword && (
 							<button
-								className="duration-300 ease-in-out px-1"
+								className="hover-effect px-1"
 								type="button"
 								onClick={togglePasswordVisibility}
 							>
@@ -60,9 +104,7 @@ const InputField: React.FC<InputFieldProps> = ({
 					</div>
 				</div>
 			</div>
-			{errorMessage && (
-				<p className="text-main duration-300 ease-in-out">{errorMessage}</p>
-			)}
+			{errorMessage && <p className="text-main hover-effect">{errorMessage}</p>}
 		</div>
 	)
 }

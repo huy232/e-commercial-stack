@@ -9,7 +9,7 @@ router.post(
 	[verifyAccessToken, isAdmin],
 	ProductController.createProduct
 )
-router.get("/get-product/:product_id", ProductController.getProduct)
+router.get("/get-product/:product_slug", ProductController.getProduct)
 router.get("/get-all-product", ProductController.getAllProducts)
 router.put(
 	"/update-product/:product_id",

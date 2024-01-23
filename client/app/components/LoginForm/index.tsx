@@ -62,8 +62,12 @@ const LoginForm: FC = () => {
 					name="email"
 					register={register}
 					required
-					pattern={/^\S+@\S+$/i}
-					errorMessage={errors.email && "Please enter a valid email address."}
+					validateType="email"
+					errorMessage={
+						errors.email &&
+						(errors.email.message?.toString() ||
+							"Please enter a valid email address.")
+					}
 				/>
 
 				<InputField
@@ -73,18 +77,21 @@ const LoginForm: FC = () => {
 					register={register}
 					required
 					togglePassword
-					errorMessage={errors.password && "Password is required."}
+					errorMessage={
+						errors.password &&
+						(errors.password.message?.toString() || "Password is required")
+					}
+					minLength={6}
+					validateType="password"
 				/>
 			</div>
 
 			{errorMessage && (
-				<p className="text-main text-center duration-300 ease-in-out">
-					{errorMessage}
-				</p>
+				<p className="text-main text-center hover-effect">{errorMessage}</p>
 			)}
 
 			<button
-				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
+				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 				type="submit"
 			>
 				Login

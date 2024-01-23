@@ -61,13 +61,11 @@ const ForgotPasswordForm = () => {
 			</div>
 
 			{errorMessage && (
-				<p className="text-main text-center duration-300 ease-in-out">
-					{errorMessage}
-				</p>
+				<p className="text-main text-center hover-effect">{errorMessage}</p>
 			)}
 
 			<button
-				className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
+				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 				type="submit"
 			>
 				Submit

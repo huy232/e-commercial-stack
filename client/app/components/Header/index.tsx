@@ -11,9 +11,9 @@ const Header: FC = () => {
 				href={path.HOME}
 				className="uppercase font-black group border-2 border-transparent hover:border-black border-solid rounded px-1"
 			>
-				<p className="group-hover:text-main transition-all duration-300 ease-in-out">
+				<p className="group-hover:text-main hover-effect">
 					Digital
-					<span className="text-main group-hover:text-[#0d0d0d] transition-all duration-300 ease-in-out">
+					<span className="text-main group-hover:text-[#0d0d0d] hover-effect">
 						World
 					</span>
 				</p>
@@ -38,7 +38,7 @@ const Header: FC = () => {
 					<BsHandbagFill color="red" />
 					<span>0 item(s)</span>
 				</div>
-				<div className="flex items-center justify-center gap-2 px-6">
+				<div className="flex items-center justify-center gap-2 px-6 relative">
 					<User />
 				</div>
 			</div>

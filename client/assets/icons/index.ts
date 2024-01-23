@@ -1,5 +1,9 @@
 export { RiPhoneFill } from "react-icons/ri"
-export { MdEmail, MdOutlineSubdirectoryArrowRight } from "react-icons/md"
+export {
+	MdEmail,
+	MdOutlineSubdirectoryArrowRight,
+	MdKeyboardArrowRight,
+} from "react-icons/md"
 export { BsHandbagFill, BsFillSuitHeartFill } from "react-icons/bs"
 export { FaUserCircle } from "react-icons/fa"
 export {

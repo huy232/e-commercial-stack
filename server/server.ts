@@ -17,7 +17,7 @@ dbConnect()
 				origin: [process.env.CLIENT_URL as string],
 				methods: ["POST", "PUT", "GET", "DELETE"],
 			})
-		)
+		);
 		app.use(cookieParser())
 		app.use(express.json())
 		app.use(express.urlencoded({ extended: true }))

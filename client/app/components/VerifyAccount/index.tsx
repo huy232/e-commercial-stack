@@ -40,7 +40,7 @@ const VerifyAccount: FC = () => {
 					<span className="text-rose-500 italic">{errorMessage}</span>
 					<span>Please try sign up again.</span>
 					<Link
-						className="border-2 border-rose-500 p-1 rounded hover:bg-rose-500 hover:text-white duration-300 ease-linear"
+						className="border-2 border-rose-500 p-1 rounded hover:bg-rose-500 hover:text-white hover-effect"
 						href={"/register"}
 					>
 						Sign up
@@ -54,7 +54,7 @@ const VerifyAccount: FC = () => {
 						Your account has verified, you can proceed to shopping now.
 					</span>
 					<Link
-						className="border-2 border-teal-500 p-1 rounded hover:bg-teal-500 hover:text-white duration-300 ease-linear"
+						className="border-2 border-teal-500 p-1 rounded hover:bg-teal-500 hover:text-white hover-effect"
 						href={"/"}
 					>
 						Home page

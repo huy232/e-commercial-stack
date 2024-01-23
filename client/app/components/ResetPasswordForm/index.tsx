@@ -65,7 +65,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				Successfully resetting your password, you can now try to login again
 			</p>
 			<Link href={path.LOGIN}>
-				<button className="duration-300 ease-linear border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1">
+				<button className="hover-effect border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1">
 					Login
 				</button>
 			</Link>
@@ -98,18 +98,16 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 
 			{errorMessage ? (
 				<div>
-					<p className="text-main text-center duration-300 ease-in-out">
-						{errorMessage}
-					</p>
+					<p className="text-main text-center hover-effect">{errorMessage}</p>
 					<Link href={path.FORGOT_PASSWORD}>
-						<button className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white duration-300 ease-in-out p-1 rounded">
+						<button className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white hover-effect p-1 rounded">
 							Try reset your password again
 						</button>
 					</Link>
 				</div>
 			) : (
 				<button
-					className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
+					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"
 				>
 					Submit

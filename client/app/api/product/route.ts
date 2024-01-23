@@ -44,3 +44,18 @@ export const getDailyDeal = async (): Promise<ApiResponse<ProductType[]>> => {
 		throw error
 	}
 }
+
+export const getSpecificProduct = async (
+	productSlug: string
+): Promise<ApiResponse<ProductType>> => {
+	try {
+		const response = await fetch(`${API}/product/get-product/${productSlug}`, {
+			method: "GET",
+			cache: "default",
+		})
+		const responseData: ApiResponse<ProductType> = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}

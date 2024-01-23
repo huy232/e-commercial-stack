@@ -14,7 +14,8 @@ const SignUpForm = () => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm()
-	const [errorMessage, setErrorMessage] = useState("")
+	const [errorMessage, setErrorMessage] = useState<string>("")
+	const [errorsField, setErrorsField] = useState<[] | undefined>([])
 	const [showSignUpComplete, setShowSignUpComplete] = useState(false)
 
 	const handleRegister = useCallback(
@@ -24,13 +25,18 @@ const SignUpForm = () => {
 				await handleSubmit(async (data) => {
 					const { firstName, lastName, email, password } = data as UserRegister
 					const hashPassword = await passwordHashingClient(password)
-					await userRegister({
+					const response = await userRegister({
 						firstName,
 						lastName,
 						email,
 						password: hashPassword,
 					})
-					setShowSignUpComplete(true)
+
+					if (response.success) {
+						setShowSignUpComplete(true)
+					} else {
+						setErrorsField(response.errors || [])
+					}
 				})(event)
 			} catch (err: unknown) {
 				if (axios.isAxiosError(err)) {
@@ -58,22 +64,35 @@ const SignUpForm = () => {
 						register={register}
 						required
 						errorMessage={
-							(errors.firstName || errors.lastName) && "Please enter your name."
+							errors.firstName &&
+							(errors.firstName.message?.toString() ||
+								"Please enter your first name.")
 						}
+						validateType="onlyWords"
 					/>
 					<InputField
 						label="Last name"
 						name="lastName"
 						register={register}
 						required
+						errorMessage={
+							errors.lastName &&
+							(errors.lastName.message?.toString() ||
+								"Please enter your last name.")
+						}
+						validateType="onlyWords"
 					/>
 					<InputField
 						label="Email"
 						name="email"
 						register={register}
 						required
-						pattern={/^\S+@\S+$/i}
-						errorMessage={errors.email && "Please enter a valid email address."}
+						validateType="email"
+						errorMessage={
+							errors.email &&
+							(errors.email.message?.toString() ||
+								"Please enter a valid email address.")
+						}
 					/>
 					<InputField
 						label="Password"
@@ -82,16 +101,19 @@ const SignUpForm = () => {
 						register={register}
 						required
 						togglePassword
-						errorMessage={errors.password && "Password is required."}
+						errorMessage={
+							errors.password &&
+							(errors.password.message?.toString() || "Password is required")
+						}
+						minLength={6}
+						validateType="custom"
 					/>
 				</div>
 				{errorMessage && (
-					<p className="text-main text-center duration-300 ease-in-out">
-						{errorMessage}
-					</p>
+					<p className="text-main text-center hover-effect">{errorMessage}</p>
 				)}
 				<button
-					className="cursor-pointer border-2 border-main hover:bg-main duration-300 ease-linear rounded p-0.5 px-4 my-4"
+					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"
 				>
 					Sign up

@@ -3,10 +3,11 @@
 import { ProductType } from "@/types/product"
 import { FC } from "react"
 import { CustomImage, ProductOptions } from "@/app/components/"
-import { formatPrice, renderStarFromNumber } from "@/utils/"
+import { formatPrice, path, renderStarFromNumber } from "@/utils/"
 import { AiFillEye, AiOutlineMenu, BsFillSuitHeartFill } from "@/assets/icons"
 import clsx from "clsx"
 import { NoProductImage } from "@/assets/images"
+import Link from "next/link"
 
 interface ProductProps {
 	product: ProductType
@@ -32,9 +33,17 @@ const Product: FC<ProductProps> = ({
 		{ "bg-blue-100 text-blue-800 border-blue-400": markLabel === "New" }
 	)
 
-	const listProductOptions = productHoverOptions.map((option) => (
-		<ProductOptions icon={option.icon} key={option.id} />
-	))
+	const listProductOptions = productHoverOptions.map((option) => {
+		if (option.id === 1) {
+			return (
+				<Link href={`${path.PRODUCTS}/${product.slug}`} key={option.id}>
+					<ProductOptions icon={option.icon} />
+				</Link>
+			)
+		} else {
+			return <ProductOptions icon={option.icon} key={option.id} />
+		}
+	})
 
 	return (
 		<div className="w-full text-base px-1">

@@ -6,8 +6,10 @@ import { useDispatch, useSelector } from "react-redux"
 import { FaUserCircle } from "@/assets/icons"
 import Link from "next/link"
 import { path } from "@/utils"
+import { useDropdown } from "@/app/hooks"
 
 const User = () => {
+	const { isOpen, toggleDropdown } = useDropdown()
 	const dispatch = useDispatch()
 	const user = useSelector(selectAuthUser)
 
@@ -34,8 +36,11 @@ const User = () => {
 	}, [dispatch])
 
 	return (
-		<div className="relative">
-			<div className="flex gap-2 items-center">
+		<div>
+			<div
+				className="flex gap-2 items-center cursor-pointer hover-effect hover:opacity-80 select-none"
+				onClick={toggleDropdown}
+			>
 				<FaUserCircle size={24} />
 				{user ? (
 					<span>{user.firstName}</span>
@@ -43,9 +48,11 @@ const User = () => {
 					<Link href={path.LOGIN}>Login</Link>
 				)}
 			</div>
-			{user && (
-				<div className="absolute h-[300px] w-full bg-rose-500">
-					<button onClick={handleLogout}>Logout</button>
+			{user && isOpen && (
+				<div className="absolute h-full w-full bg-black/20 rounded mt-1 z-10">
+					<div className="p-1">
+						<button onClick={handleLogout}>Logout</button>
+					</div>
 				</div>
 			)}
 		</div>

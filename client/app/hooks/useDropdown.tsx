@@ -29,10 +29,10 @@ const useDropdown = (initialState = false) => {
 	)
 
 	useEffect(() => {
-		document.addEventListener("mousedown", handleOutsideClick as any)
+		document.addEventListener("click", handleOutsideClick as any)
 
 		return () => {
-			document.removeEventListener("mousedown", handleOutsideClick as any)
+			document.removeEventListener("click", handleOutsideClick as any)
 		}
 	}, [handleOutsideClick])
 

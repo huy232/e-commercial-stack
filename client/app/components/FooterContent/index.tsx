@@ -31,31 +31,31 @@ const FooterContent = () => {
 					<div className="flex flex-col gap-2">
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Typography
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Gallery
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Store location
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Today&apos; deal
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Contacts
 						</Link>
@@ -66,31 +66,31 @@ const FooterContent = () => {
 					<div className="flex flex-col gap-2">
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Help
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Free shipping
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							FAQs
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Return & exchange
 						</Link>
 						<Link
 							href={"#"}
-							className="hover:opacity-70 hover:text-main duration-300 ease-in-out"
+							className="hover:opacity-70 hover:text-main hover-effect"
 						>
 							Testimonials
 						</Link>
