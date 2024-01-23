@@ -1,10 +1,22 @@
+"use client"
+
 import { BsHandbagFill, MdEmail, RiPhoneFill } from "@/assets/icons"
 import { path } from "@/utils/"
 import Link from "next/link"
-import { FC } from "react"
+import { FC, useEffect, useState } from "react"
 import { User } from "@/app/components"
 
 const Header: FC = () => {
+	const [mounted, setMounted] = useState(false)
+
+	useEffect(() => {
+		setMounted(true)
+	}, [])
+
+	if (!mounted) {
+		return null
+	}
+
 	return (
 		<div className="w-main h-[110px] py-[35px] flex justify-between">
 			<Link
@@ -39,7 +51,7 @@ const Header: FC = () => {
 					<span>0 item(s)</span>
 				</div>
 				<div className="flex items-center justify-center gap-2 px-6 relative">
-					<User />
+					{mounted ? <User /> : <></>}
 				</div>
 			</div>
 		</div>

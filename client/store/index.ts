@@ -9,7 +9,7 @@ import {
 	PURGE,
 	REGISTER,
 } from "redux-persist"
-import storage from "redux-persist/lib/storage"
+import storage from "@/store/storage"
 import authReducer, { AuthState } from "@/store/slices/authSlice"
 import { Persistor } from "redux-persist/es/types"
 import { Store } from "redux"
@@ -41,6 +41,5 @@ const persistor: Persistor = persistStore(store)
 export { store, persistor }
 
 export type AppStore = typeof store
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<AppStore["getState"]>
 export type AppDispatch = AppStore["dispatch"]

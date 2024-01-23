@@ -1,10 +1,7 @@
 "use client"
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import { CategoryType } from "@/types/category"
 import Link from "next/link"
-import { useDispatch, useSelector } from "react-redux"
-import { AppDispatch, RootState } from "@/types/redux"
-import { getCategoriesAction } from "@/store/actions/asyncAction"
 
 interface SidebarProps {
 	categories: any

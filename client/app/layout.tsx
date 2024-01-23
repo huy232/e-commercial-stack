@@ -1,9 +1,12 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
-import { Footer, Header, Navbar, TopHeader } from "@/app/components"
+import { Footer, Header, Navbar } from "@/app/components"
 import clsx from "clsx"
-import ReduxProvider from "@/app/context/reduxProvider"
 import "../app/globals.css"
+import dynamic from "next/dynamic"
+const ReduxProvider = dynamic(() => import("@/app/context/reduxProvider"), {
+	ssr: false,
+})
 
 const poppins = Poppins({
 	subsets: ["latin"],
@@ -31,7 +34,6 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={bodyClassName}>
 				<ReduxProvider>
-					{/* <TopHeader /> */}
 					<Header />
 					<Navbar />
 					<div className="w-main flex-grow">{children}</div>
