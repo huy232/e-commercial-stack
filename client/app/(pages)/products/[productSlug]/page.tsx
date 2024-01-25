@@ -1,5 +1,5 @@
 import { getSpecificProduct } from "@/app/api"
-import { Breadcrumb } from "@/app/components"
+import { Breadcrumb } from "@/components"
 
 export default async function Product({
 	params,

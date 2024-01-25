@@ -1,4 +1,4 @@
-import { LoginForm } from "@/app/components"
+import { LoginForm } from "@/components"
 import { path } from "@/utils"
 import Link from "next/link"
 

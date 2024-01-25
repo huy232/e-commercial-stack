@@ -1,4 +1,4 @@
-import { ResetPasswordForm } from "@/app/components"
+import { ResetPasswordForm } from "@/components"
 import Link from "next/link"
 
 type Props = {

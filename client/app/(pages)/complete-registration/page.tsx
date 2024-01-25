@@ -1,5 +1,5 @@
 import { verifyAccount } from "@/app/api"
-import { VerifyAccount } from "@/app/components"
+import { VerifyAccount } from "@/components"
 import Link from "next/link"
 
 type Props = {
