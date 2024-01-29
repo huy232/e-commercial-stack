@@ -1,5 +1,4 @@
 "use client"
-
 import { BsHandbagFill, MdEmail, RiPhoneFill } from "@/assets/icons"
 import { path } from "@/utils/"
 import Link from "next/link"

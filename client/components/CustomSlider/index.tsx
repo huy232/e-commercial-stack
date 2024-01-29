@@ -4,6 +4,8 @@ import { ProductCard } from "@/components"
 import { ProductType } from "@/types"
 import { FC, useCallback, useEffect, useState } from "react"
 import clsx from "clsx"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
 
 interface CustomSliderProps {
 	tabs: { id: number; name: string; sort: string; markLabel?: string }[]

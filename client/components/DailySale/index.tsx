@@ -26,7 +26,6 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 			if (dailySale.success) {
 				const product = dailySale.data
 				const expirationTime = dailySale.expirationTime
-
 				setDailyDeal({
 					loading: false,
 					product,
@@ -54,12 +53,15 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 	}, [dailyDeal.expirationTime, fetchDealDaily])
 
 	useEffect(() => {
-		setMounted(true)
 		fetchDealDaily()
 		if (dailyDeal.expirationTime) {
 			fetchDealAtEndOfDay()
 		}
 	}, [dailyDeal.expirationTime, fetchDealAtEndOfDay, fetchDealDaily])
+
+	useEffect(() => {
+		setMounted(true)
+	}, [])
 
 	if (!mounted) {
 		return null
