@@ -3,7 +3,7 @@ import { FC, useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
 import { passwordHashingClient } from "@/utils"
 import { UserLogin, userLogin, userLogout } from "@/app/api"
-import { InputField } from "@/components" // Import the InputField component
+import { Button, InputField } from "@/components" // Import the InputField component
 import { useRouter } from "next/navigation"
 import { loginSuccess } from "@/store/slices/authSlice"
 import { useDispatch } from "react-redux"
@@ -90,12 +90,12 @@ const LoginForm: FC = () => {
 				<p className="text-main text-center hover-effect">{errorMessage}</p>
 			)}
 
-			<button
+			<Button
 				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 				type="submit"
 			>
 				Login
-			</button>
+			</Button>
 		</form>
 	)
 }

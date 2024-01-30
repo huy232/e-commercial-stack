@@ -3,7 +3,7 @@ export type ProductType = {
 	category: string[]
 	color: []
 	createdAt: Date
-	descriptrion: string
+	description: string
 	images: string[]
 	price: number
 	quantity: number

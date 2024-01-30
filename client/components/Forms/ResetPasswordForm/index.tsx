@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { resetPassword } from "@/app/api"
 import Link from "next/link"
 import { passwordHashingClient, path } from "@/utils"
-import { InputField } from "@/components"
+import { Button, InputField } from "@/components"
 
 type ResetPasswordFormData = {
 	password: string
@@ -65,9 +65,9 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				Successfully resetting your password, you can now try to login again
 			</p>
 			<Link href={path.LOGIN}>
-				<button className="hover-effect border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1">
+				<Button className="hover-effect border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1">
 					Login
-				</button>
+				</Button>
 			</Link>
 		</div>
 	) : (
@@ -100,18 +100,18 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				<div>
 					<p className="text-main text-center hover-effect">{errorMessage}</p>
 					<Link href={path.FORGOT_PASSWORD}>
-						<button className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white hover-effect p-1 rounded">
+						<Button className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white hover-effect p-1 rounded">
 							Try reset your password again
-						</button>
+						</Button>
 					</Link>
 				</div>
 			) : (
-				<button
+				<Button
 					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"
 				>
 					Submit
-				</button>
+				</Button>
 			)}
 		</form>
 	)

@@ -1,45 +1,32 @@
-import { configureStore } from "@reduxjs/toolkit"
-import {
-	persistStore,
-	persistReducer,
-	FLUSH,
-	REHYDRATE,
-	PAUSE,
-	PERSIST,
-	PURGE,
-	REGISTER,
-} from "redux-persist"
-import storage from "@/store/storage"
-import authReducer, { AuthState } from "@/store/slices/authSlice"
-import { Persistor } from "redux-persist/es/types"
-import { Store } from "redux"
+import { combineReducers, configureStore } from "@reduxjs/toolkit"
+import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux"
+import { persistReducer } from "redux-persist"
+// import storage from "redux-persist/lib/storage"
+import authReducer from "@/store/slices/authSlice"
+import storage from "./storage"
 
 const persistConfig = {
 	key: "root",
-	storage,
+	storage: storage,
 }
 
-const persistedAuthReducer = persistReducer<AuthState, any>(
-	persistConfig,
-	authReducer
-)
+// const persistedAuthReducer = persistReducer<AuthState, any>(
+// 	persistConfig,
+// 	authReducer
+// )
 
-const store: Store<{ auth: AuthState }, any> = configureStore({
-	reducer: {
-		auth: persistedAuthReducer,
-	},
-	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware({
-			serializableCheck: {
-				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-			},
-		}),
+const rootReducer = combineReducers({
+	auth: persistReducer(persistConfig, authReducer),
 })
 
-const persistor: Persistor = persistStore(store)
+export const store = configureStore({
+	reducer: rootReducer,
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({ serializableCheck: false }),
+})
 
-export { store, persistor }
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
 
-export type AppStore = typeof store
-export type RootState = ReturnType<AppStore["getState"]>
-export type AppDispatch = AppStore["dispatch"]
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector

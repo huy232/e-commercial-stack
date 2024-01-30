@@ -47,6 +47,20 @@ const config: Config = {
 				"slide-up":
 					"slide-up 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both",
 			},
+			listStyleType: {
+				none: "none",
+				disc: "disc",
+				decimal: "decimal",
+				square: "square",
+				roman: "upper-roman",
+			},
+		},
+		listStyleType: {
+			none: "none",
+			disc: "disc",
+			decimal: "decimal",
+			square: "square",
+			roman: "upper-roman",
 		},
 	},
 	plugins: [],

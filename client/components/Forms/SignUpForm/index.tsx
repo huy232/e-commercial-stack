@@ -5,7 +5,7 @@ import { useState, useCallback } from "react"
 import { UserRegister, userRegister } from "@/app/api"
 import axios from "axios"
 import { passwordHashingClient, path } from "@/utils"
-import { InputField } from "@/components"
+import { Button, InputField } from "@/components"
 import Link from "next/link"
 
 const SignUpForm = () => {
@@ -114,12 +114,12 @@ const SignUpForm = () => {
 				{errorMessage && (
 					<p className="text-main text-center hover-effect">{errorMessage}</p>
 				)}
-				<button
+				<Button
 					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"
 				>
 					Sign up
-				</button>
+				</Button>
 			</form>
 			<div className="flex flex-col text-center">
 				<span>

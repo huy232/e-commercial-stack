@@ -2,6 +2,7 @@
 import { useState } from "react"
 import { RegisterOptions, UseFormRegister } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
+import { Button } from "@/components"
 
 interface InputFieldProps {
 	type?: string
@@ -93,13 +94,13 @@ const InputField: React.FC<InputFieldProps> = ({
 							placeholder={placeholder}
 						/>
 						{togglePassword && (
-							<button
+							<Button
 								className="hover-effect px-1"
 								type="button"
 								onClick={togglePasswordVisibility}
 							>
 								{passwordVisible ? <BiHide /> : <BiShow />}
-							</button>
+							</Button>
 						)}
 					</div>
 				</div>

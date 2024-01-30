@@ -36,3 +36,7 @@ button.slick-next::before {
 button.slick-prev::before {
 	content: "\2039";
 }
+
+img {
+	max-width: unset;
+}

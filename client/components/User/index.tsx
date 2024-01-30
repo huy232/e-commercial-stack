@@ -7,6 +7,7 @@ import { FaUserCircle } from "@/assets/icons"
 import Link from "next/link"
 import { path } from "@/utils"
 import { useDropdown } from "@/hooks"
+import { Button } from "@/components"
 
 const User = () => {
 	const { isOpen, toggleDropdown } = useDropdown()
@@ -51,7 +52,7 @@ const User = () => {
 			{user && isOpen && (
 				<div className="absolute h-full w-full bg-black/20 rounded mt-1 z-10">
 					<div className="p-1">
-						<button onClick={handleLogout}>Logout</button>
+						<Button onClick={handleLogout}>Logout</Button>
 					</div>
 				</div>
 			)}
