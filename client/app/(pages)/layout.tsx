@@ -2,10 +2,7 @@ import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import { Footer, Header, Navbar } from "@/components"
 import clsx from "clsx"
-import dynamic from "next/dynamic"
-const ReduxProvider = dynamic(() => import("@/context/reduxProvider"), {
-	ssr: false,
-})
+import ReduxProvider from "@/context/reduxProvider"
 import "../globals.css"
 
 const poppins = Poppins({

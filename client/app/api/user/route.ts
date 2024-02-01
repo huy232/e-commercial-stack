@@ -55,7 +55,7 @@ export const userLogin = async (data: UserLogin): Promise<ApiResponseLogin> => {
 }
 
 export const checkUserLogin = async (
-	cookies: string | undefined
+	cookieHeader?: string
 ): Promise<ApiResponse<string>> => {
 	try {
 		const response = await fetch(`${API}/user/check-auth`, {
@@ -63,7 +63,7 @@ export const checkUserLogin = async (
 			credentials: "include",
 			headers: {
 				"Content-Type": "application/json",
-				Cookie: cookies || "",
+				Cookie: cookieHeader || "",
 			},
 		})
 

@@ -4,6 +4,7 @@ import {
 	Button,
 	CustomImage,
 	CustomSlider,
+	ProductCart,
 	ProductSlider,
 } from "@/components"
 import Image from "next/image"
@@ -64,10 +65,8 @@ export default async function Product({
 							))}
 						</ul>
 					</div>
-					<div>
-						<Button className="w-full bg-rose-500 text-white hover:opacity-80 hover-effect p-2 rounded">
-							Add to cart
-						</Button>
+					<div className="flex flex-col gap-8">
+						<ProductCart />
 					</div>
 				</div>
 				<div className="w-1/5">Content</div>

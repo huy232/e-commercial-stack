@@ -5,11 +5,14 @@ import { checkUserLogin } from "./app/api"
 export async function middleware(request: NextRequest) {
 	let refreshTokenCookie = request.cookies.get("refreshToken")
 	let accessTokenCookie = request.cookies.get("accessToken")
+	console.log(refreshTokenCookie)
+	console.log(accessTokenCookie)
+
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const response = await checkUserLogin(
-			cookieHeader !== null ? cookieHeader : undefined
-		)
+		const response = await checkUserLogin(cookieHeader || undefined)
+		console.log(response)
+
 		if (response.success) {
 			return NextResponse.redirect(`${process.env.NEXT_PUBLIC_CLIENT_URL}/`)
 		}
