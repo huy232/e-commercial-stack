@@ -15,10 +15,13 @@ export const checkAuthentication = createAsyncThunk<boolean, void>(
 	"auth/checkAuthentication",
 	async () => {
 		try {
-			const response = await fetch("/api/check-auth", {
-				method: "GET",
-				credentials: "include",
-			})
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_API_URI}/user/check-auth`,
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			)
 
 			const data = await response.json()
 			return data.success

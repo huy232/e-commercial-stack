@@ -246,12 +246,12 @@ class UserController {
 			if (user) {
 				res.status(200).json({
 					success: true,
-					response: user,
+					data: user,
 				})
 			} else {
 				res.status(404).json({
 					success: false,
-					response: "User not found",
+					data: "User not found",
 				})
 			}
 		}

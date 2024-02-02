@@ -5,7 +5,14 @@ export {
 	MdKeyboardArrowRight,
 } from "react-icons/md"
 export { BsHandbagFill, BsFillSuitHeartFill } from "react-icons/bs"
-export { FaUserCircle } from "react-icons/fa"
+export {
+	FaUserCircle,
+	FaShieldAlt,
+	FaTruck,
+	FaGift,
+	FaReply,
+	FaTty,
+} from "react-icons/fa"
 export {
 	AiFillHome,
 	AiFillStar,

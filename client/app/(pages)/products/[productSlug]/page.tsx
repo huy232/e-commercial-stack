@@ -1,15 +1,14 @@
 import { getSpecificProduct } from "@/app/api"
 import {
 	Breadcrumb,
-	Button,
-	CustomImage,
-	CustomSlider,
 	ProductCart,
+	ProductInformation,
 	ProductSlider,
+	ProductExtraInfo,
 } from "@/components"
-import Image from "next/image"
 import { formatPrice } from "../../../../utils/formatPrice"
 import { renderStarFromNumber } from "../../../../utils/renderStarFromNumber"
+import { productExtraInformation } from "@/constant"
 
 export default async function Product({
 	params,
@@ -69,8 +68,20 @@ export default async function Product({
 						<ProductCart />
 					</div>
 				</div>
-				<div className="w-1/5">Content</div>
+				<div className="w-1/5">
+					{productExtraInformation.map((extra) => (
+						<ProductExtraInfo
+							key={extra.id}
+							title={extra.title}
+							description={extra.description}
+							icon={extra.icon}
+						/>
+					))}
+				</div>
 			</section>
+			<div className="w-main m-auto mt-8">
+				<ProductInformation />
+			</div>
 		</main>
 	)
 }

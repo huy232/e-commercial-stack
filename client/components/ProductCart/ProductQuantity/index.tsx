@@ -24,19 +24,22 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 	}, [quantity, setQuantity])
 
 	return (
-		<div className="flex items-center">
-			<Button className="border-r border-black" onClick={handleDecrement}>
-				-
-			</Button>
-			<input
-				className="py-2 outline-none w-[100px] text-black text-center"
-				type="number"
-				value={quantity}
-				onChange={(e) => setQuantity(Number(e.target.value))}
-			/>
-			<Button className="border-l border-black" onClick={handleIncrement}>
-				+
-			</Button>
+		<div className="flex gap-2 items-center">
+			<span className="font-semibold">Quantity</span>
+			<div className="flex items-center">
+				<Button className="border-r border-black" onClick={handleDecrement}>
+					-
+				</Button>
+				<input
+					className="py-2 outline-none w-[100px] text-black text-center"
+					type="number"
+					value={quantity}
+					onChange={(e) => setQuantity(Number(e.target.value))}
+				/>
+				<Button className="border-l border-black" onClick={handleIncrement}>
+					+
+				</Button>
+			</div>
 		</div>
 	)
 }
