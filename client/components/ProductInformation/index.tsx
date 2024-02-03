@@ -8,7 +8,7 @@ const ProductInformation = () => {
 	const [activeTab, setActiveTab] = useState(1)
 
 	const tabClass = (id: number) =>
-		clsx(`font-semibold p-2 rounded cursor-pointer`, {
+		clsx(`font-semibold p-2 rounded cursor-pointer whitespace-nowrap`, {
 			"bg-gray-300": id === activeTab,
 		})
 

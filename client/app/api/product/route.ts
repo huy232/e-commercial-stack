@@ -6,6 +6,7 @@ interface GetProductsParams {
 	limit?: number
 	page?: number
 	totalRatings?: number
+	category?: string
 }
 
 export const getProducts = async (

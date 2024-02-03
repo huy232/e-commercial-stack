@@ -1,10 +1,11 @@
-import { getSpecificProduct } from "@/app/api"
+import { getProducts, getSpecificProduct } from "@/app/api"
 import {
 	Breadcrumb,
 	ProductCart,
 	ProductInformation,
 	ProductSlider,
 	ProductExtraInfo,
+	CustomSlider,
 } from "@/components"
 import { formatPrice } from "../../../../utils/formatPrice"
 import { renderStarFromNumber } from "../../../../utils/renderStarFromNumber"
@@ -39,6 +40,13 @@ export default async function Product({
 		_id,
 		thumbnail,
 	} = data
+
+	const { data: relatedProducts } = await getProducts({
+		category: category[1] || "",
+		limit: 5,
+	})
+	const tabs = [{ id: 1, name: "Something", category: `${category[1]}` }]
+
 	return (
 		<main className="w-full">
 			<section className="w-main flex flex-col bg-gray-100">
@@ -81,6 +89,11 @@ export default async function Product({
 			</section>
 			<div className="w-main m-auto mt-8">
 				<ProductInformation />
+			</div>
+			<div>
+				<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">
+					Other customer also liked
+				</h3>
 			</div>
 		</main>
 	)
