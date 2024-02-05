@@ -1,15 +1,20 @@
 "use client"
-import { FC, useMemo, useState, useCallback } from "react"
+import { FC, useMemo, useState, useCallback, useEffect } from "react"
 import { CustomImage } from "@/components"
 import { ProductType } from "@/types/product"
 import { BannerLeft, BannerRight } from "@/assets/images"
 import { CustomSlider } from "@/components"
 
 interface SellerProps {
-	fetchProducts: (tabId: number, sort: string) => Promise<ProductType[] | null>
+	fetchProducts: (params: {}) => Promise<ProductType[] | null>
+	initialProducts: ProductType[] | []
 }
 
-const Seller: FC<SellerProps> = ({ fetchProducts }) => {
+const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
+	const [products, setProducts] = useState<ProductType[] | null>(
+		initialProducts
+	)
+
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Best sellers", sort: "-sold", markLabel: "Trending" },
@@ -18,19 +23,11 @@ const Seller: FC<SellerProps> = ({ fetchProducts }) => {
 		[]
 	)
 
-	const [products, setProducts] = useState<{ [key: number]: ProductType[] }>({
-		[1]: [],
-		[2]: [],
-	})
-
 	const fetchProductsComponent = useCallback(
-		async (tabId: number, sort: string) => {
+		async (sort: string) => {
 			try {
-				const data = await fetchProducts(tabId, sort)
-				setProducts((prevProducts) => ({
-					...prevProducts,
-					[tabId]: data || [],
-				}))
+				const data = await fetchProducts(sort)
+				setProducts(data)
 			} catch (error) {
 				console.error("Error fetching products:", error)
 			}
@@ -38,15 +35,20 @@ const Seller: FC<SellerProps> = ({ fetchProducts }) => {
 		[fetchProducts]
 	)
 
+	useEffect(() => {
+		const getProducts = async () => {
+			const data = await fetchProducts({
+				sort: tabs[0].sort,
+			})
+			console.log(data)
+		}
+
+		getProducts()
+	}, [fetchProducts, tabs])
+
 	return (
 		<div className="w-full">
-			<CustomSlider
-				tabs={tabs}
-				products={products}
-				fetchProducts={fetchProductsComponent}
-				initialActiveTab={1}
-				supportHover={true}
-			/>
+			<CustomSlider products={products} supportHover={true} />
 			<div className="w-full flex gap-4 mt-8">
 				<div className="w-1/2">
 					<CustomImage src={BannerLeft} alt="Banner left" />

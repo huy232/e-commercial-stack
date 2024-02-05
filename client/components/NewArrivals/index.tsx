@@ -40,15 +40,13 @@ const NewArrivals: FC<NewArrivalsProps> = ({ fetchProducts }) => {
 
 	return (
 		<div className="w-full">
-			<CustomSlider
-				tabs={tabs}
+			{/* <CustomSlider
 				products={products}
-				fetchProducts={fetchProductsComponent}
 				initialActiveTab={1}
 				headingClassName="justify-end"
 				headingTabClassName="text-xs"
 				headingTitle="New arrivals"
-			/>
+			/> */}
 		</div>
 	)
 }

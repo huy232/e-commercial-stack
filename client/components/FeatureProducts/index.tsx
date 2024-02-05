@@ -1,6 +1,5 @@
-import { getProducts } from "@/app/api"
 import { ProductType } from "@/types"
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC } from "react"
 import { CustomImage, ProductCard } from "@/components"
 import {
 	BottomBanner1,

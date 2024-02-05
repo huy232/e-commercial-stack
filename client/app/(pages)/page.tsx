@@ -13,16 +13,18 @@ import { getDailyDeal, getProductCategories, getProducts } from "@/app/api"
 export default async function Home() {
 	const productCategories = await getProductCategories()
 	const dailyDeal = await getDailyDeal()
-	const fetchProducts = async (tabId: number, sort: string) => {
+	const fetchProducts = async (params: {}) => {
 		"use server"
 		try {
-			const response = await getProducts({ sort })
+			const response = await getProducts(params)
 			return response.data
 		} catch (error) {
 			console.error("Error fetching products:", error)
 			return []
 		}
 	}
+
+	const { data: initialProducts } = await getProducts({ sort: "-sold" })
 	const featureProducts = await getProducts({
 		limit: 9,
 		page: 1,
@@ -38,7 +40,10 @@ export default async function Home() {
 				</div>
 				<div className="w-[75%] flex flex-col gap-5 flex-auto pl-5">
 					<Banner />
-					<Seller fetchProducts={fetchProducts} />
+					<Seller
+						fetchProducts={fetchProducts}
+						initialProducts={initialProducts}
+					/>
 				</div>
 			</div>
 			<div className="my-8">

@@ -5,7 +5,6 @@ import {
 	ProductInformation,
 	ProductSlider,
 	ProductExtraInfo,
-	CustomSlider,
 } from "@/components"
 import { formatPrice } from "../../../../utils/formatPrice"
 import { renderStarFromNumber } from "../../../../utils/renderStarFromNumber"
