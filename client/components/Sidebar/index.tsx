@@ -15,7 +15,7 @@ const Sidebar: FC<SidebarProps> = ({ categories }) => {
 				{products.map((category: CategoryType) => (
 					<Link
 						key={category._id}
-						href={category.slug}
+						href={`/products?category=${category.slug}`}
 						className="hover:text-main hover:bg-black/20 opacity-80 duration-200 ease-linear text-sm px-5 py-3 rounded"
 					>
 						{category.title}

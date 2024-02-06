@@ -5,6 +5,7 @@ import {
 	ProductInformation,
 	ProductSlider,
 	ProductExtraInfo,
+	CustomSlider,
 } from "@/components"
 import { formatPrice } from "../../../../utils/formatPrice"
 import { renderStarFromNumber } from "../../../../utils/renderStarFromNumber"
@@ -44,13 +45,16 @@ export default async function Product({
 		category: category[1] || "",
 		limit: 5,
 	})
-	const tabs = [{ id: 1, name: "Something", category: `${category[1]}` }]
 
 	return (
 		<main className="w-full">
 			<section className="w-main flex flex-col bg-gray-100">
 				<h2 className="text-xl font-semibold">{data.title}</h2>
-				<Breadcrumb categories={category} productTitle={title} />
+				<Breadcrumb
+					categories={category}
+					productTitle={title}
+					allowTitle={true}
+				/>
 			</section>
 			<section className="mx-auto flex">
 				<div className="w-2/5 flex flex-col gap-4">
@@ -93,6 +97,7 @@ export default async function Product({
 				<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">
 					Other customer also liked
 				</h3>
+				<CustomSlider products={relatedProducts} />
 			</div>
 		</main>
 	)

@@ -50,7 +50,10 @@ export default async function Home() {
 				<FeatureProducts featureProducts={featureProducts} />
 			</div>
 			<div className="my-8">
-				<NewArrivals fetchProducts={fetchProducts} />
+				<NewArrivals
+					fetchProducts={fetchProducts}
+					initialProducts={initialProducts}
+				/>
 			</div>
 			<div className="my-8">
 				<HotCollections categories={productCategories} />

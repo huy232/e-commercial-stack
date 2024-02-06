@@ -5,10 +5,15 @@ import { FC, Fragment } from "react"
 
 interface BreadcrumbProps {
 	categories: string[]
-	productTitle: string
+	productTitle?: string
+	allowTitle: boolean
 }
 
-const Breadcrumb: FC<BreadcrumbProps> = ({ categories, productTitle }) => {
+const Breadcrumb: FC<BreadcrumbProps> = ({
+	categories,
+	productTitle,
+	allowTitle,
+}) => {
 	const breadcrumbClass = clsx(
 		`hover-effect hover:opacity-80 hover:underline-offset-2 hover:underline hover:text-rose-500`
 	)
@@ -25,22 +30,28 @@ const Breadcrumb: FC<BreadcrumbProps> = ({ categories, productTitle }) => {
 				</Fragment>
 			)
 		}
-		const path = `/products?type=${encodeURIComponent(category)}`
+		const path = `/products?category=${encodeURIComponent(
+			category.toLocaleLowerCase()
+		)}`
 		return (
 			<Fragment key={index}>
 				<Link className={breadcrumbClass} href={path}>
 					{category}
 				</Link>
-				<span>
-					<MdKeyboardArrowRight />
-				</span>
 			</Fragment>
 		)
 	})
 	return (
-		<div className="flex gap-1 items-center text-sm">
+		<div className="flex gap-1 items-center text-sm uppercase">
 			{breadcrumbItems}
-			<span className="select-none opacity-70">{productTitle}</span>
+			{allowTitle && (
+				<>
+					<span>
+						<MdKeyboardArrowRight />
+					</span>
+					<span className="select-none opacity-70">{productTitle}</span>
+				</>
+			)}
 		</div>
 	)
 }

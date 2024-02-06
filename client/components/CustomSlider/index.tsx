@@ -24,7 +24,7 @@ const CustomSlider: FC<CustomSliderProps> = ({
 	headingTitle,
 	headingClassName,
 	headingTabClassName,
-	supportHover,
+	supportHover = false,
 	supportDetail,
 	markLabel,
 }) => {
@@ -45,7 +45,7 @@ const CustomSlider: FC<CustomSliderProps> = ({
 							key={item._id}
 							product={item}
 							markLabel={markLabel}
-							enableOptions={true}
+							enableOptions={supportHover}
 						/>
 					))}
 			</Slider>

@@ -2,12 +2,17 @@
 import { FC, useCallback, useMemo, useState } from "react"
 import { ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
+import clsx from "clsx"
 
 interface NewArrivalsProps {
 	fetchProducts: any
+	initialProducts: ProductType[] | []
 }
 
-const NewArrivals: FC<NewArrivalsProps> = ({ fetchProducts }) => {
+const NewArrivals: FC<NewArrivalsProps> = ({
+	fetchProducts,
+	initialProducts,
+}) => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Smartphone", sort: "-sold" },
@@ -17,20 +22,17 @@ const NewArrivals: FC<NewArrivalsProps> = ({ fetchProducts }) => {
 		[]
 	)
 
-	const [products, setProducts] = useState<{ [key: number]: ProductType[] }>({
-		[1]: [],
-		[2]: [],
-		[3]: [],
-	})
+	const [products, setProducts] = useState<ProductType[] | null>(
+		initialProducts
+	)
+	const [titleId, setTitleId] = useState(tabs[0].id)
 
 	const fetchProductsComponent = useCallback(
-		async (tabId: number, sort: string) => {
+		async (sort: {}, tabId: number) => {
 			try {
-				const data = await fetchProducts(tabId, sort)
-				setProducts((prevProducts) => ({
-					...prevProducts,
-					[tabId]: data || [],
-				}))
+				const data = await fetchProducts(sort)
+				setProducts(data)
+				setTitleId(tabId)
 			} catch (error) {
 				console.error("Error fetching products:", error)
 			}
@@ -38,15 +40,29 @@ const NewArrivals: FC<NewArrivalsProps> = ({ fetchProducts }) => {
 		[fetchProducts]
 	)
 
+	const titleClass = (id: number) =>
+		clsx(
+			`rounded p-1 hover:bg-rose-500 hover-effect border-2`,
+			titleId === id ? "border-rose-500" : "border-transparent"
+		)
+
 	return (
 		<div className="w-full">
-			{/* <CustomSlider
-				products={products}
-				initialActiveTab={1}
-				headingClassName="justify-end"
-				headingTabClassName="text-xs"
-				headingTitle="New arrivals"
-			/> */}
+			<div className="flex flex-row items-center justify-center gap-2">
+				<h2 className="font-semibold text-xl">New arrivals</h2>
+				<div className="ml-auto flex gap-2 text-xs">
+					{tabs.map((tab) => (
+						<button
+							onClick={() => fetchProductsComponent({ sort: tab.sort }, tab.id)}
+							key={tab.id}
+							className={titleClass(tab.id)}
+						>
+							{tab.name}
+						</button>
+					))}
+				</div>
+			</div>
+			<CustomSlider products={products} />
 		</div>
 	)
 }
