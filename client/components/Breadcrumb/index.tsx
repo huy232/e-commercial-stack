@@ -1,53 +1,47 @@
 import { MdKeyboardArrowRight } from "@/assets/icons"
 import clsx from "clsx"
 import Link from "next/link"
-import { FC, Fragment } from "react"
+import { FC } from "react"
 
 interface BreadcrumbProps {
-	categories: string[]
+	breadcrumbs: { name: string; slug: string }[]
 	productTitle?: string
 	allowTitle: boolean
 }
 
 const Breadcrumb: FC<BreadcrumbProps> = ({
-	categories,
+	breadcrumbs,
 	productTitle,
 	allowTitle,
 }) => {
 	const breadcrumbClass = clsx(
 		`hover-effect hover:opacity-80 hover:underline-offset-2 hover:underline hover:text-rose-500`
 	)
-	const breadcrumbItems = categories.map((category, index) => {
-		if (category === "Home") {
-			return (
-				<Fragment key={index}>
-					<Link className={breadcrumbClass} href="/">
-						Home
-					</Link>
-					<span>
-						<MdKeyboardArrowRight />
-					</span>
-				</Fragment>
-			)
-		}
-		const path = `/products?category=${encodeURIComponent(
-			category.toLocaleLowerCase()
-		)}`
+
+	const breadcrumbItems = breadcrumbs.map((breadcrumb, index) => {
 		return (
-			<Fragment key={index}>
-				<Link className={breadcrumbClass} href={path}>
-					{category}
-				</Link>
-			</Fragment>
+			<>
+				<span key={index} className="flex items-center justify-center">
+					<Link href={breadcrumb.slug} className={breadcrumbClass}>
+						{breadcrumb.name}
+					</Link>
+				</span>
+				{index < breadcrumbs.length - 1 && (
+					<span>
+						<MdKeyboardArrowRight className="mb-[2px]" />
+					</span>
+				)}
+			</>
 		)
 	})
+
 	return (
 		<div className="flex gap-1 items-center text-sm uppercase">
 			{breadcrumbItems}
 			{allowTitle && (
 				<>
 					<span>
-						<MdKeyboardArrowRight />
+						<MdKeyboardArrowRight className="mb-[2px]" />
 					</span>
 					<span className="select-none opacity-70">{productTitle}</span>
 				</>
@@ -55,4 +49,5 @@ const Breadcrumb: FC<BreadcrumbProps> = ({
 		</div>
 	)
 }
+
 export default Breadcrumb

@@ -46,12 +46,20 @@ export default async function Product({
 		limit: 5,
 	})
 
+	let breadcrumbs = [{ name: "Home", slug: "/" }]
+	if (category) {
+		breadcrumbs.push({
+			name: category[1],
+			slug: `product?category=${category[1]}`,
+		})
+	}
+
 	return (
 		<main className="w-full">
 			<section className="w-main flex flex-col bg-gray-100">
 				<h2 className="text-xl font-semibold">{data.title}</h2>
 				<Breadcrumb
-					categories={category}
+					breadcrumbs={breadcrumbs}
 					productTitle={title}
 					allowTitle={true}
 				/>

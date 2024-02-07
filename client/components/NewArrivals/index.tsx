@@ -5,7 +5,7 @@ import { CustomSlider } from "@/components"
 import clsx from "clsx"
 
 interface NewArrivalsProps {
-	fetchProducts: any
+	fetchProducts: (params: {}) => Promise<ProductType[] | null>
 	initialProducts: ProductType[] | []
 }
 
