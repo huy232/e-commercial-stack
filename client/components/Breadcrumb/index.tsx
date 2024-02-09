@@ -20,8 +20,8 @@ const Breadcrumb: FC<BreadcrumbProps> = ({
 
 	const breadcrumbItems = breadcrumbs.map((breadcrumb, index) => {
 		return (
-			<div key={index}>
-				<span className="flex items-center justify-center">
+			<div key={index} className="flex items-center">
+				<span>
 					<Link href={breadcrumb.slug} className={breadcrumbClass}>
 						{breadcrumb.name}
 					</Link>

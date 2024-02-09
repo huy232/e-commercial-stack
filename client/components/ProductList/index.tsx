@@ -32,8 +32,7 @@ const ProductList: FC<ProductsProps> = ({ fetchProducts }) => {
 	}, [fetchProducts])
 
 	const handleActiveFilter = useCallback(
-		(name: string) => {
-			console.log(name)
+		(name: string | null) => {
 			if (activeClick === name) {
 				setActiveClick(null)
 			} else {
