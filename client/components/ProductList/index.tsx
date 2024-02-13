@@ -3,6 +3,7 @@ import { ProductType } from "@/types"
 import { FC, useState, useEffect, useCallback } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import { FilterBar, ProductCard } from "@/components"
+import { useSearchParams } from "next/navigation"
 
 interface ProductsProps {
 	fetchProducts: (params: {}) => Promise<ProductType[]>
@@ -11,11 +12,12 @@ interface ProductsProps {
 const ProductList: FC<ProductsProps> = ({ fetchProducts }) => {
 	const [loading, setLoading] = useState(true)
 	const [products, setProducts] = useState<ProductType[]>([])
-	const [activeClick, setActiveClick] = useState<string | null>(null)
-	const handleFetchProducts = async () => {}
+	const params = useSearchParams() as URLSearchParams
 
 	useEffect(() => {
 		const getProductList = () => {
+			const colors = params.getAll("color")
+			const categories = params.getAll("category")
 			fetchProducts({})
 				.then((response) => {
 					setProducts(response)
@@ -29,18 +31,7 @@ const ProductList: FC<ProductsProps> = ({ fetchProducts }) => {
 				})
 		}
 		getProductList()
-	}, [fetchProducts])
-
-	const handleActiveFilter = useCallback(
-		(name: string | null) => {
-			if (activeClick === name) {
-				setActiveClick(null)
-			} else {
-				setActiveClick(name)
-			}
-		},
-		[activeClick]
-	)
+	}, [fetchProducts, params])
 
 	return (
 		<>
@@ -48,16 +39,8 @@ const ProductList: FC<ProductsProps> = ({ fetchProducts }) => {
 				<div className="w-4/5 flex-auto flex flex-col gap-3">
 					<span className="font-semibold text-sm">Filter by</span>
 					<div className="flex items-center gap-4">
-						<FilterBar
-							name="color"
-							activeClick={activeClick}
-							onActiveClick={handleActiveFilter}
-						/>
-						<FilterBar
-							name="price"
-							activeClick={activeClick}
-							onActiveClick={handleActiveFilter}
-						/>
+						<FilterBar name="color" type="checkbox" />
+						<FilterBar name="price" type="checkbox" />
 					</div>
 				</div>
 				<div className="w-1/5">Sort by</div>

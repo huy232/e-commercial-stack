@@ -10,9 +10,19 @@ function useClickOutside(
 				handler(event)
 			}
 		}
+
+		const handleEscapeKey = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				handler(event as unknown as MouseEvent)
+			}
+		}
+
 		document.addEventListener("mousedown", handleClickOutside)
+		document.addEventListener("keydown", handleEscapeKey)
+
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside)
+			document.removeEventListener("keydown", handleEscapeKey)
 		}
 	}, [ref, handler])
 }
