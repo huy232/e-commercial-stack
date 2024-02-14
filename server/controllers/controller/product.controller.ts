@@ -76,13 +76,30 @@ class ProductController {
 					(matchedElement) => `$${matchedElement}`
 				)
 				const formattedQueries = JSON.parse(queryString)
+				const filter: any = {}
+				console.log(formattedQueries)
 				// Filtering
 				if (queries.title) {
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
 				}
+				if (queries.category) {
+					formattedQueries.category = {
+						$regex: queries.category,
+						$options: "i",
+					}
+				}
+				if (queries.color) {
+					let colorArray: string[]
 
+					if (Array.isArray(queries.color)) {
+						colorArray = queries.color as string[]
+					} else {
+						colorArray = [queries.color as string]
+					}
+
+					filter.color = { $in: colorArray }
+				}
 				let query = Product.find(formattedQueries)
-
 				// Sorting
 				if (req.query.sort as string) {
 					const sortBy = (req.query.sort as string).split(",").join(" ")
@@ -101,6 +118,7 @@ class ProductController {
 				query.skip(skip).limit(limit)
 
 				const response = await query.exec()
+				console.log(response)
 				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
 
