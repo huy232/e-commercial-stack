@@ -34,16 +34,13 @@ const FilterBar: FC<FilterBarProps> = ({ name, type = "checkbox" }) => {
 
 		setSelected(updatedSelected)
 
+		const selectedColorsString = updatedSelected.join(",")
 		const params = new URLSearchParams(searchParams)
-		const allColors = params.getAll("color")
-
-		allColors.forEach((currentColor) => {
+		if (updatedSelected.length > 0) {
+			params.set("color", selectedColorsString)
+		} else {
 			params.delete("color")
-		})
-
-		updatedSelected.forEach((selectedColor) => {
-			params.append("color", selectedColor)
-		})
+		}
 
 		replace(`${pathname}?${params.toString()}`)
 	}

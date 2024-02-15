@@ -7,20 +7,23 @@ import { useSearchParams } from "next/navigation"
 
 interface ProductsProps {
 	fetchProducts: (params: {}) => Promise<ProductType[]>
+	searchParams: { [key: string]: string | string[] | undefined }
 }
 
-const ProductList: FC<ProductsProps> = ({ fetchProducts }) => {
+const ProductList: FC<ProductsProps> = ({ fetchProducts, searchParams }) => {
 	const [loading, setLoading] = useState(true)
 	const [products, setProducts] = useState<ProductType[]>([])
 	const params = useSearchParams() as URLSearchParams
 
 	useEffect(() => {
 		const getProductList = () => {
-			const colors = params.getAll("color")
-			const categories = params.getAll("category")
-			fetchProducts({})
+			fetchProducts(searchParams)
 				.then((response) => {
-					setProducts(response)
+					if (response) {
+						setProducts(response)
+					} else {
+						setProducts([])
+					}
 				})
 				.catch((error) => {
 					console.error("Error fetching products:", error)
@@ -31,7 +34,9 @@ const ProductList: FC<ProductsProps> = ({ fetchProducts }) => {
 				})
 		}
 		getProductList()
-	}, [fetchProducts, params])
+	}, [fetchProducts, params, searchParams])
+
+	console.log(products)
 
 	return (
 		<>

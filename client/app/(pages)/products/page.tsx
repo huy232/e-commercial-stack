@@ -34,7 +34,7 @@ export default function Products(props: Props) {
 				<h2 className="uppercase font-semibold">{category}</h2>
 				<Breadcrumb breadcrumbs={breadcrumbs} allowTitle={false} />
 			</div>
-			<ProductList fetchProducts={fetchProducts} />
+			<ProductList fetchProducts={fetchProducts} searchParams={searchParams} />
 		</main>
 	)
 }

@@ -4,16 +4,27 @@ import { ProductType, ApiResponse } from "@/types"
 interface GetProductsParams {
 	limit?: number
 	page?: number
-	[key: string]: string | number | undefined
+	[key: string]: string | number | undefined | string[]
 }
 
 export const getProducts = async (
 	params: GetProductsParams
 ): Promise<ApiResponse<ProductType[]>> => {
 	try {
-		const queryParamsArray: [string, string][] = Object.entries(params)
-			.filter(([_, value]) => value !== undefined)
-			.map(([key, value]) => [key, value!.toString()])
+		const queryParamsArray: Array<[string, string]> = []
+
+		for (const [key, value] of Object.entries(params)) {
+			if (value !== undefined) {
+				if (Array.isArray(value)) {
+					for (const item of value) {
+						queryParamsArray.push([key, item.toString()])
+					}
+				} else {
+					queryParamsArray.push([key, value.toString()])
+				}
+			}
+		}
+
 		const queryParams = new URLSearchParams(queryParamsArray)
 		const url = `${API}/product/get-all-product?${queryParams.toString()}`
 

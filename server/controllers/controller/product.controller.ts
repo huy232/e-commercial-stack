@@ -76,8 +76,6 @@ class ProductController {
 					(matchedElement) => `$${matchedElement}`
 				)
 				const formattedQueries = JSON.parse(queryString)
-				const filter: any = {}
-				console.log(formattedQueries)
 				// Filtering
 				if (queries.title) {
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
@@ -89,15 +87,13 @@ class ProductController {
 					}
 				}
 				if (queries.color) {
-					let colorArray: string[]
+					const formattedColorArray = formattedQueries.color.split(",")
+					const colorQuery = formattedColorArray.map((color: string) => ({
+						color: { $regex: color.trim(), $options: "i" },
+					}))
 
-					if (Array.isArray(queries.color)) {
-						colorArray = queries.color as string[]
-					} else {
-						colorArray = [queries.color as string]
-					}
-
-					filter.color = { $in: colorArray }
+					formattedQueries.$or = colorQuery
+					delete formattedQueries.color
 				}
 				let query = Product.find(formattedQueries)
 				// Sorting
@@ -118,7 +114,6 @@ class ProductController {
 				query.skip(skip).limit(limit)
 
 				const response = await query.exec()
-				console.log(response)
 				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
 

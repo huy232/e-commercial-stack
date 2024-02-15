@@ -31,13 +31,16 @@ const User = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				await dispatch(checkAuthentication())
-				if (isAuthenticated) {
+				const response = await dispatch(checkAuthentication())
+				if (response.payload) {
 					if (!user) {
 						const response = await getCurrentUser()
 						const userData = response.data
 						dispatch(loginSuccess(userData))
 					}
+				} else {
+					await userLogout()
+					dispatch(logout())
 				}
 			} catch (error) {
 				await userLogout()
