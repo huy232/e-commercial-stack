@@ -1,12 +1,15 @@
-export const colors = [
-	"black",
-	"brown",
-	"gray",
-	"white",
-	"pink",
-	"yellow",
-	"orange",
-	"purple",
-	"green",
-	"blue",
-]
+export const colorsOptions = {
+	paramName: "color",
+	values: [
+		"Black",
+		"Brown",
+		"Gray",
+		"White",
+		"Pink",
+		"Yellow",
+		"Orange",
+		"Purple",
+		"Green",
+		"Blue",
+	],
+}

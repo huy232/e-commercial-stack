@@ -34,6 +34,8 @@ const ProductCard: FC<ProductProps> = ({
 				<CustomImage
 					src={product.thumbnail || NoProductImage}
 					alt={product.title}
+					width={140}
+					height={140}
 				/>
 				{markLabel && <div className={labelProduct}>{markLabel}</div>}
 				{enableOptions && (

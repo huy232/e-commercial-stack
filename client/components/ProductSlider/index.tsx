@@ -26,19 +26,30 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 		slidesToShow: 3,
 		slidesToScroll: 1,
 	}
+
+	const handleImage = (index: number) => {
+		setDisplayImage(images[index])
+	}
+
 	return (
 		<>
-			<GlassMagnifier
-				imageSrc={displayImage}
-				imageAlt="Display product image"
-			/>
+			<div className="h-[320px]">
+				<GlassMagnifier
+					imageSrc={displayImage}
+					imageAlt="Display product image"
+					className="glass-magnifier h-full"
+				/>
+			</div>
 			<Slider className="flex gap-4" {...settings}>
 				{images.map((image, index) => (
 					<CustomImage
+						width={140}
+						height={140}
 						className="w-[140px] h-[140px]"
 						src={image}
 						alt="Sub product"
 						key={index}
+						onClick={() => handleImage(index)}
 					/>
 				))}
 			</Slider>

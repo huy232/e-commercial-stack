@@ -76,6 +76,8 @@ class ProductController {
 					(matchedElement) => `$${matchedElement}`
 				)
 				const formattedQueries = JSON.parse(queryString)
+				const priceFilter: any = {}
+
 				// Filtering
 				if (queries.title) {
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
@@ -95,6 +97,18 @@ class ProductController {
 					formattedQueries.$or = colorQuery
 					delete formattedQueries.color
 				}
+				if (queries.from) {
+					priceFilter.$gte = parseInt(queries.from as string)
+					delete formattedQueries.from
+				}
+				if (queries.to) {
+					priceFilter.$lte = parseInt(queries.to as string)
+					delete formattedQueries.to
+				}
+				if (Object.keys(priceFilter).length > 0) {
+					formattedQueries.price = priceFilter
+				}
+				console.log(formattedQueries)
 				let query = Product.find(formattedQueries)
 				// Sorting
 				if (req.query.sort as string) {

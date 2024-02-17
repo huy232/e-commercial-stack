@@ -63,7 +63,7 @@ const config: Config = {
 			roman: "upper-roman",
 		},
 	},
-	plugins: [],
+	plugins: [require("@tailwindcss/forms")({ strategy: "class" })],
 	important: true,
 }
 export default config
