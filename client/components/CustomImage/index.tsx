@@ -10,6 +10,7 @@ interface CustomImageProps {
 	onClick?: (event: MouseEvent<HTMLImageElement>) => void
 	width?: number
 	height?: number
+	fill?: boolean
 }
 
 const CustomImage: FC<CustomImageProps> = ({
@@ -19,6 +20,7 @@ const CustomImage: FC<CustomImageProps> = ({
 	onClick,
 	width,
 	height,
+	fill,
 	...rest
 }) => {
 	const [isLoaded, setIsLoaded] = useState(false)
@@ -37,15 +39,14 @@ const CustomImage: FC<CustomImageProps> = ({
 
 	return (
 		<Image
-			width={width}
-			height={height}
 			src={src}
 			alt={alt}
 			className={imageClass}
 			loading="lazy"
 			onLoad={handleImageLoad}
-			// fill
 			onClick={onClick}
+			{...(fill ? {} : { width, height })}
+			{...(fill ? { fill: true } : {})}
 			{...rest}
 		/>
 	)

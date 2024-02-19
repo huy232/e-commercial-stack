@@ -85,6 +85,7 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 							<CustomImage
 								src={dailyDeal.product.thumbnail || NoProductImage}
 								alt="Daily deal"
+								fill
 							/>
 						</div>
 						<div className="flex flex-col justify-center items-center w-full">

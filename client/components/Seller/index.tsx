@@ -61,10 +61,10 @@ const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
 			<CustomSlider products={products} supportHover={true} />
 			<div className="w-full flex gap-4 mt-8">
 				<div className="w-1/2">
-					<CustomImage src={BannerLeft} alt="Banner left" />
+					<CustomImage src={BannerLeft} alt="Banner left" fill />
 				</div>
 				<div className="w-1/2">
-					<CustomImage src={BannerRight} alt="Banner right" />
+					<CustomImage src={BannerRight} alt="Banner right" fill />
 				</div>
 			</div>
 		</div>

@@ -18,7 +18,7 @@ const HotCollections: FC<HotCollectionsProps> = ({ categories }) => {
 					categories.data.map((category: any) => (
 						<div key={category._id} className="flex">
 							<div className="w-1/2 h-[140px]">
-								<CustomImage src={category.image} alt={category.title} />
+								<CustomImage src={category.image} alt={category.title} fill />
 							</div>
 							<div className="w-1/2">
 								<h4 className="font-semibold uppercase text-sm text-black/80">

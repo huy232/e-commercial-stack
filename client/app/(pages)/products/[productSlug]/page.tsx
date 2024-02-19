@@ -99,7 +99,7 @@ export default async function Product({
 				</div>
 			</section>
 			<div className="w-main m-auto mt-8">
-				<ProductInformation />
+				<ProductInformation ratingTotal={totalRatings} ratingCount={18} />
 			</div>
 			<div>
 				<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">

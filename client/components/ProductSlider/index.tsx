@@ -43,8 +43,7 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 			<Slider className="flex gap-4" {...settings}>
 				{images.map((image, index) => (
 					<CustomImage
-						width={140}
-						height={140}
+						fill
 						className="w-[140px] h-[140px]"
 						src={image}
 						alt="Sub product"
