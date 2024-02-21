@@ -68,3 +68,19 @@ export const getSpecificProduct = async (
 		throw error
 	}
 }
+
+export const productRating = async (
+	req: Request
+): Promise<ApiResponse<ProductType>> => {
+	try {
+		const body = await req.json()
+		const response = await fetch(`${API}/product/rating-product`, {
+			method: "PUT",
+			cache: "no-cache",
+		})
+		const responseData: ApiResponse<ProductType> = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}

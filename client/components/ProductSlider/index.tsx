@@ -2,14 +2,7 @@
 import { FC, useState } from "react"
 import Slider from "react-slick"
 import { CustomImage } from "@/components"
-import {
-	Magnifier,
-	GlassMagnifier,
-	SideBySideMagnifier,
-	PictureInPictureMagnifier,
-	MOUSE_ACTIVATION,
-	TOUCH_ACTIVATION,
-} from "react-image-magnifiers"
+import { GlassMagnifier } from "react-image-magnifiers-v2"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 

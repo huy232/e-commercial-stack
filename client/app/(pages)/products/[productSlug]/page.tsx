@@ -7,8 +7,7 @@ import {
 	ProductExtraInfo,
 	CustomSlider,
 } from "@/components"
-import { formatPrice } from "../../../../utils/formatPrice"
-import { renderStarFromNumber } from "../../../../utils/renderStarFromNumber"
+import { formatPrice, renderStarFromNumber } from "@/utils"
 import { productExtraInformation } from "@/constant"
 
 export default async function Product({
@@ -99,7 +98,11 @@ export default async function Product({
 				</div>
 			</section>
 			<div className="w-main m-auto mt-8">
-				<ProductInformation ratingTotal={totalRatings} ratingCount={18} />
+				<ProductInformation
+					ratingTotal={totalRatings}
+					ratingCount={18}
+					productName={title}
+				/>
 			</div>
 			<div>
 				<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">
