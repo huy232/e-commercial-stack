@@ -30,7 +30,7 @@ export default async function Product({
 		images,
 		price,
 		quantity,
-		rating,
+		ratings,
 		slug,
 		sold,
 		title,
@@ -39,7 +39,6 @@ export default async function Product({
 		_id,
 		thumbnail,
 	} = data
-
 	const { data: relatedProducts } = await getProducts({
 		category: category[1] || "",
 		limit: 5,
@@ -98,11 +97,7 @@ export default async function Product({
 				</div>
 			</section>
 			<div className="w-main m-auto mt-8">
-				<ProductInformation
-					ratingTotal={totalRatings}
-					ratingCount={18}
-					productName={title}
-				/>
+				<ProductInformation product={data} />
 			</div>
 			<div>
 				<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">

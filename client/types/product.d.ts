@@ -7,7 +7,7 @@ export type ProductType = {
 	images: string[]
 	price: number
 	quantity: number
-	rating: []
+	ratings: []
 	slug: string
 	sold: number
 	title: string

@@ -70,13 +70,23 @@ export const getSpecificProduct = async (
 }
 
 export const productRating = async (
-	req: Request
+	star: number,
+	comment: string,
+	pid: string
 ): Promise<ApiResponse<ProductType>> => {
 	try {
-		const body = await req.json()
 		const response = await fetch(`${API}/product/rating-product`, {
 			method: "PUT",
 			cache: "no-cache",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			body: JSON.stringify({
+				star,
+				comment,
+				product_id: pid,
+			}),
 		})
 		const responseData: ApiResponse<ProductType> = await response.json()
 		return responseData
