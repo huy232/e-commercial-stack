@@ -52,6 +52,13 @@ export default async function Product({
 		})
 	}
 
+	const updateReviews = async () => {
+		"use server"
+		const product = await getSpecificProduct(productSlug)
+		const { data } = product
+		return data
+	}
+
 	return (
 		<main className="w-full">
 			<section className="w-main flex flex-col bg-gray-100">
@@ -73,9 +80,9 @@ export default async function Product({
 						<span>Available: {quantity}</span>
 						<span>Sold: 100</span>
 						<span className="flex">{renderStarFromNumber(totalRatings)}</span>
-						<ul className="list-item list-square text-sm text-gray-500 px-6">
+						<ul className="text-sm text-gray-500 px-6">
 							{description.split(",").map((element: string) => (
-								<li className="leading-6" key={element}>
+								<li className="list-item list-square leading-6" key={element}>
 									{element}
 								</li>
 							))}
@@ -97,7 +104,7 @@ export default async function Product({
 				</div>
 			</section>
 			<div className="w-main m-auto mt-8">
-				<ProductInformation product={data} />
+				<ProductInformation product={data} updateReviews={updateReviews} />
 			</div>
 			<div>
 				<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">

@@ -5,9 +5,10 @@ import { ProductType } from "@/types/product"
 import { BannerLeft, BannerRight } from "@/assets/images"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
+import { ApiProductResponse } from "@/types"
 
 interface SellerProps {
-	fetchProducts: (params: {}) => Promise<ProductType[] | null>
+	fetchProducts: (params: {}) => Promise<ApiProductResponse<ProductType[]>>
 	initialProducts: ProductType[] | []
 }
 
@@ -28,8 +29,8 @@ const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
 	const fetchProductsComponent = useCallback(
 		async (sort: {}, tabId: number) => {
 			try {
-				const data = await fetchProducts(sort)
-				setProducts(data)
+				const response = await fetchProducts(sort)
+				setProducts(response.data)
 				setTitleId(tabId)
 			} catch (error) {
 				console.error("Error fetching products:", error)

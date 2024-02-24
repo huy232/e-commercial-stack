@@ -6,6 +6,16 @@ export interface ApiResponse<T> {
 	errors?: []
 }
 
+export interface ApiProductResponse<T> {
+	success: boolean
+	data: T
+	error?: string
+	message?: string
+	counts: number
+	totalPage: number
+	currentPage: number
+}
+
 export interface ApiResponseProductCategories {
 	success: boolean
 	data: ProductCategory[]

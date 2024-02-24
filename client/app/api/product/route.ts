@@ -1,5 +1,5 @@
 import { API } from "@/constant"
-import { ProductType, ApiResponse } from "@/types"
+import { ProductType, ApiResponse, ApiProductResponse } from "@/types"
 
 interface GetProductsParams {
 	limit?: number
@@ -9,7 +9,7 @@ interface GetProductsParams {
 
 export const getProducts = async (
 	params: GetProductsParams
-): Promise<ApiResponse<ProductType[]>> => {
+): Promise<ApiProductResponse<ProductType[]>> => {
 	try {
 		const queryParamsArray: Array<[string, string]> = []
 
@@ -32,7 +32,8 @@ export const getProducts = async (
 			method: "GET",
 		})
 
-		const responseData: ApiResponse<ProductType[]> = await response.json()
+		const responseData: ApiProductResponse<ProductType[]> =
+			await response.json()
 		return responseData
 	} catch (error) {
 		throw error
@@ -60,7 +61,7 @@ export const getSpecificProduct = async (
 	try {
 		const response = await fetch(`${API}/product/get-product/${productSlug}`, {
 			method: "GET",
-			cache: "default",
+			cache: "no-cache",
 		})
 		const responseData: ApiResponse<ProductType> = await response.json()
 		return responseData
@@ -72,7 +73,8 @@ export const getSpecificProduct = async (
 export const productRating = async (
 	star: number,
 	comment: string,
-	pid: string
+	pid: string,
+	updatedAt: number
 ): Promise<ApiResponse<ProductType>> => {
 	try {
 		const response = await fetch(`${API}/product/rating-product`, {
@@ -86,6 +88,7 @@ export const productRating = async (
 				star,
 				comment,
 				product_id: pid,
+				updatedAt,
 			}),
 		})
 		const responseData: ApiResponse<ProductType> = await response.json()

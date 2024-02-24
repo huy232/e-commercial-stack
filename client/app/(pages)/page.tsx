@@ -17,10 +17,16 @@ export default async function Home() {
 		"use server"
 		try {
 			const response = await getProducts(params)
-			return response.data
+			return response
 		} catch (error) {
 			console.error("Error fetching products:", error)
-			return []
+			return {
+				success: false,
+				data: [],
+				counts: 0,
+				totalPage: 0,
+				currentPage: 0,
+			}
 		}
 	}
 

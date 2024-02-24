@@ -36,6 +36,11 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 		setStar(star)
 	}
 
+	const resetForm = () => {
+		setValue("")
+		setStar(0)
+	}
+
 	return (
 		<div
 			className="flex flex-col gap-4 items-center justify-center p-4"
@@ -66,6 +71,7 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 			<Button
 				onClick={() => {
 					handleSubmitReview({ value, star, productId })
+					resetForm()
 				}}
 				className="rounded bg-red-500 text-white p-1 hover-effect"
 			>

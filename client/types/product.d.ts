@@ -1,3 +1,15 @@
+export type Review = {
+	comment: string
+	postedBy: {
+		firstName: string
+		lastName: string
+		avatar: string
+	}
+	star: number
+	_id: string
+	updatedAt: string
+}
+
 export type ProductType = {
 	brand: string
 	category: string[]
@@ -7,7 +19,7 @@ export type ProductType = {
 	images: string[]
 	price: number
 	quantity: number
-	ratings: []
+	ratings: Review[]
 	slug: string
 	sold: number
 	title: string

@@ -3,9 +3,10 @@ import { FC, useCallback, useMemo, useState } from "react"
 import { ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
+import { ApiProductResponse } from "@/types"
 
 interface NewArrivalsProps {
-	fetchProducts: (params: {}) => Promise<ProductType[] | null>
+	fetchProducts: (params: {}) => Promise<ApiProductResponse<ProductType[]>>
 	initialProducts: ProductType[] | []
 }
 
@@ -30,8 +31,8 @@ const NewArrivals: FC<NewArrivalsProps> = ({
 	const fetchProductsComponent = useCallback(
 		async (sort: {}, tabId: number) => {
 			try {
-				const data = await fetchProducts(sort)
-				setProducts(data)
+				const response = await fetchProducts(sort)
+				setProducts(response.data)
 				setTitleId(tabId)
 			} catch (error) {
 				console.error("Error fetching products:", error)

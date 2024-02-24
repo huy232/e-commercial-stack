@@ -15,8 +15,4 @@ export const productInformationTabs = [
 		name: "Payment",
 		id: 4,
 	},
-	{
-		name: "Customer review",
-		id: 5,
-	},
 ]
