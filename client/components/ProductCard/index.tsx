@@ -59,7 +59,7 @@ const ProductCard: FC<ProductProps> = ({
 						{renderStarFromNumber(product.totalRatings)}
 					</span>
 				)}
-				{enablePrice && <span>{formatPrice(product.price)} VND</span>}
+				{enablePrice && <span>{formatPrice(product.price)}</span>}
 			</div>
 		</div>
 	)

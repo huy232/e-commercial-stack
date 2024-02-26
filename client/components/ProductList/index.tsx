@@ -40,30 +40,28 @@ const ProductList: FC<ProductsProps> = ({ fetchProducts, searchParams }) => {
 				})
 				.finally(() => {
 					setLoading(false)
-					console.log("Fetch products operation completed")
 				})
 		}
 		getProductList()
 	}, [fetchProducts, params, searchParams])
-	console.log(loading)
 	return (
-		!loading && (
-			<>
-				{/* <div className="w-main border p-4 flex justify-center items-center mx-auto">
-					<div className="w-4/5 flex flex-col gap-3">
-						<span className="font-semibold text-sm">Filter by</span>
-						<div className="flex items-center gap-4">
-							<FilterBar name="color" type="checkbox" options={colorsOptions} />
-							<FilterBar name="price" type="input" maxPrice={maxPrice} />
-						</div>
+		<>
+			<div className="w-main border p-4 flex justify-center items-center mx-auto">
+				<div className="w-4/5 flex flex-col gap-3">
+					<span className="font-semibold text-sm">Filter by</span>
+					<div className="flex items-center gap-4">
+						<FilterBar name="color" type="checkbox" options={colorsOptions} />
+						<FilterBar name="price" type="input" maxPrice={maxPrice} />
 					</div>
-					<div className="w-1/5 flex flex-col">
-						<span>Sort by</span>
-						<div className="w-full">
-							<InputSelect options={sortByOptions} />
-						</div>
+				</div>
+				<div className="w-1/5 flex flex-col">
+					<span>Sort by</span>
+					<div className="w-full">
+						<InputSelect options={sortByOptions} />
 					</div>
-				</div> */}
+				</div>
+			</div>
+			{!loading && (
 				<div className="w-full">
 					<ResponsiveMasonry
 						columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}
@@ -76,8 +74,8 @@ const ProductList: FC<ProductsProps> = ({ fetchProducts, searchParams }) => {
 					</ResponsiveMasonry>
 					<Pagination totalPages={totalPage} />
 				</div>
-			</>
-		)
+			)}
+		</>
 	)
 }
 export default ProductList

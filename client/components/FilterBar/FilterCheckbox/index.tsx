@@ -44,11 +44,23 @@ const FilterCheckbox: FC<FilterCheckboxProps> = ({ options }) => {
 		replace(`${pathname}?${params.toString()}`)
 	}
 
+	const handleReset = () => {
+		const params = new URLSearchParams(searchParams)
+		params.delete(options.paramName)
+		setSelected([])
+		replace(`${pathname}?${params.toString()}`)
+	}
+
 	return (
 		<div onClick={(e) => e.stopPropagation()}>
 			<div className="p-4 items-center flex justify-between gap-8 text-md">
 				<span className="whitespace-nowrap">{`${selected.length} selected`}</span>
-				<button className="underline hover:text-main">Reset</button>
+				<button
+					className="underline hover:text-main"
+					onClick={() => handleReset()}
+				>
+					Reset
+				</button>
 			</div>
 			<div className="flex flex-col gap-3 text-xs">
 				{options.values.map((option, index) => (

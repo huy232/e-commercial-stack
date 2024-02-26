@@ -95,7 +95,7 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 							<span className="flex h-4">
 								{renderStarFromNumber(dailyDeal.product.totalRatings, 20)}
 							</span>
-							<span>{formatPrice(dailyDeal.product.price)} VND</span>
+							<span>{formatPrice(dailyDeal.product.price)}</span>
 							{mounted ? (
 								<SaleCountdown
 									expirationTime={dailyDeal.expirationTime}

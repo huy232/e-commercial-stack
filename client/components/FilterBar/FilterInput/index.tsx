@@ -18,31 +18,54 @@ const FilterInput: FC<FilterInputProps> = ({ maxPrice }) => {
 	const [toPrice, setToPrice] = useState(initialToPrice)
 	const debouncedFromPrice = useDebounce(fromPrice, 1000)
 	const debouncedToPrice = useDebounce(toPrice, 1000)
+
 	useEffect(() => {
-		const updateURLParams = () => {
-			const params = new URLSearchParams()
-			if (debouncedFromPrice) {
-				params.set("from", debouncedFromPrice)
-			} else {
-				params.delete("from")
+		const timeoutId = setTimeout(() => {
+			const updateURLParams = () => {
+				const params = new URLSearchParams(searchParams)
+				if (debouncedFromPrice !== "") {
+					params.set("from", debouncedFromPrice)
+				} else {
+					params.delete("from")
+				}
+				if (debouncedToPrice !== "") {
+					params.set("to", debouncedToPrice)
+				} else {
+					params.delete("to")
+				}
+				replace(`${pathname}?${params.toString()}`)
 			}
-			if (debouncedToPrice) {
-				params.set("to", debouncedToPrice)
-			} else {
-				params.delete("to")
-			}
-			replace(`${pathname}?${params.toString()}`)
-		}
-		updateURLParams()
-	}, [debouncedFromPrice, debouncedToPrice, pathname, replace])
+			updateURLParams()
+		}, 1000)
+
+		return () => clearTimeout(timeoutId)
+	}, [debouncedFromPrice, debouncedToPrice, pathname, replace, searchParams])
 
 	const handlePriceChange = (value: string, type: "from" | "to") => {
 		const parsedValue = parseInt(value, 10)
-		if (type === "from") {
-			setFromPrice(isNaN(parsedValue) ? "" : parsedValue.toString())
+
+		if (!isNaN(parsedValue)) {
+			if (type === "from") {
+				setFromPrice(parsedValue.toString())
+			} else {
+				setToPrice(parsedValue.toString())
+			}
 		} else {
-			setToPrice(isNaN(parsedValue) ? "" : parsedValue.toString())
+			if (type === "from") {
+				setFromPrice("")
+			} else {
+				setToPrice("")
+			}
 		}
+	}
+
+	const handleReset = () => {
+		const params = new URLSearchParams(searchParams)
+		params.delete("from")
+		params.delete("to")
+		setFromPrice("")
+		setToPrice("")
+		replace(`${pathname}?${params.toString()}`)
 	}
 
 	return (
@@ -51,7 +74,12 @@ const FilterInput: FC<FilterInputProps> = ({ maxPrice }) => {
 				<span className="whitespace-nowrap">{`Max price: ${formatPrice(
 					maxPrice
 				)}`}</span>
-				<button className="underline hover:text-main">Reset</button>
+				<button
+					className="underline hover:text-main"
+					onClick={() => handleReset()}
+				>
+					Reset
+				</button>
 			</div>
 			<div className="flex items-center p-2 gap-2 text-xs">
 				<div className="flex items-center gap-2">
@@ -78,4 +106,5 @@ const FilterInput: FC<FilterInputProps> = ({ maxPrice }) => {
 		</div>
 	)
 }
+
 export default FilterInput

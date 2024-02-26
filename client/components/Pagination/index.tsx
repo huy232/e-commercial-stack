@@ -1,6 +1,6 @@
 "use client"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useState, FC } from "react"
+import { useState, FC, useEffect } from "react"
 import ReactPaginate from "react-paginate"
 
 interface PaginationProps {
@@ -15,6 +15,26 @@ const Pagination: FC<PaginationProps> = ({ totalPages }) => {
 	const [currentPage, setCurrentPage] = useState(
 		Number(initialSelected) > totalPages ? totalPages : Number(initialSelected)
 	)
+	const [prevSearchParams, setPrevSearchParams] =
+		useState<URLSearchParams | null>(null)
+
+	useEffect(() => {
+		if (prevSearchParams) {
+			const pageParams = searchParams.getAll("page")
+			const otherParams = Array.from(searchParams.entries()).filter(
+				([key, value]) => {
+					return key !== "page" && value !== prevSearchParams.get(key)
+				}
+			)
+			if (pageParams.length > 0 && otherParams.length > 0) {
+				const newSearchParams = new URLSearchParams(searchParams.toString())
+				newSearchParams.set("page", "1")
+				replace(`${pathname}?${newSearchParams.toString()}`)
+				setCurrentPage(1)
+			}
+		}
+		setPrevSearchParams(searchParams)
+	}, [searchParams, pathname, replace, prevSearchParams, totalPages])
 
 	const handlePageChange = ({ selected }: { selected: number }) => {
 		const pageNumber = selected + 1
@@ -38,8 +58,8 @@ const Pagination: FC<PaginationProps> = ({ totalPages }) => {
 				containerClassName={"flex justify-center items-center gap-2"}
 				activeClassName={"bg-red-500 p-1 rounded"}
 				pageLinkClassName={"hover-effect hover:bg-red-500 p-1 rounded"}
-				previousLinkClassName={"hover-effect hover:bg-red-500"}
-				nextLinkClassName={"hover-effect hover:bg-red-500"}
+				previousLinkClassName={"hover-effect hover:bg-red-500 rounded p-1"}
+				nextLinkClassName={"hover-effect hover:bg-red-500 rounded p-1"}
 				disabledClassName={"disabled bg-gray-500"}
 			/>
 		</div>
