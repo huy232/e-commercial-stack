@@ -48,7 +48,6 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				setConfirm(false)
 			} else {
 				setErrorMessage("")
-				console.log("Password reset successful: ", response)
 				setConfirm(true)
 			}
 		} catch (error) {

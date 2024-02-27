@@ -28,7 +28,6 @@ const ForgotPasswordForm = () => {
 			} else {
 				setErrorMessage("")
 				setConfirm(true)
-				console.log("Print this handle login success: ", response)
 			}
 		} catch (error) {
 			setErrorMessage(

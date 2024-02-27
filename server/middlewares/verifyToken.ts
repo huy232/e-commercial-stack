@@ -64,7 +64,6 @@ const verifyAccessToken = asyncHandler(
 			)
 
 			if (!tokenCookie && req.cookies.refreshToken) {
-				// If no access token is found, but refresh token is present, attempt to refresh
 				try {
 					const responseToken = await jwt.verify(
 						req.cookies.refreshToken,
@@ -77,22 +76,19 @@ const verifyAccessToken = asyncHandler(
 						jwtPayload.role
 					)
 
-					// Include the new access token in the response
 					res.cookie("accessToken", newAccessToken, {
 						httpOnly: true,
-						maxAge: 60 * 1000, // Set the new access token's expiration time
+						maxAge: 60 * 1000,
 						sameSite: "none",
 						secure: true,
 					})
 
-					// Continue with the request using the new access token
 					req.user = jwt.verify(
 						newAccessToken,
 						process.env.JWT_SECRET as string
 					)
 					next()
 				} catch (refreshError) {
-					// Handle refresh token verification error
 					console.error("Error during verify refresh token:", refreshError)
 					res.status(401).json({
 						success: false,
@@ -111,7 +107,6 @@ const verifyAccessToken = asyncHandler(
 					req.user = decoded
 					next()
 				} catch (error) {
-					// Handle other errors
 					if (error instanceof Error)
 						res.status(401).json({
 							success: false,
@@ -121,14 +116,12 @@ const verifyAccessToken = asyncHandler(
 						})
 				}
 			} else {
-				// No access token and no refresh token found
 				res.status(401).json({
 					success: false,
 					message: "No access or refresh token found in cookies",
 				})
 			}
 		} else {
-			// No cookies found
 			res.status(401).json({
 				success: false,
 				message: "No cookies found",

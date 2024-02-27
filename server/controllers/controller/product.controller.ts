@@ -38,7 +38,13 @@ class ProductController {
 			const { product_slug } = req.params
 
 			try {
-				const product = await Product.findOne({ slug: product_slug })
+				const product = await Product.findOne({ slug: product_slug }).populate({
+					path: "ratings",
+					populate: {
+						path: "postedBy",
+						select: "firstName lastName avatar",
+					},
+				})
 
 				if (product) {
 					res.status(200).json({
@@ -108,7 +114,6 @@ class ProductController {
 				if (Object.keys(priceFilter).length > 0) {
 					formattedQueries.price = priceFilter
 				}
-				console.log(formattedQueries)
 				let query = Product.find(formattedQueries)
 				// Sorting
 				if (req.query.sort as string) {
@@ -130,6 +135,8 @@ class ProductController {
 				const response = await query.exec()
 				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
+				const totalPage = Math.ceil(counts / limit)
+				const currentPage = page
 
 				res.status(200).json({
 					success: response ? true : false,
@@ -138,6 +145,8 @@ class ProductController {
 						: "Something went wrong while finding all products",
 					data: response ? response : {},
 					counts,
+					totalPage,
+					currentPage,
 				})
 			} catch (err: any) {
 				res.status(500).json({
@@ -190,8 +199,8 @@ class ProductController {
 	ratingProduct = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
-			const { star, comment, product_id } = req.body
-			if (!star || !product_id) {
+			const { star, comment, product_id, updatedAt } = req.body
+			if (!star || !product_id || !comment || !updatedAt) {
 				throw new Error("Missing input while rating product")
 			}
 			const product = await Product.findById(product_id)
@@ -207,7 +216,11 @@ class ProductController {
 						},
 					},
 					{
-						$set: { "ratings.$.star": star, "ratings.$.comment": comment },
+						$set: {
+							"ratings.$.star": star,
+							"ratings.$.comment": comment,
+							"ratings.$.updatedAt": updatedAt,
+						},
 					},
 					{ new: true }
 				)
@@ -215,7 +228,7 @@ class ProductController {
 				await Product.findByIdAndUpdate(
 					product_id,
 					{
-						$push: { ratings: { star, comment, postedBy: _id } },
+						$push: { ratings: { star, comment, postedBy: _id, updatedAt } },
 					},
 					{ new: true }
 				)

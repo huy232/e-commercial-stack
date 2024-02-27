@@ -19,7 +19,6 @@ export const useFetchMaxPrice = ({ fetchProducts }: FetchMaxPriceProps) => {
 			} catch (error) {
 				console.error("Error fetching max price:", error)
 			} finally {
-				console.log("Fetch max price operation completed")
 			}
 		}
 

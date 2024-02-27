@@ -39,7 +39,6 @@ const LoginForm: FC = () => {
 						response.message || "An error occurred while login"
 					setErrorMessage(responseErrorMessage)
 				} else {
-					console.log("Print this handle login success: ", response)
 					dispatch(loginSuccess(response.userData))
 					router.push("/")
 					router.refresh()

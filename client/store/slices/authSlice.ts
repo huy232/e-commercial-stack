@@ -4,11 +4,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 export interface AuthState {
 	isAuthenticated: boolean
 	user: User | null
+	isAdmin: boolean
 }
 
 const initialState: AuthState = {
 	isAuthenticated: false,
 	user: null,
+	isAdmin: false,
 }
 
 export const checkAuthentication = createAsyncThunk<boolean, void>(
@@ -39,10 +41,12 @@ const authSlice = createSlice({
 		loginSuccess: (state, action) => {
 			state.isAuthenticated = true
 			state.user = action.payload
+			state.isAdmin = action.payload.role.includes("admin")
 		},
 		logout: (state) => {
 			state.isAuthenticated = false
 			state.user = null
+			state.isAdmin = false
 		},
 	},
 	extraReducers: (builder) => {
@@ -55,6 +59,7 @@ const authSlice = createSlice({
 export const selectAuthUser = (state: RootState) => state.auth.user
 export const selectIsAuthenticated = (state: RootState) =>
 	state.auth.isAuthenticated
+export const selectIsAdmin = (state: RootState) => state.auth.isAdmin
 
 export const { loginSuccess, logout } = authSlice.actions
 export default authSlice.reducer

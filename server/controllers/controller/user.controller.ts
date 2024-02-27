@@ -169,10 +169,8 @@ class UserController {
 
 	login = async (req: Request, res: Response): Promise<void> => {
 		try {
-			// Validate inputs
 			Validators.validateLogin.forEach((validation) => validation.run(req))
 			Validators.runValidation(req, res, async () => {
-				// Continue with login logic
 				let { email, password } = req.body
 
 				const user = await User.findOne({ email })
@@ -189,18 +187,16 @@ class UserController {
 
 				if (passwordCheck) {
 					const userData = user.toObject()
-					const { password, role, refreshToken, ...rest } = userData
-					const accessToken = generateAccessToken(userData._id, role)
+					const { password, refreshToken, ...rest } = userData
+					const accessToken = generateAccessToken(userData._id, userData.role)
 					const newRefreshToken = generateRefreshToken(userData._id)
 
-					// Save refresh token to database
 					await User.findByIdAndUpdate(
 						userData._id,
 						{ refreshToken: newRefreshToken },
 						{ new: true }
 					)
 
-					// Save refresh token to cookie
 					res.cookie("refreshToken", newRefreshToken, {
 						httpOnly: true,
 						maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -208,7 +204,6 @@ class UserController {
 						secure: true,
 					})
 
-					// Save access token to cookie
 					res.cookie("accessToken", accessToken, {
 						httpOnly: true,
 						maxAge: 60 * 1000,
@@ -241,7 +236,7 @@ class UserController {
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
 			const user = await User.findById({ _id }).select(
-				"-refreshToken -password -role"
+				"-refreshToken -password"
 			)
 			if (user) {
 				res.status(200).json({
@@ -387,7 +382,7 @@ class UserController {
 
 	getAllUsers = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const response = await User.find().select("-password -refreshToken -role")
+			const response = await User.find().select("-password -refreshToken")
 			res.status(200).json({
 				success: response ? true : false,
 				users: response,
@@ -424,7 +419,7 @@ class UserController {
 			}
 			const response = await User.findByIdAndUpdate(_id, req.body, {
 				new: true,
-			}).select("-password -role -refreshToken")
+			}).select("-password -refreshToken")
 			if (response) {
 				res.status(200).json({
 					success: true,
@@ -448,7 +443,7 @@ class UserController {
 			}
 			const response = await User.findByIdAndUpdate(uid, req.body, {
 				new: true,
-			}).select("-password -role -refreshToken")
+			}).select("-password -refreshToken")
 			if (response) {
 				res.status(200).json({
 					success: true,
@@ -476,7 +471,7 @@ class UserController {
 				{
 					new: true,
 				}
-			).select("-password -role -refreshToken")
+			).select("-password -refreshToken")
 			if (response) {
 				res.status(200).json({
 					success: true,

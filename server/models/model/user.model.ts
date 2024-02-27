@@ -13,6 +13,7 @@ interface IUser extends Document {
 	lastName: string
 	email: string
 	mobile: string
+	avatar: string
 	password: string
 	role: string[]
 	cart: ICartItem[]
@@ -48,6 +49,9 @@ var userSchema = new mongoose.Schema<IUser>(
 			required: true,
 			unique: true,
 			trim: true,
+		},
+		avatar: {
+			type: String,
 		},
 		mobile: {
 			type: String,

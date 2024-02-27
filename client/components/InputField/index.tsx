@@ -92,6 +92,7 @@ const InputField: React.FC<InputFieldProps> = ({
 								},
 							})}
 							placeholder={placeholder}
+							autoComplete="true"
 						/>
 						{togglePassword && (
 							<Button

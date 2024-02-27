@@ -4,6 +4,7 @@ interface IRating {
 	star: number
 	postedBy: mongoose.Types.ObjectId | Types.ObjectId | string
 	comment: string
+	updatedAt: Date
 }
 
 interface IProduct extends Document {
@@ -75,6 +76,9 @@ var productSchema = new mongoose.Schema<IProduct>(
 				star: { type: Number },
 				postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 				comment: { type: String },
+				updatedAt: {
+					type: Date,
+				},
 			},
 		],
 		totalRatings: {
