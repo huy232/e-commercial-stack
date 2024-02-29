@@ -9,11 +9,11 @@ export const path = {
 	FAQS: "/faqs",
 
 	ADMIN: "/admin",
-	DASHBOARD: "/dashboard",
-	MANAGE_USER: "/manage-user",
-	MANAGE_PRODUCTS: "/manage-products",
-	MANAGE_ORDERS: "/manage-orders",
-	CREATE_PRODUCTS: "/create-products",
+	DASHBOARD: "dashboard",
+	MANAGE_USER: "manage-user",
+	MANAGE_PRODUCTS: "manage-products",
+	MANAGE_ORDERS: "manage-orders",
+	CREATE_PRODUCTS: "create-products",
 
 	MEMEBER: "/member",
 	PROFILE: "/profile",

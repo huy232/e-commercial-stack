@@ -34,6 +34,26 @@ export const checkAuthentication = createAsyncThunk<boolean, void>(
 	}
 )
 
+export const checkIsAdmin = createAsyncThunk<boolean, void>(
+	"auth/checkIsAdmin",
+	async () => {
+		try {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_API_URI}/user/check-admin`,
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			)
+
+			const data = await response.json()
+			return data.success
+		} catch (error) {
+			return false
+		}
+	}
+)
+
 const authSlice = createSlice({
 	name: "auth",
 	initialState,
@@ -53,6 +73,7 @@ const authSlice = createSlice({
 		builder.addCase(checkAuthentication.fulfilled, (state, action) => {
 			state.isAuthenticated = action.payload
 		})
+		builder.addCase(checkIsAdmin.fulfilled, (state, action) => {})
 	},
 })
 

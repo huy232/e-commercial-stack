@@ -75,6 +75,26 @@ export const checkUserLogin = async (
 	}
 }
 
+export const checkAdmin = async (
+	cookieHeader?: string
+): Promise<ApiResponse<string>> => {
+	try {
+		const response = await fetch(`${API}/user/check-admin`, {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+				Cookie: cookieHeader || "",
+			},
+		})
+		const responseData: ApiResponse<string> = await response.json()
+
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
 export const userLogout = async (): Promise<ApiResponse<string>> => {
 	try {
 		const response = await fetch(`${API}/user/logout`, {

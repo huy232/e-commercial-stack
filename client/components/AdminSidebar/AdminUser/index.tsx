@@ -2,11 +2,10 @@
 import { selectIsAdmin, selectIsAuthenticated } from "@/store/slices/authSlice"
 import { useSelector } from "react-redux"
 
-const AdminMounted = () => {
+const AdminUser = () => {
 	const isAuthenticated = useSelector(selectIsAuthenticated)
 	const isAdmin = useSelector(selectIsAdmin)
-	console.log(isAuthenticated)
-	console.log(isAdmin)
+
 	if (isAuthenticated && isAdmin) {
 		return (
 			<div className="w-[327px] flex-none">
@@ -14,8 +13,10 @@ const AdminMounted = () => {
 			</div>
 		)
 	}
-	if (!isAuthenticated && !isAdmin) {
+
+	if (!isAuthenticated || !isAdmin) {
 		return <div>Redirect</div>
 	}
 }
-export default AdminMounted
+
+export default AdminUser

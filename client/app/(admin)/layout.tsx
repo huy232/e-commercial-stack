@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 }
 
 const bodyClassName = clsx(
-	"w-full flex flex-col items-center min-h-screen",
+	"w-full flex flex-col min-h-screen",
 	poppins.className
 )
 
@@ -32,9 +32,11 @@ export default function AdminLayout({
 		<html lang="en">
 			<body className={bodyClassName}>
 				<ReduxProvider>
-					<AdminSidebar />
-					<div className="w-main flex-grow">{children}</div>
-					<Footer />
+					<div className="flex flex-grow">
+						<AdminSidebar />
+						<div>{children}</div>
+					</div>
+					{/* <Footer /> */}
 				</ReduxProvider>
 			</body>
 		</html>

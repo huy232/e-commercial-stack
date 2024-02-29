@@ -1,16 +1,26 @@
 "use client"
-import { useEffect, useState } from "react"
-import AdminMounted from "./AdminMounted"
+import { Fragment, useState } from "react"
+import { useLayoutEffect } from "react"
+import { useSelector } from "react-redux"
+import { selectIsAdmin, selectIsAuthenticated } from "@/store/slices/authSlice"
+import { adminSidebarOptions } from "@/constant"
+import { adminDashboardStatus } from "@/types/adminDashboard"
+import Link from "next/link"
 const AdminSidebar = () => {
-	const [mounted, setMounted] = useState(false)
-
-	useEffect(() => {
-		setMounted(true)
-	}, [])
-
-	if (!mounted) {
-		return null
-	}
-	return mounted ? <AdminMounted /> : <></>
+	return (
+		<div>
+			{adminSidebarOptions.map((option) => (
+				<Fragment key={option.id}>
+					{option.type === adminDashboardStatus.SINGLE && (
+						<Link href={option.path || ""} className="flex items-center gap-1">
+							<span>{option.icon}</span>
+							<span>{option.text}</span>
+						</Link>
+					)}
+				</Fragment>
+			))}
+		</div>
+	)
 }
+
 export default AdminSidebar
