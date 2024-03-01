@@ -13,6 +13,7 @@ export {
 	FaGift,
 	FaReply,
 	FaTty,
+	FaWindowClose,
 } from "react-icons/fa"
 export {
 	AiFillHome,
@@ -29,3 +30,4 @@ export { PiPasswordFill } from "react-icons/pi"
 export { BiShow, BiHide } from "react-icons/bi"
 export { TbBrandProducthunt } from "react-icons/tb"
 export { LuMenuSquare } from "react-icons/lu"
+export { FaArrowDownShortWide } from "react-icons/fa6"
