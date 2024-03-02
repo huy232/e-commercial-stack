@@ -3,6 +3,7 @@ import asyncHandler from "express-async-handler"
 import { NextFunction, Request, Response } from "express"
 import { AuthenticatedRequest } from "../types/user"
 import { generateAccessToken } from "./jwt"
+import { User } from "../models"
 
 const verifyToken = async (
 	req: AuthenticatedRequest,
@@ -56,7 +57,6 @@ const verifyAccessToken = asyncHandler(
 		next: NextFunction
 	): Promise<void> => {
 		const cookies = req.headers.cookie
-
 		if (cookies) {
 			const cookieArray = cookies.split("; ")
 			const tokenCookie = cookieArray.find((cookie) =>
@@ -146,8 +146,9 @@ const isAdmin = asyncHandler(
 		res: Response,
 		next: NextFunction
 	): Promise<void> => {
-		const { role } = req.user
-		if (role && role.includes("admin")) {
+		const { _id } = req.user
+		const user = await User.findById({ _id }).select("-refreshToken -password")
+		if (user && user.role.includes("admin")) {
 			next()
 		} else {
 			res.status(403).json({

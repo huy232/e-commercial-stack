@@ -53,5 +53,10 @@ router.get(
 	UserController.checkAuth
 )
 router.post("/complete-registration", UserController.verifyRegister)
+router.get(
+	"/check-admin",
+	[verifyAccessToken, isAdmin],
+	UserController.checkAdmin
+)
 
 export { router as userRouter }

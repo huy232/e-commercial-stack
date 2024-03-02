@@ -40,3 +40,13 @@ export interface ApiResponseLogin {
 		address: []
 	}
 }
+
+export interface ApiUsersResponse<T> {
+	success: boolean
+	users: T
+	error?: string
+	message?: string
+	counts: number
+	totalPage: number
+	currentPage: number
+}

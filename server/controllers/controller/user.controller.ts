@@ -11,6 +11,7 @@ import { sendMail } from "../../utils/sendMail"
 import crypto from "crypto"
 import * as Validators from "../../validators/userValidators"
 import { validationResult } from "express-validator"
+import { parseInteger } from "../../utils/parseInteger"
 
 class UserController {
 	register = async (req: Request, res: Response): Promise<void> => {
@@ -164,6 +165,13 @@ class UserController {
 					message: "Invalid or expired token.",
 				})
 			}
+		}
+	)
+
+	checkAdmin = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			console.log("Admin check: ", req.user)
+			res.status(200).json({ success: true, message: "Valid role" })
 		}
 	)
 
@@ -382,10 +390,52 @@ class UserController {
 
 	getAllUsers = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const response = await User.find().select("-password -refreshToken")
+			const queries = { ...req.query }
+			const excludeFields = ["limit", "sort", "page", "fields"]
+			excludeFields.forEach((element) => delete queries[element])
+
+			let queryString = JSON.stringify(queries)
+			queryString = queryString.replace(
+				/\b(gte|gt|lt|lte)\b/g,
+				(matchedElement) => `$${matchedElement}`
+			)
+			const formattedQueries = JSON.parse(queryString)
+
+			// Filtering
+			if (queries.name) {
+				formattedQueries.name = { $regex: queries.name, $options: "i" }
+			}
+			let query = User.find(formattedQueries)
+			// Sorting
+			if (req.query.sort as string) {
+				const sortBy = (req.query.sort as string).split(",").join(" ")
+				query = query.sort(sortBy)
+			}
+
+			// Fields limiting
+			if (req.query.fields as string) {
+				const fields = (req.query.fields as string).split(",").join(" ")
+				query = query.select(fields)
+			}
+
+			const page = parseInteger(req.query.page, 1)
+			const limit = parseInteger(req.query.limit, 10)
+			const skip = (page - 1) * limit
+			query.skip(skip).limit(limit)
+
+			const response = await query.exec()
+			// Count the documents
+			const counts = await User.countDocuments(formattedQueries)
+			const totalPage = Math.ceil(counts / limit)
+			const currentPage = page
+
+			// const response = await User.find().select("-password -refreshToken")
 			res.status(200).json({
 				success: response ? true : false,
 				users: response,
+				counts,
+				totalPage,
+				currentPage,
 			})
 		}
 	)
@@ -574,7 +624,7 @@ class UserController {
 
 	checkAuth = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			console.log(req.user)
+			console.log("Auth check: ", req.user)
 			res.status(200).json({ success: true, message: "Valid user" })
 		}
 	)

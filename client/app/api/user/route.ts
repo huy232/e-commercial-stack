@@ -1,4 +1,4 @@
-import { ApiResponse, ApiResponseLogin } from "@/types"
+import { ApiResponse, ApiResponseLogin, ApiUsersResponse, Users } from "@/types"
 import { API } from "@/constant"
 
 // User Route
@@ -12,6 +12,12 @@ export interface UserRegister {
 export interface UserLogin {
 	email: string
 	password: string
+}
+
+export interface GetUsersParams {
+	limit?: number
+	page?: number
+	[key: string]: string | number | undefined | string[]
 }
 
 export const userRegister = async (
@@ -188,6 +194,42 @@ export const getCurrentUser = async (): Promise<ApiResponse<string>> => {
 		})
 
 		const responseData: ApiResponse<string> = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const getUsers = async (
+	params: GetUsersParams
+): Promise<ApiUsersResponse<Users[]>> => {
+	try {
+		const queryParamsArray: Array<[string, string]> = []
+
+		for (const [key, value] of Object.entries(params)) {
+			if (value !== undefined) {
+				if (Array.isArray(value)) {
+					for (const item of value) {
+						queryParamsArray.push([key, item.toString()])
+					}
+				} else {
+					queryParamsArray.push([key, value.toString()])
+				}
+			}
+		}
+
+		const queryParams = new URLSearchParams(queryParamsArray)
+		const url = `${API}/user/get-all-users?${queryParams.toString()}`
+
+		const response = await fetch(url, {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+
+		const responseData: ApiUsersResponse<Users[]> = await response.json()
 		return responseData
 	} catch (error) {
 		throw error
