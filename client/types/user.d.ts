@@ -16,4 +16,5 @@ export interface Users {
 	address: string
 	wishlist: []
 	isBlocked: boolean
+	createdAt: string
 }

@@ -405,6 +405,15 @@ class UserController {
 			if (queries.name) {
 				formattedQueries.name = { $regex: queries.name, $options: "i" }
 			}
+			if (req.query.search as string) {
+				delete formattedQueries.search
+				formattedQueries["$or"] = [
+					{ firstName: { $regex: req.query.search, $options: "i" } },
+					{ lastName: { $regex: req.query.search, $options: "i" } },
+					{ email: { $regex: req.query.search, $options: "i" } },
+				]
+			}
+
 			let query = User.find(formattedQueries)
 			// Sorting
 			if (req.query.sort as string) {
