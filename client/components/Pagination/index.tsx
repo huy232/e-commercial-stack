@@ -11,10 +11,11 @@ const Pagination: FC<PaginationProps> = ({ totalPages }) => {
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const { replace } = useRouter()
-	const initialSelected = searchParams.get("page") ?? 1
-	const [currentPage, setCurrentPage] = useState(
-		Number(initialSelected) > totalPages ? totalPages : Number(initialSelected)
-	)
+	const initialSelected = Number(searchParams.get("page")) ?? 1
+	// const [currentPage, setCurrentPage] = useState(
+	// 	Number(initialSelected) > totalPages ? totalPages : Number(initialSelected)
+	// )
+	const [currentPage, setCurrentPage] = useState(initialSelected)
 	const [prevSearchParams, setPrevSearchParams] =
 		useState<URLSearchParams | null>(null)
 
