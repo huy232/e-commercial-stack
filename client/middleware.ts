@@ -26,13 +26,13 @@ export async function adminMiddleware(request: NextRequest) {
 		const cookieHeader = request.headers.get("cookie")
 		const response = await checkUserLogin(cookieHeader || undefined)
 		const adminResponse = await checkAdmin(cookieHeader || undefined)
-		console.log("Response middleware: ", response)
-		console.log("Admin response middleware: ", adminResponse)
 		if (!response.success || !adminResponse.success) {
 			return NextResponse.redirect(
 				`${process.env.NEXT_PUBLIC_CLIENT_URL}/login`
 			)
 		}
+	} else {
+		return NextResponse.redirect(`${process.env.NEXT_PUBLIC_CLIENT_URL}/login`)
 	}
 }
 
@@ -60,6 +60,6 @@ export const config = {
 		"/register",
 		"/complete-registration",
 		"/admin",
-		"/admin:path*",
+		"/admin/:path*",
 	],
 }

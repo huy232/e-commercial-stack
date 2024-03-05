@@ -1,4 +1,10 @@
-import { ApiResponse, ApiResponseLogin, ApiUsersResponse, Users } from "@/types"
+import {
+	ApiResponse,
+	ApiResponseLogin,
+	ApiUsersResponse,
+	UpdateUser,
+	Users,
+} from "@/types"
 import { API } from "@/constant"
 
 // User Route
@@ -230,6 +236,27 @@ export const getUsers = async (
 		})
 
 		const responseData: ApiUsersResponse<Users[]> = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const updateUser = async (
+	userId: string,
+	requestBody: UpdateUser
+): Promise<ApiUsersResponse<UpdateUser>> => {
+	try {
+		const response = await fetch(`${API}/user/user-update/${userId}`, {
+			method: "PUT",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(requestBody),
+		})
+
+		const responseData: ApiUsersResponse<UpdateUser> = await response.json()
 		return responseData
 	} catch (error) {
 		throw error

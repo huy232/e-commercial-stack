@@ -4,6 +4,8 @@ export {
 	MdOutlineSubdirectoryArrowRight,
 	MdKeyboardArrowRight,
 	MdGroups,
+	MdEdit,
+	MdDelete,
 } from "react-icons/md"
 export { BsHandbagFill, BsFillSuitHeartFill } from "react-icons/bs"
 export {
@@ -30,4 +32,5 @@ export { PiPasswordFill } from "react-icons/pi"
 export { BiShow, BiHide } from "react-icons/bi"
 export { TbBrandProducthunt } from "react-icons/tb"
 export { LuMenuSquare } from "react-icons/lu"
-export { FaArrowDownShortWide } from "react-icons/fa6"
+export { FaArrowDownShortWide, FaCircleXmark } from "react-icons/fa6"
+export { IoMdCheckmarkCircleOutline } from "react-icons/io"

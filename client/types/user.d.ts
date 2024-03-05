@@ -18,3 +18,12 @@ export interface Users {
 	isBlocked: boolean
 	createdAt: string
 }
+
+export interface UpdateUser {
+	_id?: string
+	firstName?: string
+	lastName?: string
+	email?: string
+	isBlocked?: boolean
+	role?: string[]
+}

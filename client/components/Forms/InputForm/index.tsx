@@ -17,6 +17,7 @@ interface InputFormProps {
 	type?: string
 	placeholder?: string
 	fullWidth?: boolean
+	defaultValue?: string
 }
 
 const InputForm: FC<InputFormProps> = ({
@@ -29,6 +30,7 @@ const InputForm: FC<InputFormProps> = ({
 	type = "text",
 	placeholder,
 	fullWidth,
+	defaultValue,
 }) => {
 	return (
 		<div className="flex flex-col h-[80px] gap-2">
@@ -40,6 +42,7 @@ const InputForm: FC<InputFormProps> = ({
 				disabled={disabled}
 				placeholder={placeholder}
 				className={clsx("form-input", fullWidth && "w-full")}
+				defaultValue={defaultValue}
 			/>
 			{errors && id && errors[id]?.message && (
 				<small className="text-xs text-red-500">{errors[id]?.message}</small>
