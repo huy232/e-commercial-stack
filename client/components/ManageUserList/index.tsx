@@ -1,43 +1,16 @@
 "use client"
-import { ApiUsersResponse, User, Users } from "@/types"
-import { FC, useCallback, useEffect, useState } from "react"
-import {
-	Button,
-	InputField,
-	Pagination,
-	SearchUser,
-	UserTableRow,
-} from "@/components"
+import { Users } from "@/types"
+import { FC, useEffect, useState } from "react"
+import { Pagination, SearchUser, UserTableRow } from "@/components"
 import { getUsers } from "@/app/api"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { tableHeaders } from "@/constant"
+import { useSearchParams } from "next/navigation"
 
-interface ManageUserListProps {
-	searchParams: { [key: string]: string | string[] | undefined }
-	userList: Users[]
-}
-
-interface EditElement {
-	_id?: string
-	firstName?: string
-	lastName?: string
-	email?: string
-	avatar?: string
-	mobile?: number
-	role: string[]
-	isBlocked?: boolean
-	createdAt?: string
-}
-
-const ManageUserList: FC<ManageUserListProps> = ({ searchParams }) => {
+const ManageUserList: FC = () => {
 	const [userList, setUserList] = useState<Users[]>([])
 	const [totalPage, setTotalPage] = useState(1)
 	const [loading, setLoading] = useState(true)
+	const [userListChanged, setUserListChanged] = useState(false)
 	const params = useSearchParams() as URLSearchParams
-	const searchParamsUser = useSearchParams()
-	const pathname = usePathname()
-	const { replace } = useRouter()
 
 	useEffect(() => {
 		const fetchUsers = async (params: any) => {
@@ -67,13 +40,24 @@ const ManageUserList: FC<ManageUserListProps> = ({ searchParams }) => {
 		} else {
 			fetchUsers({ page, limit: 1 })
 		}
-	}, [params])
+	}, [params, userListChanged])
+
+	const handleUserListChange = () => {
+		setUserListChanged((prevState) => !prevState)
+	}
 
 	return (
 		<div className="w-full p-4">
-			<SearchUser />
-			{!loading && <UserTableRow userList={userList} />}
-			<Pagination totalPages={totalPage} />
+			{!loading && (
+				<>
+					<SearchUser />
+					<UserTableRow
+						userList={userList}
+						onUserListChange={handleUserListChange}
+					/>
+					<Pagination totalPages={totalPage} />
+				</>
+			)}
 		</div>
 	)
 }

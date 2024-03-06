@@ -496,11 +496,11 @@ class UserController {
 
 	updateUserByAdmin = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			const { uid } = req.user
+			const { _id } = req.body
 			if (Object.keys(req.body).length === 0) {
 				throw new Error("Missing inputs to update user")
 			}
-			const response = await User.findByIdAndUpdate(uid, req.body, {
+			const response = await User.findByIdAndUpdate(_id, req.body, {
 				new: true,
 			}).select("-password -refreshToken")
 			if (response) {

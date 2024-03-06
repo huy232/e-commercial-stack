@@ -12,7 +12,8 @@ import {
 	MdEdit,
 } from "@/assets/icons"
 import clsx from "clsx"
-import { updateUser } from "@/app/api"
+import { deleteUser, updateUser } from "@/app/api"
+import { useRouter } from "next/navigation"
 
 interface CustomFieldError extends FieldError {
 	message: string
@@ -32,9 +33,14 @@ interface EditElement {
 
 interface UserTableRowProps {
 	userList: Users[] | []
+	onUserListChange: () => void
 }
 
-const UserTableRow: FC<UserTableRowProps> = ({ userList }) => {
+const UserTableRow: FC<UserTableRowProps> = ({
+	userList,
+	onUserListChange,
+}) => {
+	const router = useRouter()
 	const [editElement, setEditElement] = useState<EditElement | null>(null)
 	const {
 		register,
@@ -77,12 +83,20 @@ const UserTableRow: FC<UserTableRowProps> = ({ userList }) => {
 					editedUser._id,
 					userInformation
 				)
-				console.log(updateUserInformation)
+				if (updateUserInformation.success) {
+					onUserListChange()
+				}
 			} catch (error) {
 				console.error("Error updating user:", error)
 			}
 		}
 	})
+
+	const handleDeleteUser = async (_id: string) => {
+		const deleteUserResponse = await deleteUser(_id)
+		onUserListChange()
+		console.log(deleteUserResponse)
+	}
 
 	return (
 		<form onSubmit={onSubmit}>
@@ -218,7 +232,10 @@ const UserTableRow: FC<UserTableRowProps> = ({ userList }) => {
 										>
 											<MdEdit />
 										</button>
-										<button className="text-orange-600 h-full">
+										<button
+											className="text-orange-600 h-full"
+											onClick={() => handleDeleteUser(user._id)}
+										>
 											<MdDelete />
 										</button>
 									</>

@@ -262,3 +262,20 @@ export const updateUser = async (
 		throw error
 	}
 }
+
+export const deleteUser = async (_id: string) => {
+	try {
+		const response = await fetch(`${API}/user/delete-user?_id=${_id}`, {
+			method: "DELETE",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+
+		const responseData = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
