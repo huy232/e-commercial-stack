@@ -7,7 +7,7 @@ import { Button } from "@/components"
 interface InputFieldProps {
 	type?: string
 	name: string
-	label: string
+	label?: string
 	register: UseFormRegister<any>
 	required?: boolean
 	pattern?: RegisterOptions["pattern"]
@@ -70,7 +70,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	return (
 		<div className="w-[320px]">
 			<div className="flex flex-col gap-2 py-2">
-				<label className="text-md font-medium">{label}</label>
+				{label && <label className="text-md font-medium">{label}</label>}
 				<div className="flex items-center gap-4">
 					<div className="w-full">
 						<input

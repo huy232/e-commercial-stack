@@ -50,3 +50,13 @@ export interface ApiUsersResponse<T> {
 	totalPage: number
 	currentPage: number
 }
+
+export interface ApiProductCategoryResponse<T> {
+	success: boolean
+	data: T
+	error?: string
+	message?: string
+	counts: number
+	totalPage: number
+	currentPage: number
+}
