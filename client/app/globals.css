@@ -16,6 +16,22 @@
 	}
 } */
 
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+.clearfix {
+	overflow: auto;
+}
+
+.clearfix::after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
 button.slick-next {
 	right: 80px;
 	z-index: 10;

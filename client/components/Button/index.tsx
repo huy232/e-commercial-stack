@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import { ReactNode, ButtonHTMLAttributes } from "react"
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,9 +14,12 @@ const Button: React.FC<ButtonProps> = ({
 	...rest
 }) => {
 	const baseClass = "custom-button"
-	const buttonClass = `${baseClass} ${className || ""} ${
-		disabled ? "disabled" : ""
-	} ${loading ? "loading" : ""}`
+	const buttonClass = clsx(
+		`${baseClass}`,
+		className,
+		disabled && "disabled",
+		loading && "loading"
+	)
 
 	return (
 		<button className={buttonClass} disabled={disabled || loading} {...rest}>

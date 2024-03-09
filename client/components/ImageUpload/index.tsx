@@ -1,10 +1,11 @@
 "use client"
+import clsx from "clsx"
 import React, { useCallback } from "react"
-import { DropEvent, FileRejection, useDropzone } from "react-dropzone"
+import { FileRejection, useDropzone } from "react-dropzone"
 
 interface ImageUploadProps {
 	multiple?: boolean
-	onUpload: (files: FileList | File) => void
+	onUpload: (files: File[]) => void
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -13,12 +14,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
 	const onDrop = useCallback(
 		(acceptedFiles: File[], fileRejections: FileRejection[]) => {
-			const filesArray = acceptedFiles.concat(
-				fileRejections.map((fileRejection) => fileRejection.file)
-			)
-			filesArray.forEach((file) => {
-				onUpload(file)
-			})
+			onUpload(acceptedFiles)
 		},
 		[onUpload]
 	)
@@ -28,13 +24,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 		multiple,
 	})
 
+	const imageUploadClass = clsx(
+		`border border-gray-300 p-4 text-center cursor-pointer h-fit`,
+		isDragActive && "bg-gray-100"
+	)
+
 	return (
-		<div
-			{...getRootProps()}
-			className={`border border-gray-300 p-4 text-center ${
-				isDragActive ? "bg-gray-100" : ""
-			}`}
-		>
+		<div {...getRootProps()} className={imageUploadClass}>
 			<input {...getInputProps()} />
 			<p>Drag and drop your {multiple ? "images" : "image"} here</p>
 			<p>or</p>

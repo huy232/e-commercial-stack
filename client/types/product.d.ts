@@ -32,3 +32,14 @@ export type ProductType = {
 export interface DailyDealType extends ProductType {
 	expirationTime: string
 }
+
+export type CreateProductType = {
+	title: string
+	description: string
+	price: number
+	quantity: number
+	thumbnail: File
+	productImages: File[]
+	category: string
+	brand: string
+}

@@ -1,19 +1,30 @@
 "use client"
-import { useForm } from "react-hook-form"
+import { FieldValues, useForm } from "react-hook-form"
 import {
 	BrandSelect,
 	Button,
-	CustomImage,
+	ImagePreview,
 	ImageUpload,
 	InputField,
-	InputForm,
 	Select,
 } from "@/components"
 import { FC, useState } from "react"
-import { ProductCategoryType } from "@/types"
+import { CreateProductType, ProductCategoryType } from "@/types"
+import dynamic from "next/dynamic"
+import { createProduct } from "@/app/api"
+
+const DynamicReactQuill = dynamic(() => import("react-quill"), { ssr: false })
 
 interface CreateProductProps {
 	categories: ProductCategoryType[]
+}
+
+interface ProductFormData extends FieldValues {
+	productName: string
+	price: string
+	quantity: string
+	category: string
+	brand: string
 }
 
 const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
@@ -27,11 +38,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	)
 	const [thumbnail, setThumbnail] = useState<File | null>(null)
 	const [productImages, setProductImages] = useState<File[]>([])
-
-	const handleSubmitProduct = handleSubmit((data) => {
-		console.log(data)
-	})
-
+	const [value, setValue] = useState("")
 	const selectValueGetterTitle = (option: ProductCategoryType) => option.title
 	const selectLabelGetterTitle = (option: ProductCategoryType) => option.title
 	const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,28 +47,47 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	const selectedCategoryData =
 		selectedCategory &&
 		categories.find((category) => category.title === selectedCategory)
-	const handleThumbnailUpload = (file: FileList | File) => {
-		console.log("Run this is upload single image")
-		if (file instanceof File) {
-			setThumbnail(file)
+	const handleThumbnailUpload = (files: File[]) => {
+		if (files.length > 0) {
+			setThumbnail(files[0])
 		}
 	}
-
-	const handleProductImagesUpload = (files: FileList | File) => {
-		console.log("Run this if upload multiple images")
-		if (files instanceof FileList) {
-			const imageFiles = Array.from(files)
-			setProductImages([...productImages, ...imageFiles])
-		} else {
-			setProductImages([...productImages, files])
-		}
+	const handleProductImagesUpload = (files: File[]) => {
+		setProductImages([...productImages, ...files])
+	}
+	const handleDeleteThumbnail = () => {
+		setThumbnail(null)
+	}
+	const handleDeleteProductImage = (index: number) => {
+		const updatedImages = productImages.filter((_, i) => i !== index)
+		setProductImages(updatedImages)
 	}
 
-	console.log(thumbnail)
-	console.log(productImages)
+	const handleSubmitProduct = handleSubmit(async (data) => {
+		if (!thumbnail) {
+			console.error("Thumbnail is required")
+			return
+		}
+		const formData = new FormData()
+		for (let i of Object.entries(data)) {
+			formData.append(i[0], i[1])
+		}
+		if (thumbnail) {
+			console.log()
+			formData.append("thumbnail", thumbnail)
+		}
+		if (productImages) {
+			for (let image of productImages) {
+				formData.append("productImages", image)
+			}
+		}
+
+		const response = await createProduct(formData)
+		console.log(response)
+	})
 
 	return (
-		<form onSubmit={handleSubmitProduct}>
+		<form onSubmit={handleSubmitProduct} className="w-full flex flex-col">
 			<InputField
 				label="Product name"
 				name="productName"
@@ -73,75 +99,77 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						"Please enter a valid product name.")
 				}
 			/>
-			<InputField
-				label="Price"
-				name="price"
-				register={register}
-				required
-				validateType={"onlyNumbers"}
-				errorMessage={
-					errors.price &&
-					(errors.price.message?.toString() || "Please enter a valid price.")
-				}
-			/>
-			<InputField
-				label="Quantity"
-				name="quantity"
-				register={register}
-				required
-				validateType={"onlyNumbers"}
-				errorMessage={
-					errors.quantity &&
-					(errors.quantity.message?.toString() ||
-						"Please enter a valid quantity.")
-				}
-			/>
-			<Select
-				name="category"
-				label="Category"
-				register={register}
-				required
-				options={categories}
-				getValue={selectValueGetterTitle}
-				getLabel={selectLabelGetterTitle}
-				onChange={handleCategoryChange}
-			/>
-			{selectedCategoryData && (
-				<BrandSelect
-					name="brand"
-					label="Brand"
+			<div className="flex gap-4">
+				<InputField
+					label="Price"
+					name="price"
 					register={register}
 					required
-					options={selectedCategoryData.brand}
+					validateType={"onlyNumbers"}
+					errorMessage={
+						errors.price &&
+						(errors.price.message?.toString() || "Please enter a valid price.")
+					}
 				/>
-			)}
-			{thumbnail && (
-				<div>
-					<p>Thumbnail Preview:</p>
-					<CustomImage
-						src={URL.createObjectURL(thumbnail)}
-						alt="Thumbnail"
-						width={160}
-						height={160}
+				<InputField
+					label="Quantity"
+					name="quantity"
+					register={register}
+					required
+					validateType={"onlyNumbers"}
+					errorMessage={
+						errors.quantity &&
+						(errors.quantity.message?.toString() ||
+							"Please enter a valid quantity.")
+					}
+				/>
+			</div>
+			<div className="flex gap-4">
+				<Select
+					name="category"
+					label="Category"
+					register={register}
+					required
+					options={categories}
+					getValue={selectValueGetterTitle}
+					getLabel={selectLabelGetterTitle}
+					onChange={handleCategoryChange}
+				/>
+				{selectedCategoryData && (
+					<BrandSelect
+						name="brand"
+						label="Brand"
+						register={register}
+						required
+						options={selectedCategoryData.brand}
 					/>
-				</div>
-			)}
-			<ImageUpload onUpload={handleThumbnailUpload} />
-			{productImages.length > 0 && (
-				<div>
-					<p>Product Image Previews:</p>
-					{productImages.map((image, index) => (
-						<CustomImage
-							key={index}
-							src={URL.createObjectURL(image)}
-							alt={`Product Image ${index + 1}`}
-							width={160}
-							height={160}
-						/>
-					))}
-				</div>
-			)}
-			<ImageUpload multiple onUpload={handleProductImagesUpload} />
+				)}
+			</div>
+			<div className="h-[200px]">
+				<DynamicReactQuill
+					theme="snow"
+					value={value}
+					onChange={setValue}
+					className="h-[152px]"
+				/>
+			</div>
+			<div className="w-full h-full">
+				<h3 className="font-semibold">Thumbnail preview</h3>
+				{thumbnail && (
+					<ImagePreview images={thumbnail} onDelete={handleDeleteThumbnail} />
+				)}
+				<ImageUpload onUpload={handleThumbnailUpload} />
+
+				<h3 className="font-semibold">Product images</h3>
+				{productImages.length > 0 && (
+					<ImagePreview
+						images={productImages}
+						onDelete={handleDeleteProductImage}
+					/>
+				)}
+				<ImageUpload multiple onUpload={handleProductImagesUpload} />
+			</div>
+
 			<Button type="submit">Create product</Button>
 		</form>
 	)

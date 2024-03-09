@@ -1,5 +1,10 @@
 import { API } from "@/constant"
-import { ProductType, ApiResponse, ApiProductResponse } from "@/types"
+import {
+	ProductType,
+	ApiResponse,
+	ApiProductResponse,
+	CreateProductType,
+} from "@/types"
 
 interface GetProductsParams {
 	limit?: number
@@ -92,6 +97,20 @@ export const productRating = async (
 			}),
 		})
 		const responseData: ApiResponse<ProductType> = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const createProduct = async (formData: FormData) => {
+	try {
+		const response = await fetch(`${API}/product/create-product`, {
+			method: "POST",
+			credentials: "include",
+			body: formData,
+		})
+		const responseData = await response.json()
 		return responseData
 	} catch (error) {
 		throw error
