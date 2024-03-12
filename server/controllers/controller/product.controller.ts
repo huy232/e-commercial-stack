@@ -7,6 +7,7 @@ import { AuthenticatedRequest } from "../../types/user"
 import moment from "moment"
 import { DailyDeal } from "../../models/model/dailyDeal.model"
 import { ProductType } from "../../../client/types/product"
+import { UploadedFile, UploadedFiles } from "../../types/uploadFile"
 
 class ProductController {
 	static cachedDailyDeal: {
@@ -16,19 +17,41 @@ class ProductController {
 
 	createProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			if (Object.keys(req.body).length === 0) {
+			const { productName, price, description, brand, category, color } =
+				req.body
+			const images = req.files as UploadedFiles
+			if (!images || !images.thumbnail || !images.productImages) {
+				res.status(400).json({ message: "No images uploaded" })
+				return
+			}
+			if (
+				!(productName && price && description && brand && category && color)
+			) {
 				throw new Error("Missing inputs")
 			}
-			if (req.body && req.body.title) {
-				req.body.slug = slugify(req.body.title)
-			}
+			const productImageURLs = images.productImages.map(
+				(image: UploadedFile) => image.path
+			)
+			const colorMod = color.map((colorEdit: string) => colorEdit.toUpperCase())
+			const categoriesArray = Array.isArray(category) ? category : [category]
+			const updatedCategories = ["Home", ...categoriesArray]
+
+			req.body.images = productImageURLs
+			req.body.slug = slugify(productName)
+			req.body.totalRatings = 0
+			req.body.rating = []
+			req.body.sold = 0
+			req.body.thumbnail = images.thumbnail[0].path
+			req.body.title = productName
+			req.body.color = colorMod
+			req.body.category = updatedCategories
 			const newProduct = await Product.create(req.body)
 			res.status(200).json({
-				success: newProduct ? true : false,
-				message: newProduct
+				success: !!newProduct,
+				message: !!newProduct
 					? "Success created product"
 					: "Cannot create new product",
-				data: newProduct ? newProduct : {},
+				data: !!newProduct ? newProduct : {},
 			})
 		}
 	)

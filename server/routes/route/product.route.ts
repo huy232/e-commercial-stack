@@ -7,6 +7,13 @@ const router = express.Router()
 router.post(
 	"/create-product",
 	[verifyAccessToken, isAdmin],
+	uploadCloud.fields([
+		{ name: "productImages", maxCount: 10 },
+		{
+			name: "thumbnail",
+			maxCount: 1,
+		},
+	]),
 	ProductController.createProduct
 )
 router.get("/get-product/:product_slug", ProductController.getProduct)
