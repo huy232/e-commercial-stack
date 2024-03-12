@@ -9,3 +9,15 @@ export const tableHeaders = [
 	"Created at",
 	"Actions",
 ]
+
+export const productTableHeaders = [
+	"#",
+	"Thumbnail",
+	"Product name",
+	"Category",
+	"Brand",
+	"Price",
+	"Sold",
+	"Created at",
+	"Actions",
+]

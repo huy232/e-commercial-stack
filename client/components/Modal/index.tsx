@@ -5,7 +5,7 @@ import clsx from "clsx"
 interface ModalProps {
 	isOpen: boolean
 	children: ReactNode
-	onClose: () => void
+	onClose?: () => void
 }
 
 const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
@@ -14,7 +14,8 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
 				modalRef.current &&
-				!modalRef.current.contains(event.target as Node)
+				!modalRef.current.contains(event.target as Node) &&
+				onClose
 			) {
 				onClose()
 			}

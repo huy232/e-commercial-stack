@@ -42,7 +42,7 @@ const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
 	const titleClass = (id: number) =>
 		clsx(
 			`rounded border-rose-500 p-1 hover:bg-rose-500 hover-effect`,
-			titleId === id && ""
+			titleId === id && "bg-red-500"
 		)
 
 	return (

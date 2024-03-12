@@ -13,7 +13,6 @@ import {
 } from "@/assets/icons"
 import clsx from "clsx"
 import { deleteUser, updateUser } from "@/app/api"
-import { useRouter } from "next/navigation"
 
 interface CustomFieldError extends FieldError {
 	message: string
@@ -40,7 +39,6 @@ const UserTableRow: FC<UserTableRowProps> = ({
 	userList,
 	onUserListChange,
 }) => {
-	const router = useRouter()
 	const [editElement, setEditElement] = useState<EditElement | null>(null)
 	const {
 		register,
@@ -53,7 +51,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 		return true
 	}
 	const tdClass = (additionClassName?: string) =>
-		clsx("px-1 py-1", additionClassName)
+		clsx("px-1 py-1 align-middle", additionClassName)
 
 	const handleRoleChange = (role: string, checked: boolean) => {
 		const normalizedRole = role.toLowerCase()
@@ -151,7 +149,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 									user.lastName
 								)}
 							</td>
-							<td className={tdClass("flex flex-col")}>
+							<td className={tdClass()}>
 								{editElement?._id
 									? roleSelection.map((role) => (
 											<>
@@ -204,11 +202,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 								)}
 							</td>
 							<td className={tdClass()}>{moment(user.createdAt).fromNow()}</td>
-							<td
-								className={tdClass(
-									"flex gap-1 items-center justify-center h-full"
-								)}
-							>
+							<td className={tdClass()}>
 								{editElement?._id ? (
 									<>
 										<button type="submit" className="text-orange-600 h-full">

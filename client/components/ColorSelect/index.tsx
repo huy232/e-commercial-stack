@@ -1,0 +1,43 @@
+"use client"
+import { colorSelection } from "@/constant"
+
+interface ColorSelectProps {
+	selectedColors: string[]
+	onColorsChange: (colors: string[]) => void
+}
+
+const ColorSelect: React.FC<ColorSelectProps> = ({
+	selectedColors,
+	onColorsChange,
+}) => {
+	const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const { value, checked } = event.target
+		if (checked) {
+			onColorsChange([...selectedColors, value])
+		} else {
+			onColorsChange(selectedColors.filter((color) => color !== value))
+		}
+	}
+
+	return (
+		<div>
+			<h3>Available Colors</h3>
+			<div className="grid grid-cols-3 gap-2">
+				{colorSelection.map((color) => (
+					<label key={color} className="inline-flex items-center">
+						<input
+							type="checkbox"
+							value={color}
+							onChange={handleColorChange}
+							checked={selectedColors.includes(color)}
+							className="mr-2"
+						/>
+						{color}
+					</label>
+				))}
+			</div>
+		</div>
+	)
+}
+
+export default ColorSelect
