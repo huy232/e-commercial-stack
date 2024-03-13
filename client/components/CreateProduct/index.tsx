@@ -13,20 +13,8 @@ import {
 } from "@/components"
 import { FC, useState } from "react"
 import { ProductCategoryType } from "@/types"
-import dynamic from "next/dynamic"
 import { createProduct } from "@/app/api"
-
-import type ReactQuill from "react-quill"
-const QuillWrapper = dynamic(
-	async () => {
-		const { default: RQ } = await import("react-quill")
-		// eslint-disable-next-line react/display-name
-		return ({ ...props }) => <RQ {...props} />
-	},
-	{
-		ssr: false,
-	}
-) as typeof ReactQuill
+import ReactQuill from "react-quill"
 
 interface CreateProductProps {
 	categories: ProductCategoryType[]
@@ -221,7 +209,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 					)}
 				</div>
 				<div className="h-[200px]">
-					<QuillWrapper
+					<ReactQuill
 						theme="snow"
 						value={value}
 						onChange={setValue}

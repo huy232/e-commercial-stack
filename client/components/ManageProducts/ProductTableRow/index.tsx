@@ -2,10 +2,13 @@
 import { FC, useState } from "react"
 import { ProductType, Users } from "@/types"
 import { FieldError, FieldErrors, useForm } from "react-hook-form"
-import { CustomImage, InputForm } from "@/components"
+import { CustomImage, InputForm, UpdateProduct } from "@/components"
 import { productTableHeaders, roleSelection, tableHeaders } from "@/constant"
 import moment from "moment"
 import clsx from "clsx"
+import { formatPriceNumber } from "../../../utils/formatPrice"
+import { MdDelete, MdEdit } from "@/assets/icons"
+import Link from "next/link"
 
 interface CustomFieldError extends FieldError {
 	message: string
@@ -20,7 +23,7 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 	productList,
 	onProductListChange,
 }) => {
-	const [editElement, setEditElement] = useState(null)
+	const [editElement, setEditElement] = useState<ProductType | null>(null)
 	const {
 		register,
 		handleSubmit,
@@ -54,15 +57,31 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 									alt={product.title}
 								/>
 							</td>
-							<td className={tdClass()}>{product.title}</td>
-							<td className={tdClass()}>{product.category[1]}</td>
-							<td className={tdClass()}>{product.brand}</td>
-							<td className={tdClass()}>{product.price}</td>
-							<td className={tdClass()}>{product.quantity}</td>
-							<td className={tdClass()}>
+							<td className={tdClass(`line-clamp-2 w-[120px]`)}>
+								{product.title}
+							</td>
+							<td className={tdClass(`text-xs`)}>{product.category[1]}</td>
+							<td className={tdClass(`text-xs`)}>{product.brand}</td>
+							<td className={tdClass(`text-xs`)}>
+								{formatPriceNumber(product.price)}
+							</td>
+							<td className={tdClass(`text-xs`)}>{product.quantity}</td>
+							<td className={tdClass(`text-xs`)}>
 								{moment(product.createdAt).fromNow()}
 							</td>
-							<td className={tdClass("h-full")}>Actions</td>
+							<td className={tdClass("h-full")}>
+								<div className="flex gap-1">
+									<Link
+										href={`/admin/update-product/${product._id}`}
+										className="text-orange-600 h-full"
+									>
+										<MdEdit />
+									</Link>
+									<button className="text-orange-600 h-full">
+										<MdDelete />
+									</button>
+								</div>
+							</td>
 						</tr>
 					))}
 				</tbody>

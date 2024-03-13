@@ -5,19 +5,7 @@ import { reviewRating } from "@/constant"
 import { AiFillStar } from "@/assets/icons"
 import "react-quill/dist/quill.snow.css"
 import { Button } from "@/components"
-import dynamic from "next/dynamic"
 import ReactQuill from "react-quill"
-
-const QuillWrapper = dynamic(
-	async () => {
-		const { default: RQ } = await import("react-quill")
-		// eslint-disable-next-line react/display-name
-		return ({ ...props }) => <RQ {...props} />
-	},
-	{
-		ssr: false,
-	}
-) as typeof ReactQuill
 
 interface ReviewOptionsProps {
 	productName: string
@@ -61,7 +49,7 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 			<h2 className={headingClassName}>Digital World</h2>
 			<h3>Review this product: {productName}</h3>
 
-			<QuillWrapper theme="snow" value={value} onChange={setValue} />
+			<ReactQuill theme="snow" value={value} onChange={setValue} />
 
 			<div className="w-full flex flex-col gap-4">
 				<p>How do you like this product</p>
