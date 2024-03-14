@@ -72,7 +72,7 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 							<td className={tdClass("h-full")}>
 								<div className="flex gap-1">
 									<Link
-										href={`/admin/update-product/${product._id}`}
+										href={`/admin/update-product/${product.slug}`}
 										className="text-orange-600 h-full"
 									>
 										<MdEdit />

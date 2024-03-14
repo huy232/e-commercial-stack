@@ -16,6 +16,7 @@ interface InputFieldProps {
 	togglePassword?: boolean
 	validate?: (value: string) => boolean | string
 	minLength?: number
+	value?: string | number
 
 	validateType?:
 		| "email"
@@ -53,6 +54,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	validate,
 	minLength,
 	validateType,
+	value,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -93,6 +95,7 @@ const InputField: React.FC<InputFieldProps> = ({
 							})}
 							placeholder={placeholder}
 							autoComplete="true"
+							value={value}
 						/>
 						{togglePassword && (
 							<Button

@@ -1,12 +1,12 @@
 "use client"
 
-import { ProductCategoryType, ProductType } from "@/types"
+import { ApiResponse, ProductCategoryType, ProductType } from "@/types"
 import { Dispatch, FC, SetStateAction, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
+import { ColorSelect, InputField } from ".."
 
 interface UpdateProductProps {
-	editProduct: ProductType
-	onEditElement: () => void
+	productResponse: ApiResponse<ProductType>
 }
 
 interface ProductFormData extends FieldValues {
@@ -18,11 +18,7 @@ interface ProductFormData extends FieldValues {
 	colors: string[]
 }
 
-const UpdateProduct: FC<UpdateProductProps> = ({
-	editProduct,
-	onEditElement,
-}) => {
-	console.log(editProduct)
+const UpdateProduct: FC<UpdateProductProps> = ({ productResponse }) => {
 	const {
 		register,
 		reset,
@@ -31,11 +27,13 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		formState: { errors },
 	} = useForm<ProductFormData>()
 	const [selectedCategory, setSelectedCategory] = useState<string[] | null>(
-		editProduct.category
+		productResponse.data.category
 	)
-	const [value, setValueEditor] = useState<string>(editProduct.description)
+	const [value, setValueEditor] = useState<string>(
+		productResponse.data.description
+	)
 	const [selectedColors, setSelectedColors] = useState<string[]>(
-		editProduct.color
+		productResponse.data.color
 	)
 
 	const [thumbnail, setThumbnail] = useState<File | null>(null)
@@ -47,7 +45,68 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	const [colorError, setColorError] = useState<string>("")
 	const [loading, setLoading] = useState<boolean>(false)
 
-	return <div>UpdateProduct</div>
+	const handleColorChange = (colors: string[]) => {
+		setSelectedColors(colors)
+		setColorError("")
+	}
+
+	if (!productResponse.success) {
+		return (
+			<div>
+				Something went wrong with the product itself. Can not proceed to update
+			</div>
+		)
+	}
+
+	return (
+		<div>
+			<div>
+				<InputField
+					label="Product name"
+					name="productName"
+					register={register}
+					required
+					errorMessage={
+						errors.productName &&
+						(errors.productName.message?.toString() ||
+							"Please enter a valid product name.")
+					}
+					value={productResponse.data.title}
+				/>
+				<ColorSelect
+					onColorsChange={handleColorChange}
+					selectedColors={selectedColors}
+				/>
+			</div>
+			<div className="flex gap-4">
+				<InputField
+					label="Price"
+					name="price"
+					register={register}
+					required
+					validateType={"onlyNumbers"}
+					errorMessage={
+						errors.price &&
+						(errors.price.message?.toString() || "Please enter a valid price.")
+					}
+					value={productResponse.data.price}
+				/>
+				<InputField
+					label="Quantity"
+					name="quantity"
+					register={register}
+					required
+					validateType={"onlyNumbers"}
+					errorMessage={
+						errors.quantity &&
+						(errors.quantity.message?.toString() ||
+							"Please enter a valid quantity.")
+					}
+					value={productResponse.data.quantity}
+				/>
+			</div>
+		</div>
+	)
 }
 
 export default UpdateProduct
