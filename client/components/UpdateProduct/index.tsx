@@ -3,10 +3,11 @@
 import { ApiResponse, ProductCategoryType, ProductType } from "@/types"
 import { Dispatch, FC, SetStateAction, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
-import { ColorSelect, InputField } from ".."
+import { BrandSelect, ColorSelect, InputField, Select } from ".."
 
 interface UpdateProductProps {
 	productResponse: ApiResponse<ProductType>
+	categories: ProductCategoryType[]
 }
 
 interface ProductFormData extends FieldValues {
@@ -18,7 +19,10 @@ interface ProductFormData extends FieldValues {
 	colors: string[]
 }
 
-const UpdateProduct: FC<UpdateProductProps> = ({ productResponse }) => {
+const UpdateProduct: FC<UpdateProductProps> = ({
+	productResponse,
+	categories,
+}) => {
 	const {
 		register,
 		reset,
@@ -26,8 +30,11 @@ const UpdateProduct: FC<UpdateProductProps> = ({ productResponse }) => {
 		setValue,
 		formState: { errors },
 	} = useForm<ProductFormData>()
-	const [selectedCategory, setSelectedCategory] = useState<string[] | null>(
-		productResponse.data.category
+	console.log(productResponse.data)
+	const initialCategory = productResponse.data.category[1]
+	const initialBrand = productResponse.data.brand
+	const [selectedCategory, setSelectedCategory] = useState<string | null>(
+		productResponse.data.category[1]
 	)
 	const [value, setValueEditor] = useState<string>(
 		productResponse.data.description
@@ -49,6 +56,14 @@ const UpdateProduct: FC<UpdateProductProps> = ({ productResponse }) => {
 		setSelectedColors(colors)
 		setColorError("")
 	}
+	const selectValueGetterTitle = (option: ProductCategoryType) => option.title
+	const selectLabelGetterTitle = (option: ProductCategoryType) => option.title
+	const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedCategory(e.target.value)
+	}
+	const selectedCategoryData =
+		selectedCategory &&
+		categories.find((category) => category.title === selectedCategory)
 
 	if (!productResponse.success) {
 		return (
@@ -104,6 +119,29 @@ const UpdateProduct: FC<UpdateProductProps> = ({ productResponse }) => {
 					}
 					value={productResponse.data.quantity}
 				/>
+			</div>
+			<div className="flex gap-4">
+				<Select
+					name="category"
+					label="Category"
+					register={register}
+					required
+					options={categories}
+					getValue={selectValueGetterTitle}
+					getLabel={selectLabelGetterTitle}
+					onChange={handleCategoryChange}
+					value={initialCategory}
+				/>
+				{selectedCategoryData && (
+					<BrandSelect
+						name="brand"
+						label="Brand"
+						register={register}
+						required
+						options={selectedCategoryData.brand}
+						value={initialBrand}
+					/>
+				)}
 			</div>
 		</div>
 	)

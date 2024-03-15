@@ -7,6 +7,7 @@ interface BrandSelectProps {
 	register: UseFormRegister<any>
 	required?: boolean
 	options: string[]
+	value?: string | undefined
 }
 
 const BrandSelect: React.FC<BrandSelectProps> = ({
@@ -15,7 +16,12 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 	register,
 	required = false,
 	options,
+	value,
 }) => {
+	const normalizedValue = value
+		? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+		: ""
+
 	return (
 		<div className="w-[320px]">
 			<div className="flex flex-col gap-2 py-2">
@@ -23,6 +29,7 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 				<select
 					className="rounded p-1 border-[1px] border-black"
 					{...register(name, { required })}
+					value={normalizedValue}
 				>
 					{options.map((brand, index) => (
 						<option key={index} value={brand}>

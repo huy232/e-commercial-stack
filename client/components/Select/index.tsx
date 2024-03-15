@@ -9,6 +9,7 @@ interface SelectProps<T> {
 	options: T[]
 	getValue: (option: T) => string
 	getLabel: (option: T) => string
+	value?: string | undefined
 	onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
@@ -20,6 +21,7 @@ const Select = <T extends any>({
 	options,
 	getValue,
 	getLabel,
+	value,
 	onChange,
 }: SelectProps<T>) => {
 	return (
@@ -30,6 +32,7 @@ const Select = <T extends any>({
 					className="rounded p-1 border-[1px] border-black"
 					{...register(name, { required })}
 					onChange={onChange}
+					value={value}
 				>
 					{options.map((option, index) => (
 						<option key={index} value={getValue(option)}>
