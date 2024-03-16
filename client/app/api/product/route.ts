@@ -116,3 +116,20 @@ export const createProduct = async (formData: FormData) => {
 		throw error
 	}
 }
+
+export const updateProduct = async (product_id: string, formData: FormData) => {
+	try {
+		const response = await fetch(
+			`${API}/product/update-product/${product_id}`,
+			{
+				method: "PUT",
+				credentials: "include",
+				body: formData,
+			}
+		)
+		const responseData = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}

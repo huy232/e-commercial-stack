@@ -184,8 +184,18 @@ class ProductController {
 	updateProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_id } = req.params
+			const images = req.files as UploadedFiles
 			if (req.body && req.body.title) {
 				req.body.slug = slugify(req.body.title)
+			}
+			if (images.thumbnail.length > 0) {
+				req.body.thumbnail = images.thumbnail[0].path
+			}
+			if (images.productImages.length > 0) {
+				const newImage = images.productImages.map(
+					(image: UploadedFile) => image.path
+				)
+				req.body.images = [...req.body.images, ...newImage]
 			}
 			const updatedProduct = await Product.findByIdAndUpdate(
 				product_id,

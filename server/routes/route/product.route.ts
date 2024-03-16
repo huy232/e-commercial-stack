@@ -21,6 +21,13 @@ router.get("/get-all-product", ProductController.getAllProducts)
 router.put(
 	"/update-product/:product_id",
 	[verifyAccessToken, isAdmin],
+	uploadCloud.fields([
+		{ name: "productImages", maxCount: 10 },
+		{
+			name: "thumbnail",
+			maxCount: 1,
+		},
+	]),
 	ProductController.updateProduct
 )
 router.delete(

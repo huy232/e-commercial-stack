@@ -29,7 +29,7 @@ const ColorSelect: React.FC<ColorSelectProps> = ({
 							type="checkbox"
 							value={color}
 							onChange={handleColorChange}
-							checked={selectedColors.includes(color)}
+							checked={selectedColors.includes(color.toUpperCase())}
 							className="mr-2"
 						/>
 						{color}
