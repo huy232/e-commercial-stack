@@ -19,7 +19,10 @@ const ImagePreview: FC<ImagePreviewProps> = ({ images, onDelete }) => {
 
 	const renderImage = (image: string | File, index: number) => {
 		return (
-			<div key={index} className="relative inline-block group">
+			<div
+				key={index}
+				className="relative inline-block group w-[160px] h-[160px]"
+			>
 				<CustomImage
 					src={
 						typeof image === "string"
@@ -27,8 +30,7 @@ const ImagePreview: FC<ImagePreviewProps> = ({ images, onDelete }) => {
 							: URL.createObjectURL(image as File)
 					}
 					alt={`Product Image ${index + 1}`}
-					width={160}
-					height={160}
+					fill
 				/>
 				<button className={imageClass} onClick={() => handleDeleteImage(index)}>
 					<MdDelete size={20} color="#FF0000" />

@@ -133,3 +133,16 @@ export const updateProduct = async (product_id: string, formData: FormData) => {
 		throw error
 	}
 }
+
+export const removeProduct = async (product_id: string) => {
+	try {
+		const response = await fetch(
+			`${API}/product/delete-product/${product_id}`,
+			{ method: "DELETE", credentials: "include" }
+		)
+		const responseData = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}

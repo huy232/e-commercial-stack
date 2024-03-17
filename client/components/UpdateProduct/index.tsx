@@ -40,7 +40,6 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		setValue,
 		formState: { errors },
 	} = useForm<ProductFormData>()
-	console.log(productResponse.data)
 	const initialCategory = productResponse.data.category[1]
 	const initialBrand = productResponse.data.brand
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(
@@ -236,18 +235,22 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			</div>
 			<div className="w-full h-full">
 				<h3 className="font-semibold">Thumbnail preview</h3>
-				{thumbnail && (
-					<ImagePreview images={thumbnail} onDelete={handleDeleteThumbnail} />
-				)}
+				<div className="flex items-center">
+					{thumbnail && (
+						<ImagePreview images={thumbnail} onDelete={handleDeleteThumbnail} />
+					)}
+				</div>
 				<ImageUpload onUpload={handleThumbnailUpload} />
 
 				<h3 className="font-semibold">Product images</h3>
-				{productImages.length > 0 && (
-					<ImagePreview
-						images={productImages}
-						onDelete={handleDeleteProductImage}
-					/>
-				)}
+				<div className="flex items-center">
+					{productImages.length > 0 && (
+						<ImagePreview
+							images={productImages}
+							onDelete={handleDeleteProductImage}
+						/>
+					)}
+				</div>
 				<ImageUpload multiple onUpload={handleProductImagesUpload} />
 			</div>
 			<Button type="submit">Update product</Button>

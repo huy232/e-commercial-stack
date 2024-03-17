@@ -27,6 +27,13 @@ export type ProductType = {
 	updatedAt: Date
 	_id: string
 	thumbnail: string
+	variant?: {
+		color: []
+		images: string[]
+		thumbnail: string
+		price: number
+		title: string
+	}
 }
 
 export interface DailyDealType extends ProductType {

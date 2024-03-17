@@ -215,10 +215,8 @@ class ProductController {
 	deleteProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_id } = req.params
-			if (req.body && req.body.title) {
-				req.body.slug = slugify(req.body.title)
-			}
 			const deletedProduct = await Product.findByIdAndDelete(product_id)
+			// const deletedProduct = { product: "Something" }
 			res.status(200).json({
 				success: deletedProduct ? true : false,
 				message: deletedProduct

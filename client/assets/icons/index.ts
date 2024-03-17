@@ -16,6 +16,7 @@ export {
 	FaReply,
 	FaTty,
 	FaWindowClose,
+	FaPlusCircle,
 } from "react-icons/fa"
 export {
 	AiFillHome,

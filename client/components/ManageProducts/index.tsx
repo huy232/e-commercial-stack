@@ -42,7 +42,7 @@ const ManageProducts: FC = () => {
 		} else {
 			fetchProducts({ page, limit: 10 })
 		}
-	}, [params, setProductListChanged])
+	}, [params, productListChanged])
 
 	const handleProductListChange = () => {
 		setProductListChanged((prevState) => !prevState)

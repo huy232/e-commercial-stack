@@ -56,7 +56,7 @@ const AdminSidebar = () => {
 		)
 
 	return (
-		<div className="bg-zinc-800 h-screen py-4 rounded">
+		<div className="bg-zinc-800 h-screen py-4 rounded w-[320px]">
 			<div className="flex flex-col w-fit">
 				<Logo />
 			</div>

@@ -17,6 +17,7 @@ interface InputFieldProps {
 	validate?: (value: string) => boolean | string
 	minLength?: number
 	value?: string | number
+	readOnly?: boolean
 
 	validateType?:
 		| "email"
@@ -55,6 +56,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	minLength,
 	validateType,
 	value,
+	readOnly,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -76,6 +78,7 @@ const InputField: React.FC<InputFieldProps> = ({
 				<div className="flex items-center gap-4">
 					<div className="w-full">
 						<input
+							readOnly={readOnly}
 							className="rounded p-1 border-[1px] border-black"
 							type={
 								togglePassword ? (passwordVisible ? "text" : "password") : type

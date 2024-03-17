@@ -5,21 +5,25 @@ import { AiOutlineLoading3Quarters } from "@/assets/icons"
 interface LoadingSpinnerProps {
 	color?: string
 	text?: string
+	size?: number
 }
 
 const LoadingSpinner: FC<LoadingSpinnerProps> = ({
 	color = "red-500",
 	text,
+	size = 8,
 }) => {
+	const spinnerClass = clsx(
+		`spinner-border animate-spin inline-block rounded-full`,
+		`w-${size} h-${size}`
+	)
+
 	return (
 		<div className="flex justify-center items-center overflow-hidden opacity-75 gap-1">
-			<div
-				className="spinner-border animate-spin inline-block w-8 h-8 rounded-full"
-				role="status"
-			>
+			<div className={spinnerClass} role="status">
 				<span className="visually-hidden">
 					<svg
-						className="animate-spin -inline-block w-8 h-8 border-4 rounded-full"
+						className="animate-spin -inline-block border-4 rounded-full"
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
 						viewBox="0 0 24 24"
