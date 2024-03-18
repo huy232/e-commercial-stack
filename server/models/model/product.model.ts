@@ -7,6 +7,15 @@ interface IRating {
 	updatedAt: Date
 }
 
+interface IVariant {
+	color: string
+	price: number
+	thumbnail: string
+	images: []
+	title: string
+	sku: string
+}
+
 interface IProduct extends Document {
 	title: string
 	slug: string
@@ -21,6 +30,7 @@ interface IProduct extends Document {
 	ratings: IRating[]
 	totalRatings: number
 	thumbnail: string
+	variants: IVariant[]
 }
 
 var productSchema = new mongoose.Schema<IProduct>(
@@ -85,6 +95,16 @@ var productSchema = new mongoose.Schema<IProduct>(
 			type: Number,
 			default: 0,
 		},
+		variants: [
+			{
+				color: String,
+				price: Number,
+				thumbnail: String,
+				images: Array,
+				title: String,
+				sku: String,
+			},
+		],
 	},
 	{ timestamps: true }
 )

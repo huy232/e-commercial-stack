@@ -6,6 +6,7 @@ import {
 	ImagePreview,
 	ImageUpload,
 	InputField,
+	Option,
 } from "@/components"
 import { ApiResponse, ProductType } from "@/types"
 import { FC, useState } from "react"
@@ -27,6 +28,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 	)
 	const [thumbnailError, setThumbnailError] = useState<string>("")
 	const [productImagesError, setProductImagesError] = useState<string>("")
+	const [loading, setLoading] = useState(false)
 
 	const {
 		register,
@@ -56,31 +58,73 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 		const updatedImages = productImages.filter((_, i) => i !== index)
 		setProductImages(updatedImages)
 	}
+	const handleSubmitProduct = handleSubmit(async (data) => {
+		let hasError = false
+		const formData = new FormData()
+		for (let i of Object.entries(data)) {
+			formData.append(i[0], i[1])
+		}
+		if (thumbnail) {
+			formData.append("thumbnail", thumbnail)
+		} else {
+			setThumbnailError("Thumbnail is required")
+			hasError = true
+		}
+		if (productImages) {
+			for (let image of productImages) {
+				formData.append("productImages", image)
+			}
+		} else {
+			setProductImagesError("Please choose a picture for product")
+			hasError = true
+		}
+		if (hasError) {
+			return
+		}
+		// setLoading(true)
+		// await createProduct(formData)
+		// 	.then(() => {
+		// 		reset()
+		// 		setThumbnail(null)
+		// 		setProductImages([])
+		// 		setValue("")
+		// 		setSelectedColors([])
+		// 		setDescriptionError("")
+		// 		setColorError("")
+		// 		setThumbnailError("")
+		// 		setProductImagesError("")
+		// 	})
+		// 	.finally(() => {
+		// 		setLoading(false)
+		// 	})
+	})
 
 	return (
 		<div>
-			<form>
+			<form onSubmit={handleSubmitProduct}>
 				<div className="flex gap-4">
 					<InputField
-						label="Product name"
+						label="Variant name"
 						name="productName"
 						register={register}
 						required
 						errorMessage={
 							errors.productName &&
 							(errors.productName.message?.toString() ||
-								"Please enter a valid product name.")
+								"Please enter a valid product variant name.")
 						}
 						value={productResponse.data.title}
 					/>
-					<ColorSelect
-						onColorsChange={handleColorChange}
-						selectedColors={selectedColors}
+					<Option
+						name="color"
+						label="Color variant"
+						options={selectedColors}
+						register={register}
 					/>
 				</div>
 				<div className="flex gap-4">
 					<InputField
-						label="Price"
+						label="Variant price"
 						name="price"
 						register={register}
 						required
@@ -88,7 +132,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 						errorMessage={
 							errors.price &&
 							(errors.price.message?.toString() ||
-								"Please enter a valid price.")
+								"Please enter a valid variant price.")
 						}
 					/>
 				</div>

@@ -8,6 +8,7 @@ import moment from "moment"
 import { DailyDeal } from "../../models/model/dailyDeal.model"
 import { ProductType } from "../../../client/types/product"
 import { UploadedFile, UploadedFiles } from "../../types/uploadFile"
+import { v4 as uuidv4 } from "uuid"
 
 class ProductController {
 	static cachedDailyDeal: {
@@ -391,6 +392,53 @@ class ProductController {
 			console.error("Error updating daily deal in MongoDB:", error)
 		}
 	}
+
+	addVariant = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			try {
+				const { product_id } = req.params
+				const { title, price, color } = req.body
+				const images = req.files as UploadedFiles
+				if (!images || !images.thumbnail || !images.productImages) {
+					res.status(400).json({ message: "No images uploaded" })
+					return
+				}
+				if (!(title && price && color)) {
+					throw new Error("Missing inputs")
+				}
+				const productImageURLs = images.productImages.map(
+					(image: UploadedFile) => image.path
+				)
+				req.body.images = [...req.body.images, ...productImageURLs]
+				const productImages = req.body.images
+				const thumbnail = images.thumbnail[0].path || req.body.thumbnail
+				const response = await Product.findByIdAndUpdate(product_id, {
+					$push: {
+						variants: {
+							color,
+							title,
+							price,
+							images: productImages,
+							thumbnail,
+							sku: uuidv4(),
+						},
+					},
+				})
+				res.json({
+					success: response ? true : false,
+					message: response
+						? "Update variant for product successfully"
+						: "Failed update variant for product",
+					data: response ? response : {},
+				})
+			} catch (error) {
+				console.error("Error uploading image:", error)
+				res
+					.status(500)
+					.json({ success: false, message: "An unexpected error occurred." })
+			}
+		}
+	)
 }
 
 export default new ProductController()

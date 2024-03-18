@@ -46,6 +46,18 @@ router.put(
 	uploadCloud.array("images", 10),
 	ProductController.uploadImagesProduct
 )
+router.put(
+	"/variant/:product_id",
+	[verifyAccessToken, isAdmin],
+	uploadCloud.fields([
+		{ name: "productImages", maxCount: 10 },
+		{
+			name: "thumbnail",
+			maxCount: 1,
+		},
+	]),
+	ProductController.uploadImagesProduct
+)
 
 router.get("/daily-product", ProductController.getRandomProductWithFiveStars)
 
