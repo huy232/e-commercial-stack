@@ -409,8 +409,7 @@ class ProductController {
 				const productImageURLs = images.productImages.map(
 					(image: UploadedFile) => image.path
 				)
-				req.body.images = [...req.body.images, ...productImageURLs]
-				const productImages = req.body.images
+				const productImages = [...productImageURLs]
 				const thumbnail = images.thumbnail[0].path || req.body.thumbnail
 				const response = await Product.findByIdAndUpdate(product_id, {
 					$push: {

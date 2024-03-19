@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form"
 import {
+	Button,
 	ColorSelect,
 	ImagePreview,
 	ImageUpload,
@@ -9,17 +10,14 @@ import {
 	Option,
 } from "@/components"
 import { ApiResponse, ProductType } from "@/types"
-import { FC, useState } from "react"
+import { ChangeEvent, FC, useState } from "react"
+import { updateProductVariant } from "@/app/api"
 
 interface ProductVariantProps {
 	productResponse: ApiResponse<ProductType>
 }
 
 const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
-	const [selectedColors, setSelectedColors] = useState<string[]>(
-		productResponse.data.color
-	)
-	const [colorError, setColorError] = useState<string>("")
 	const [thumbnail, setThumbnail] = useState<string | File | null>(
 		productResponse.data?.variant?.thumbnail || null
 	)
@@ -37,10 +35,6 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 		reset,
 		watch,
 	} = useForm()
-	const handleColorChange = (colors: string[]) => {
-		setSelectedColors(colors)
-		setColorError("")
-	}
 	const handleThumbnailUpload = (files: File[]) => {
 		if (files.length > 0) {
 			setThumbnail(files[0])
@@ -81,22 +75,15 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 		if (hasError) {
 			return
 		}
-		// setLoading(true)
-		// await createProduct(formData)
-		// 	.then(() => {
-		// 		reset()
-		// 		setThumbnail(null)
-		// 		setProductImages([])
-		// 		setValue("")
-		// 		setSelectedColors([])
-		// 		setDescriptionError("")
-		// 		setColorError("")
-		// 		setThumbnailError("")
-		// 		setProductImagesError("")
-		// 	})
-		// 	.finally(() => {
-		// 		setLoading(false)
-		// 	})
+		setLoading(true)
+		await updateProductVariant(productResponse.data._id, formData)
+			.then(() => {
+				setThumbnailError("")
+				setProductImagesError("")
+			})
+			.finally(() => {
+				setLoading(false)
+			})
 	})
 
 	return (
@@ -105,12 +92,12 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 				<div className="flex gap-4">
 					<InputField
 						label="Variant name"
-						name="productName"
+						name="title"
 						register={register}
 						required
 						errorMessage={
-							errors.productName &&
-							(errors.productName.message?.toString() ||
+							errors.title &&
+							(errors.title.message?.toString() ||
 								"Please enter a valid product variant name.")
 						}
 						value={productResponse.data.title}
@@ -118,7 +105,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 					<Option
 						name="color"
 						label="Color variant"
-						options={selectedColors}
+						options={productResponse.data.color}
 						register={register}
 					/>
 				</div>
@@ -147,7 +134,6 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 						)}
 					</div>
 					<ImageUpload onUpload={handleThumbnailUpload} />
-
 					<h3 className="font-semibold">Product images</h3>
 					<div className="flex items-center">
 						{productImages.length > 0 && (
@@ -159,6 +145,15 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 					</div>
 					<ImageUpload multiple onUpload={handleProductImagesUpload} />
 				</div>
+				<div>
+					{thumbnailError && (
+						<span className="text-red-500">{thumbnailError}</span>
+					)}
+					{productImagesError && (
+						<span className="text-red-500">{productImagesError}</span>
+					)}
+				</div>
+				<Button type="submit">Create product</Button>
 			</form>
 		</div>
 	)

@@ -56,7 +56,7 @@ router.put(
 			maxCount: 1,
 		},
 	]),
-	ProductController.uploadImagesProduct
+	ProductController.addVariant
 )
 
 router.get("/daily-product", ProductController.getRandomProductWithFiveStars)

@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { ChangeEventHandler, useEffect, useState } from "react"
 import { RegisterOptions, UseFormRegister } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
@@ -18,7 +18,7 @@ interface InputFieldProps {
 	minLength?: number
 	value?: string | number
 	readOnly?: boolean
-
+	onChange?: ChangeEventHandler<HTMLInputElement>
 	validateType?:
 		| "email"
 		| "noSpaceNoNumber"
@@ -56,8 +56,10 @@ const InputField: React.FC<InputFieldProps> = ({
 	minLength,
 	validateType,
 	value,
-	readOnly,
+	readOnly = false,
+	onChange,
 }) => {
+	const [inputValue, setInputValue] = useState(value || "")
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
 	const togglePasswordVisibility = () => {
@@ -70,6 +72,10 @@ const InputField: React.FC<InputFieldProps> = ({
 					validateType as NonNullable<InputFieldProps["validateType"]>
 			  ]
 			: undefined
+
+	useEffect(() => {
+		setInputValue(value || "")
+	}, [value])
 
 	return (
 		<div className="w-[320px]">
@@ -98,7 +104,13 @@ const InputField: React.FC<InputFieldProps> = ({
 							})}
 							placeholder={placeholder}
 							autoComplete="true"
-							value={value}
+							value={inputValue}
+							onChange={(e) => {
+								setInputValue(e.target.value)
+								if (onChange) {
+									onChange(e)
+								}
+							}}
 						/>
 						{togglePassword && (
 							<Button

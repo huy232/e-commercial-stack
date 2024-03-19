@@ -146,3 +146,20 @@ export const removeProduct = async (product_id: string) => {
 		throw error
 	}
 }
+
+export const updateProductVariant = async (
+	product_id: string,
+	formData: FormData
+) => {
+	try {
+		const response = await fetch(`${API}/product/variant/${product_id}`, {
+			method: "PUT",
+			credentials: "include",
+			body: formData,
+		})
+		const responseData = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
