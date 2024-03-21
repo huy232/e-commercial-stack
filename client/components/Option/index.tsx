@@ -1,5 +1,5 @@
 "use client"
-import { FC } from "react"
+import { FC, memo } from "react"
 import { useForm, UseFormRegister } from "react-hook-form"
 
 interface OptionProps {
@@ -10,6 +10,8 @@ interface OptionProps {
 	required?: boolean
 	defaultValue?: string
 	className?: string
+	onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
+	selectedColor?: string
 }
 
 const Option: FC<OptionProps> = ({
@@ -20,6 +22,8 @@ const Option: FC<OptionProps> = ({
 	required = false,
 	defaultValue = "",
 	className,
+	onChange,
+	selectedColor,
 }) => {
 	return (
 		<div className="w-[320px]">
@@ -30,6 +34,8 @@ const Option: FC<OptionProps> = ({
 				className="py-2 rounded border-2 border-red-500 px-[4px] mx-1"
 				{...register(name, { required })}
 				defaultValue={defaultValue}
+				onChange={onChange}
+				value={selectedColor}
 			>
 				{options.map((option, index) => (
 					<option key={index} value={option}>
@@ -41,4 +47,4 @@ const Option: FC<OptionProps> = ({
 	)
 }
 
-export default Option
+export default memo(Option)

@@ -196,7 +196,10 @@ class ProductController {
 				const newImage = images.productImages.map(
 					(image: UploadedFile) => image.path
 				)
-				req.body.images = [...req.body.images, ...newImage]
+				const existingProductImages = Array.isArray(req.body.productImages)
+					? req.body.productImages
+					: [req.body.productImages]
+				req.body.images = [...existingProductImages, ...newImage]
 			}
 			const updatedProduct = await Product.findByIdAndUpdate(
 				product_id,
@@ -399,37 +402,73 @@ class ProductController {
 				const { product_id } = req.params
 				const { title, price, color } = req.body
 				const images = req.files as UploadedFiles
-				if (!images || !images.thumbnail || !images.productImages) {
-					res.status(400).json({ message: "No images uploaded" })
-					return
-				}
 				if (!(title && price && color)) {
 					throw new Error("Missing inputs")
 				}
-				const productImageURLs = images.productImages.map(
-					(image: UploadedFile) => image.path
-				)
-				const productImages = [...productImageURLs]
-				const thumbnail = images.thumbnail[0].path || req.body.thumbnail
-				const response = await Product.findByIdAndUpdate(product_id, {
-					$push: {
-						variants: {
-							color,
-							title,
-							price,
-							images: productImages,
-							thumbnail,
-							sku: uuidv4(),
+
+				if (images.productImages) {
+					const productImageURLs = images.productImages.map(
+						(image: UploadedFile) => image.path
+					)
+
+					const existingProductImages = Array.isArray(req.body.productImages)
+						? req.body.productImages
+						: [req.body.productImages]
+
+					const productImages = [...existingProductImages, ...productImageURLs]
+					req.body.productImages = productImages
+				}
+				if (images.thumbnail) {
+					const thumbnail = images.thumbnail[0].path || req.body.thumbnail
+					req.body.thumbnail = thumbnail
+				}
+
+				const existingVariant = await Product.findOneAndUpdate(
+					{
+						_id: product_id,
+						variants: { $elemMatch: { $or: [{ title }, { color }] } },
+					},
+					{
+						$set: {
+							"variants.$.price": price, // Update price of existing variant
+							"variants.$.images": req.body.productImages, // Update images of existing variant
+							"variants.$.thumbnail": req.body.thumbnail, // Update thumbnail of existing variant
 						},
 					},
-				})
-				res.json({
-					success: response ? true : false,
-					message: response
-						? "Update variant for product successfully"
-						: "Failed update variant for product",
-					data: response ? response : {},
-				})
+					{ new: true }
+				)
+
+				if (!existingVariant) {
+					const response = await Product.findByIdAndUpdate(
+						product_id,
+						{
+							$addToSet: {
+								variants: {
+									color,
+									title,
+									price,
+									images: req.body.productImages,
+									thumbnail: req.body.thumbnail,
+									sku: uuidv4(),
+								},
+							},
+						},
+						{ new: true }
+					)
+					res.json({
+						success: response ? true : false,
+						message: response
+							? "Update variant for product successfully"
+							: "Failed update variant for product",
+						data: response ? response : {},
+					})
+				} else {
+					res.json({
+						success: true,
+						message: "Variant updated successfully",
+						data: existingVariant,
+					})
+				}
 			} catch (error) {
 				console.error("Error uploading image:", error)
 				res

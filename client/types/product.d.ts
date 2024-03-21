@@ -10,10 +10,18 @@ export type Review = {
 	updatedAt: string
 }
 
+export type VariantType = {
+	color: string
+	images: string[]
+	thumbnail: string
+	price: number
+	title: string
+}
+
 export type ProductType = {
 	brand: string
 	category: string[]
-	color: []
+	color: string[]
 	createdAt: Date
 	description: string
 	images: string[]
@@ -27,13 +35,7 @@ export type ProductType = {
 	updatedAt: Date
 	_id: string
 	thumbnail: string
-	variant?: {
-		color: []
-		images: string[]
-		thumbnail: string
-		price: number
-		title: string
-	}
+	variants?: VariantType[]
 }
 
 export interface DailyDealType extends ProductType {

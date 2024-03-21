@@ -21,7 +21,6 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 	const normalizedValue = value
 		? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
 		: ""
-
 	return (
 		<div className="w-[320px]">
 			<div className="flex flex-col gap-2 py-2">
@@ -29,7 +28,7 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 				<select
 					className="rounded p-1 border-[1px] border-black"
 					{...register(name, { required })}
-					value={normalizedValue}
+					defaultValue={normalizedValue}
 				>
 					{options.map((brand, index) => (
 						<option key={index} value={brand}>

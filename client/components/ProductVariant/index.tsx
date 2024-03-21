@@ -18,11 +18,36 @@ interface ProductVariantProps {
 }
 
 const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
+	const [selectedColor, setSelectedColor] = useState<string>(
+		(productResponse.data?.variants &&
+			productResponse.data.variants[0]?.color) ||
+			productResponse.data.color[0]
+	)
+	const variantTitle =
+		(productResponse.data?.variants &&
+			productResponse.data?.variants.find(
+				(variant) => variant.color === selectedColor
+			)?.title) ||
+		productResponse.data.title
+	const price =
+		(productResponse.data?.variants &&
+			productResponse.data?.variants.find(
+				(variant) => variant.color === selectedColor
+			)?.price) ||
+		productResponse.data.price
 	const [thumbnail, setThumbnail] = useState<string | File | null>(
-		productResponse.data?.variant?.thumbnail || null
+		(productResponse.data?.variants &&
+			productResponse.data?.variants.find(
+				(variant) => variant.color === selectedColor
+			)?.thumbnail) ||
+			null
 	)
 	const [productImages, setProductImages] = useState<Array<string | File>>(
-		productResponse.data?.variant?.images || []
+		(productResponse.data?.variants &&
+			productResponse.data?.variants.find(
+				(variant) => variant.color === selectedColor
+			)?.images) ||
+			[]
 	)
 	const [thumbnailError, setThumbnailError] = useState<string>("")
 	const [productImagesError, setProductImagesError] = useState<string>("")
@@ -35,6 +60,9 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 		reset,
 		watch,
 	} = useForm()
+	const handleColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedColor(event.target.value)
+	}
 	const handleThumbnailUpload = (files: File[]) => {
 		if (files.length > 0) {
 			setThumbnail(files[0])
@@ -85,6 +113,9 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 				setLoading(false)
 			})
 	})
+	{
+		console.log(productImages)
+	}
 
 	return (
 		<div>
@@ -100,13 +131,15 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 							(errors.title.message?.toString() ||
 								"Please enter a valid product variant name.")
 						}
-						value={productResponse.data.title}
+						value={variantTitle}
 					/>
 					<Option
 						name="color"
 						label="Color variant"
 						options={productResponse.data.color}
 						register={register}
+						onChange={handleColorChange}
+						selectedColor={selectedColor}
 					/>
 				</div>
 				<div className="flex gap-4">
@@ -121,6 +154,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 							(errors.price.message?.toString() ||
 								"Please enter a valid variant price.")
 						}
+						value={price}
 					/>
 				</div>
 				<div className="w-full h-full">
@@ -153,7 +187,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 						<span className="text-red-500">{productImagesError}</span>
 					)}
 				</div>
-				<Button type="submit">Create product</Button>
+				<Button type="submit">Create/update variant</Button>
 			</form>
 		</div>
 	)
