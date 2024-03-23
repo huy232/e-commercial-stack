@@ -429,13 +429,30 @@ class UserController {
 
 			const page = parseInteger(req.query.page, 1)
 			const limit = parseInteger(req.query.limit, 10)
+			if (page < 1) {
+				res.status(400).json({
+					success: false,
+					message:
+						"Invalid value for page parameter. Must be a positive integer.",
+				})
+				return
+			}
+
+			if (limit < 1) {
+				res.status(400).json({
+					success: false,
+					message:
+						"Invalid value for limit parameter. Must be a positive integer.",
+				})
+				return
+			}
 			const skip = (page - 1) * limit
 			query.skip(skip).limit(limit)
 
 			const response = await query.exec()
 			// Count the documents
 			const counts = await User.countDocuments(formattedQueries)
-			const totalPage = Math.ceil(counts / limit)
+			const totalPage = Math.ceil(counts / limit) || 1
 			const currentPage = page
 
 			// const response = await User.find().select("-password -refreshToken")

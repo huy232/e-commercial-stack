@@ -19,6 +19,7 @@ interface InputFieldProps {
 	value?: string | number
 	readOnly?: boolean
 	onChange?: ChangeEventHandler<HTMLInputElement>
+	disabled?: boolean
 	validateType?:
 		| "email"
 		| "noSpaceNoNumber"
@@ -58,6 +59,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	value,
 	readOnly = false,
 	onChange,
+	disabled = false,
 }) => {
 	const [inputValue, setInputValue] = useState(value || "")
 	const [passwordVisible, setPasswordVisible] = useState(false)
@@ -84,6 +86,7 @@ const InputField: React.FC<InputFieldProps> = ({
 				<div className="flex items-center gap-4">
 					<div className="w-full">
 						<input
+							disabled={disabled}
 							readOnly={readOnly}
 							className="rounded p-1 border-[1px] border-black"
 							type={
@@ -117,6 +120,7 @@ const InputField: React.FC<InputFieldProps> = ({
 								className="hover-effect px-1"
 								type="button"
 								onClick={togglePasswordVisibility}
+								disabled={disabled}
 							>
 								{passwordVisible ? <BiHide /> : <BiShow />}
 							</Button>

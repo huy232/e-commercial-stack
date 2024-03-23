@@ -11,6 +11,7 @@ interface SelectProps<T> {
 	getLabel: (option: T) => string
 	value?: string | undefined
 	onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
+	disabled?: boolean
 }
 
 const Select = <T extends any>({
@@ -23,6 +24,7 @@ const Select = <T extends any>({
 	getLabel,
 	value,
 	onChange,
+	disabled = false,
 }: SelectProps<T>) => {
 	return (
 		<div className="w-[320px]">
@@ -33,6 +35,7 @@ const Select = <T extends any>({
 					{...register(name, { required })}
 					onChange={onChange}
 					value={value}
+					disabled={disabled}
 				>
 					{options.map((option, index) => (
 						<option key={index} value={getValue(option)}>

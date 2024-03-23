@@ -35,11 +35,12 @@ const Pagination: FC<PaginationProps> = ({ totalPages }) => {
 				replace(`${pathname}?${newSearchParams.toString()}`)
 				setCurrentPage(1)
 			}
-		} else {
-			const newSearchParams = new URLSearchParams(searchParams.toString())
-			newSearchParams.set("page", currentPage.toString())
-			replace(`${pathname}?${newSearchParams.toString()}`)
 		}
+		//  else {
+		// 	const newSearchParams = new URLSearchParams(searchParams.toString())
+		// 	newSearchParams.set("page", currentPage.toString())
+		// 	replace(`${pathname}?${newSearchParams.toString()}`)
+		// }
 		setPrevSearchParams(searchParams)
 	}, [
 		searchParams,

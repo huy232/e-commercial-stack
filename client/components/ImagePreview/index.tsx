@@ -6,9 +6,14 @@ import clsx from "clsx"
 interface ImagePreviewProps {
 	images: File | File[] | string | string[] | Array<string | File>
 	onDelete: (index: number) => void
+	disabled?: boolean
 }
 
-const ImagePreview: FC<ImagePreviewProps> = ({ images, onDelete }) => {
+const ImagePreview: FC<ImagePreviewProps> = ({
+	images,
+	onDelete,
+	disabled,
+}) => {
 	const handleDeleteImage = (index: number) => {
 		onDelete(index)
 	}
@@ -32,7 +37,11 @@ const ImagePreview: FC<ImagePreviewProps> = ({ images, onDelete }) => {
 					alt={`Product Image ${index + 1}`}
 					fill
 				/>
-				<button className={imageClass} onClick={() => handleDeleteImage(index)}>
+				<button
+					className={imageClass}
+					onClick={() => handleDeleteImage(index)}
+					disabled={disabled}
+				>
 					<MdDelete size={20} color="#FF0000" />
 				</button>
 			</div>

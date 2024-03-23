@@ -8,6 +8,7 @@ interface BrandSelectProps {
 	required?: boolean
 	options: string[]
 	value?: string | undefined
+	disabled?: boolean
 }
 
 const BrandSelect: React.FC<BrandSelectProps> = ({
@@ -17,6 +18,7 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 	required = false,
 	options,
 	value,
+	disabled,
 }) => {
 	const normalizedValue = value
 		? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
@@ -29,6 +31,7 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 					className="rounded p-1 border-[1px] border-black"
 					{...register(name, { required })}
 					defaultValue={normalizedValue}
+					disabled={disabled}
 				>
 					{options.map((brand, index) => (
 						<option key={index} value={brand}>

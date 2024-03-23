@@ -4,11 +4,13 @@ import { colorSelection } from "@/constant"
 interface ColorSelectProps {
 	selectedColors: string[]
 	onColorsChange: (colors: string[]) => void
+	disabled?: boolean
 }
 
 const ColorSelect: React.FC<ColorSelectProps> = ({
 	selectedColors,
 	onColorsChange,
+	disabled,
 }) => {
 	const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value, checked } = event.target
@@ -31,6 +33,7 @@ const ColorSelect: React.FC<ColorSelectProps> = ({
 							onChange={handleColorChange}
 							checked={selectedColors.includes(color.toUpperCase())}
 							className="mr-2"
+							disabled={disabled}
 						/>
 						{color}
 					</label>

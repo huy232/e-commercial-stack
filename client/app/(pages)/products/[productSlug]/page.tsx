@@ -38,6 +38,7 @@ export default async function Product({
 		updatedAt,
 		_id,
 		thumbnail,
+		variants,
 	} = data
 	const { data: relatedProducts } = await getProducts({
 		category: category[1] || "",
@@ -82,14 +83,16 @@ export default async function Product({
 						<span className="flex">{renderStarFromNumber(totalRatings)}</span>
 						<ul className="text-sm text-gray-500 px-6">
 							{description.split(",").map((element: string) => (
-								<li className="list-item list-square leading-6" key={element}>
-									{element}
-								</li>
+								<li
+									className="list-item list-square leading-6"
+									key={element}
+									dangerouslySetInnerHTML={{ __html: element }}
+								/>
 							))}
 						</ul>
 					</div>
 					<div className="flex flex-col gap-8">
-						<ProductCart />
+						<ProductCart variants={variants} />
 					</div>
 				</div>
 				<div className="w-1/5">

@@ -108,9 +108,19 @@ class ProductController {
 				const formattedQueries = JSON.parse(queryString)
 				const priceFilter: any = {}
 
+				console.log(queries)
+
 				// Filtering
+				if (queries.search as string) {
+					delete formattedQueries.search
+					formattedQueries["$or"] = [
+						{ title: { $regex: req.query.search, $options: "i" } },
+					]
+				}
 				if (queries.title) {
+					console.log("Normal queries:", queries.title)
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
+					console.log("Formatted queries:", formattedQueries)
 				}
 				if (queries.category) {
 					formattedQueries.category = {
@@ -153,13 +163,30 @@ class ProductController {
 
 				const page = parseInteger(req.query.page, 1)
 				const limit = parseInteger(req.query.limit, 10)
+				if (page < 1) {
+					res.status(400).json({
+						success: false,
+						message:
+							"Invalid value for page parameter. Must be a positive integer.",
+					})
+					return
+				}
+
+				if (limit < 1) {
+					res.status(400).json({
+						success: false,
+						message:
+							"Invalid value for limit parameter. Must be a positive integer.",
+					})
+					return
+				}
 				const skip = (page - 1) * limit
 				query.skip(skip).limit(limit)
 
 				const response = await query.exec()
 				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
-				const totalPage = Math.ceil(counts / limit)
+				const totalPage = Math.ceil(counts / limit) || 1
 				const currentPage = page
 
 				res.status(200).json({
@@ -189,18 +216,21 @@ class ProductController {
 			if (req.body && req.body.title) {
 				req.body.slug = slugify(req.body.title)
 			}
-			if (images.thumbnail.length > 0) {
+			if (images.thumbnail) {
 				req.body.thumbnail = images.thumbnail[0].path
 			}
-			if (images.productImages.length > 0) {
-				const newImage = images.productImages.map(
+			if (images.productImages) {
+				const productImageURLs = images.productImages.map(
 					(image: UploadedFile) => image.path
 				)
-				const existingProductImages = Array.isArray(req.body.productImages)
-					? req.body.productImages
-					: [req.body.productImages]
-				req.body.images = [...existingProductImages, ...newImage]
+				let existingProductImages = req.body.productImages || []
+				if (!Array.isArray(existingProductImages)) {
+					existingProductImages = [existingProductImages]
+				}
+				const productImages = [...existingProductImages, ...productImageURLs]
+				req.body.images = productImages
 			}
+			console.log(req.body)
 			const updatedProduct = await Product.findByIdAndUpdate(
 				product_id,
 				req.body,
@@ -410,11 +440,10 @@ class ProductController {
 					const productImageURLs = images.productImages.map(
 						(image: UploadedFile) => image.path
 					)
-
-					const existingProductImages = Array.isArray(req.body.productImages)
-						? req.body.productImages
-						: [req.body.productImages]
-
+					let existingProductImages = req.body.productImages || []
+					if (!Array.isArray(existingProductImages)) {
+						existingProductImages = [existingProductImages]
+					}
 					const productImages = [...existingProductImages, ...productImageURLs]
 					req.body.productImages = productImages
 				}
@@ -422,17 +451,16 @@ class ProductController {
 					const thumbnail = images.thumbnail[0].path || req.body.thumbnail
 					req.body.thumbnail = thumbnail
 				}
-
 				const existingVariant = await Product.findOneAndUpdate(
 					{
 						_id: product_id,
-						variants: { $elemMatch: { $or: [{ title }, { color }] } },
+						variants: { $elemMatch: { $or: [{ color }] } },
 					},
 					{
 						$set: {
-							"variants.$.price": price, // Update price of existing variant
-							"variants.$.images": req.body.productImages, // Update images of existing variant
-							"variants.$.thumbnail": req.body.thumbnail, // Update thumbnail of existing variant
+							"variants.$.price": price,
+							"variants.$.images": req.body.productImages,
+							"variants.$.thumbnail": req.body.thumbnail,
 						},
 					},
 					{ new: true }

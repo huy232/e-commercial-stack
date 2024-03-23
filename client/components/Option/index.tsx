@@ -12,6 +12,7 @@ interface OptionProps {
 	className?: string
 	onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
 	selectedColor?: string
+	disabled?: boolean
 }
 
 const Option: FC<OptionProps> = ({
@@ -24,6 +25,7 @@ const Option: FC<OptionProps> = ({
 	className,
 	onChange,
 	selectedColor,
+	disabled,
 }) => {
 	return (
 		<div className="w-[320px]">
@@ -36,6 +38,7 @@ const Option: FC<OptionProps> = ({
 				defaultValue={defaultValue}
 				onChange={onChange}
 				value={selectedColor}
+				disabled={disabled}
 			>
 				{options.map((option, index) => (
 					<option key={index} value={option}>

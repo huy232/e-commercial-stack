@@ -112,7 +112,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			formData.append(i[0], i[1])
 		}
 		if (value) {
-			formData.append("description", JSON.stringify(value))
+			formData.append("description", value)
 		} else {
 			setDescriptionError("Please enter description for the product")
 			hasError = true
@@ -169,10 +169,12 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 							"Please enter a valid product name.")
 					}
 					value={productResponse.data.title}
+					disabled={loading}
 				/>
 				<ColorSelect
 					onColorsChange={handleColorChange}
 					selectedColors={selectedColors}
+					disabled={loading}
 				/>
 			</div>
 			<div className="flex gap-4">
@@ -187,6 +189,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 						(errors.price.message?.toString() || "Please enter a valid price.")
 					}
 					value={productResponse.data.price}
+					disabled={loading}
 				/>
 				<InputField
 					label="Quantity"
@@ -200,6 +203,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 							"Please enter a valid quantity.")
 					}
 					value={productResponse.data.quantity}
+					disabled={loading}
 				/>
 			</div>
 			<div className="flex gap-4">
@@ -213,6 +217,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 					getLabel={selectLabelGetterTitle}
 					onChange={handleCategoryChange}
 					value={initialCategory}
+					disabled={loading}
 				/>
 				{selectedCategoryData && (
 					<BrandSelect
@@ -222,6 +227,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 						required
 						options={selectedCategoryData.brand}
 						value={initialBrand}
+						disabled={loading}
 					/>
 				)}
 			</div>
@@ -237,7 +243,11 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 				<h3 className="font-semibold">Thumbnail preview</h3>
 				<div className="flex items-center">
 					{thumbnail && (
-						<ImagePreview images={thumbnail} onDelete={handleDeleteThumbnail} />
+						<ImagePreview
+							images={thumbnail}
+							onDelete={handleDeleteThumbnail}
+							disabled={loading}
+						/>
 					)}
 				</div>
 				<ImageUpload onUpload={handleThumbnailUpload} />
@@ -248,12 +258,15 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 						<ImagePreview
 							images={productImages}
 							onDelete={handleDeleteProductImage}
+							disabled={loading}
 						/>
 					)}
 				</div>
 				<ImageUpload multiple onUpload={handleProductImagesUpload} />
 			</div>
-			<Button type="submit">Update product</Button>
+			<Button disabled={loading} type="submit">
+				Update product
+			</Button>
 		</form>
 	)
 }

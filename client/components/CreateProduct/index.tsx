@@ -86,7 +86,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			formData.append(i[0], i[1])
 		}
 		if (value) {
-			formData.append("description", JSON.stringify(value))
+			formData.append("description", value)
 		} else {
 			setDescriptionError("Please enter description for the product")
 			hasError = true

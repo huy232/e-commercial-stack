@@ -15,9 +15,9 @@ const storage = new CloudinaryStorage({
 	cloudinary,
 	params: {
 		folder: "e-commercial",
-		allowed_formats: ["jpg", "png"],
-		use_filename: true,
-		unique_filename: false,
+		allowed_formats: ["jpg", "png", "jpeg", "webp"],
+		use_filename: false,
+		unique_filename: true,
 	} as Options["params"],
 })
 

@@ -9,8 +9,8 @@ import {
 	InputField,
 	Option,
 } from "@/components"
-import { ApiResponse, ProductType } from "@/types"
-import { ChangeEvent, FC, useState } from "react"
+import { ApiResponse, ProductType, VariantType } from "@/types"
+import { ChangeEvent, FC, useState, useEffect } from "react"
 import { updateProductVariant } from "@/app/api"
 
 interface ProductVariantProps {
@@ -52,7 +52,6 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 	const [thumbnailError, setThumbnailError] = useState<string>("")
 	const [productImagesError, setProductImagesError] = useState<string>("")
 	const [loading, setLoading] = useState(false)
-
 	const {
 		register,
 		handleSubmit,
@@ -93,11 +92,23 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 			hasError = true
 		}
 		if (productImages) {
-			for (let image of productImages) {
-				formData.append("productImages", image)
+			const newProductImages = productImages.filter(
+				(image) => typeof image !== "string"
+			)
+			const images = productImages.filter((image) => typeof image === "string")
+			if (images.length > 0) {
+				images.forEach((image) => formData.append("images", image))
+			}
+			if (newProductImages.length > 0) {
+				newProductImages.forEach((image) =>
+					formData.append("productImages", image)
+				)
+			} else {
+				setProductImagesError("Please choose new pictures for product")
+				hasError = true
 			}
 		} else {
-			setProductImagesError("Please choose a picture for product")
+			setProductImagesError("Please choose pictures for product")
 			hasError = true
 		}
 		if (hasError) {
@@ -117,6 +128,23 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 		console.log(productImages)
 	}
 
+	useEffect(() => {
+		setThumbnail(
+			(productResponse.data?.variants &&
+				productResponse.data?.variants.find(
+					(variant) => variant.color === selectedColor
+				)?.thumbnail) ||
+				null
+		)
+		setProductImages(
+			(productResponse.data?.variants &&
+				productResponse.data?.variants.find(
+					(variant) => variant.color === selectedColor
+				)?.images) ||
+				[]
+		)
+	}, [productResponse.data?.variants, selectedColor])
+
 	return (
 		<div>
 			<form onSubmit={handleSubmitProduct}>
@@ -132,6 +160,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 								"Please enter a valid product variant name.")
 						}
 						value={variantTitle}
+						disabled={loading}
 					/>
 					<Option
 						name="color"
@@ -140,6 +169,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 						register={register}
 						onChange={handleColorChange}
 						selectedColor={selectedColor}
+						disabled={loading}
 					/>
 				</div>
 				<div className="flex gap-4">
@@ -155,6 +185,7 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 								"Please enter a valid variant price.")
 						}
 						value={price}
+						disabled={loading}
 					/>
 				</div>
 				<div className="w-full h-full">
@@ -164,20 +195,26 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 							<ImagePreview
 								images={thumbnail}
 								onDelete={handleDeleteThumbnail}
+								disabled={loading}
 							/>
 						)}
 					</div>
-					<ImageUpload onUpload={handleThumbnailUpload} />
+					<ImageUpload onUpload={handleThumbnailUpload} disabled={loading} />
 					<h3 className="font-semibold">Product images</h3>
 					<div className="flex items-center">
 						{productImages.length > 0 && (
 							<ImagePreview
 								images={productImages}
 								onDelete={handleDeleteProductImage}
+								disabled={loading}
 							/>
 						)}
 					</div>
-					<ImageUpload multiple onUpload={handleProductImagesUpload} />
+					<ImageUpload
+						multiple
+						onUpload={handleProductImagesUpload}
+						disabled={loading}
+					/>
 				</div>
 				<div>
 					{thumbnailError && (
@@ -187,7 +224,9 @@ const ProductVariant: FC<ProductVariantProps> = ({ productResponse }) => {
 						<span className="text-red-500">{productImagesError}</span>
 					)}
 				</div>
-				<Button type="submit">Create/update variant</Button>
+				<Button type="submit" disabled={loading}>
+					Create/update variant
+				</Button>
 			</form>
 		</div>
 	)

@@ -6,11 +6,13 @@ import { FileRejection, useDropzone } from "react-dropzone"
 interface ImageUploadProps {
 	multiple?: boolean
 	onUpload: (files: File[]) => void
+	disabled?: boolean
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
 	multiple = false,
 	onUpload,
+	disabled,
 }) => {
 	const onDrop = useCallback(
 		(acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -31,7 +33,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
 	return (
 		<div {...getRootProps()} className={imageUploadClass}>
-			<input {...getInputProps()} />
+			<input {...getInputProps()} disabled={disabled} />
 			<p>Drag and drop your {multiple ? "images" : "image"} here</p>
 			<p>or</p>
 			<label htmlFor="file-upload" className="cursor-pointer">
