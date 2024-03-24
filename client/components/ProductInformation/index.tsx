@@ -3,10 +3,10 @@ import { FC, useCallback, useState } from "react"
 import { productInformationTabs } from "@/constant"
 import clsx from "clsx"
 import { memo } from "react"
-import { Review } from "@/components"
+import { Review, ReviewComment } from "@/components"
 import { productRating } from "@/app/api"
 import { ProductType } from "@/types"
-import ReviewComment from "../ReviewComment"
+import { useMounted } from "@/hooks"
 
 interface ProductInformationProps {
 	product: ProductType
@@ -17,6 +17,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 	product,
 	updateReviews,
 }) => {
+	const mounted = useMounted()
 	const [baseProduct, setBaseProduct] = useState(product)
 	const [activeTab, setActiveTab] = useState(1)
 	const [isVote, setIsVote] = useState(false)
@@ -72,16 +73,20 @@ const ProductInformation: FC<ProductInformationProps> = ({
 					</span>
 				))}
 			</div>
-			<div className="w-full"></div>
-			<Review
-				totalRatings={baseProduct.totalRatings}
-				ratings={baseProduct.ratings}
-				handleToggleVote={handleToggleVote}
-				isVote={isVote}
-				productName={baseProduct.title}
-				handleSubmitReview={handleSubmitReview}
-				productId={baseProduct._id}
-			/>
+			{mounted ? (
+				<Review
+					totalRatings={baseProduct.totalRatings}
+					ratings={baseProduct.ratings}
+					handleToggleVote={handleToggleVote}
+					isVote={isVote}
+					productName={baseProduct.title}
+					handleSubmitReview={handleSubmitReview}
+					productId={baseProduct._id}
+				/>
+			) : (
+				<></>
+			)}
+
 			<div className="block w-full">
 				<ReviewComment reviews={reviews} />
 			</div>

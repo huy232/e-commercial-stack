@@ -3,9 +3,7 @@ import { memo, FC, useState, useEffect } from "react"
 import clsx from "clsx"
 import { reviewRating } from "@/constant"
 import { AiFillStar } from "@/assets/icons"
-import "react-quill/dist/quill.snow.css"
-import { Button } from "@/components"
-import ReactQuill from "react-quill"
+import { Button, TextEditor } from "@/components"
 
 interface ReviewOptionsProps {
 	productName: string
@@ -49,8 +47,7 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 			<h2 className={headingClassName}>Digital World</h2>
 			<h3>Review this product: {productName}</h3>
 
-			<ReactQuill theme="snow" value={value} onChange={setValue} />
-
+			<TextEditor value={value} onChange={setValue} />
 			<div className="w-full flex flex-col gap-4">
 				<p>How do you like this product</p>
 				<div className="flex items-center justify-center gap-4">

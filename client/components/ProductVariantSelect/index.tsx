@@ -9,9 +9,17 @@ interface ProductVariantSelectProps {
 
 const ProductVariantSelect: FC<ProductVariantSelectProps> = ({ variant }) => {
 	return (
-		<div>
-			<CustomImage src={variant.images[0]} alt="Product variant image" fill />
-			<span>{formatPriceNumber(variant.price)}</span>
+		<div className="flex gap-1 items-center">
+			<CustomImage
+				className="w-[30px] h-[30px]"
+				src={variant.thumbnail}
+				alt="Product variant image"
+				fill
+			/>
+			<div className="flex w-[120px] flex-col">
+				<span className="text-sm line-clamp-1">{variant.color}</span>
+				<span className="text-xs">{formatPriceNumber(variant.price)}</span>
+			</div>
 		</div>
 	)
 }

@@ -11,8 +11,8 @@ import {
 	ImageUpload,
 	InputField,
 	Select,
-} from ".."
-import ReactQuill from "react-quill"
+	TextEditor,
+} from "@/components"
 import { updateProduct } from "@/app/api"
 
 interface UpdateProductProps {
@@ -232,12 +232,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 				)}
 			</div>
 			<div className="h-[200px]">
-				<ReactQuill
-					theme="snow"
-					value={value}
-					onChange={setValueEditor}
-					className="h-[152px]"
-				/>
+				<TextEditor value={value} onChange={setValueEditor} />
 			</div>
 			<div className="w-full h-full">
 				<h3 className="font-semibold">Thumbnail preview</h3>

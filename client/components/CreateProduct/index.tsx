@@ -10,11 +10,11 @@ import {
 	LoadingSpinner,
 	Modal,
 	Select,
+	TextEditor,
 } from "@/components"
 import { FC, useState } from "react"
 import { ProductCategoryType } from "@/types"
 import { createProduct } from "@/app/api"
-import ReactQuill from "react-quill"
 
 interface CreateProductProps {
 	categories: ProductCategoryType[]
@@ -209,12 +209,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 					)}
 				</div>
 				<div className="h-[200px]">
-					<ReactQuill
-						theme="snow"
-						value={value}
-						onChange={setValue}
-						className="h-[152px]"
-					/>
+					<TextEditor value={value} onChange={setValue} />
 				</div>
 				<div className="w-full h-full">
 					<h3 className="font-semibold">Thumbnail preview</h3>
