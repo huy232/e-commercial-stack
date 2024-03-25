@@ -9,7 +9,7 @@ import {
 	ProductSlider,
 } from "@/components"
 import { FC, useState } from "react"
-import { ProductType } from "@/types/product"
+import { ProductType, VariantType } from "@/types/product"
 import { productExtraInformation } from "@/constant"
 import { getSpecificProduct } from "@/app/api"
 
@@ -23,6 +23,9 @@ const ProductDetail: FC<ProductDetailProps> = ({
 	relatedProducts,
 }) => {
 	const [productDetail, setProductDetail] = useState<ProductType>(product)
+	const [selectedVariantImages, setSelectedVariantImages] = useState<string[]>(
+		product.images
+	)
 	let breadcrumbs = [{ name: "Home", slug: "/" }]
 	if (productDetail.category) {
 		breadcrumbs.push({
@@ -30,11 +33,25 @@ const ProductDetail: FC<ProductDetailProps> = ({
 			slug: `product?category=${productDetail.category[1]}`,
 		})
 	}
-
 	const updateReviews = async () => {
 		const product = await getSpecificProduct(productDetail.slug)
 		const { data } = product
 		return data
+	}
+	const handleProductDetail = async (variant: VariantType | null) => {
+		if (variant) {
+			setProductDetail({
+				...productDetail,
+				title: variant.title,
+				price: variant.price,
+				thumbnail: variant.thumbnail,
+				images: variant.images,
+			})
+			setSelectedVariantImages(variant.images)
+		} else {
+			setProductDetail(product)
+			setSelectedVariantImages(product.images)
+		}
 	}
 
 	return (
@@ -49,7 +66,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 			</section>
 			<section className="mx-auto flex">
 				<div className="w-2/5 flex flex-col gap-4">
-					<ProductSlider images={productDetail.images} />
+					<ProductSlider images={selectedVariantImages} />
 				</div>
 				<div className="w-2/5 flex flex-col">
 					<div className="flex flex-col">
@@ -72,7 +89,10 @@ const ProductDetail: FC<ProductDetailProps> = ({
 						</ul>
 					</div>
 					<div className="flex flex-col gap-8">
-						<ProductCart variants={productDetail.variants} />
+						<ProductCart
+							variants={productDetail.variants}
+							handleProductDetail={handleProductDetail}
+						/>
 					</div>
 				</div>
 				<div className="w-1/5">

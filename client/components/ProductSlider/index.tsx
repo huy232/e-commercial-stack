@@ -1,5 +1,5 @@
 "use client"
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import Slider from "react-slick"
 import { CustomImage } from "@/components"
 import { GlassMagnifier } from "react-image-magnifiers-v2"
@@ -12,6 +12,9 @@ interface ProductSliderProps {
 
 const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 	const [displayImage, setDisplayImage] = useState(images[0])
+	useEffect(() => {
+		setDisplayImage(images[0])
+	}, [images])
 	const settings = {
 		dots: false,
 		infinite: false,
@@ -25,7 +28,7 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 	}
 
 	return (
-		<>
+		<div className="w-full">
 			<div className="h-[320px]">
 				<GlassMagnifier
 					imageSrc={displayImage}
@@ -33,10 +36,11 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 					className="glass-magnifier h-full"
 				/>
 			</div>
-			<Slider className="flex gap-4" {...settings}>
+			<Slider className="flex gap-4 w-full h-full flex-col" {...settings}>
 				{images.map((image, index) => (
 					<CustomImage
-						fill
+						width={140}
+						height={140}
 						className="w-[140px] h-[140px]"
 						src={image}
 						alt="Sub product"
@@ -45,7 +49,7 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 					/>
 				))}
 			</Slider>
-		</>
+		</div>
 	)
 }
 export default ProductSlider

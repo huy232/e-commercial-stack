@@ -15,6 +15,7 @@ import { path } from "@/utils"
 import { useDropdown } from "@/hooks"
 import { Button } from "@/components"
 import { AppDispatch } from "@/types"
+import clsx from "clsx"
 
 const User = () => {
 	const [loading, setLoading] = useState(true)
@@ -65,6 +66,10 @@ const User = () => {
 		)
 	}
 
+	const itemClass = clsx(
+		`hover-effect hover:opacity-80 hover:bg-black/20 p-1 m-1 rounded`
+	)
+
 	return (
 		<div>
 			<div
@@ -79,9 +84,24 @@ const User = () => {
 				)}
 			</div>
 			{user && isOpen && (
-				<div className="absolute h-full w-full bg-black/20 rounded mt-1 z-10">
-					<div className="p-1">
-						<Button onClick={handleLogout}>Logout</Button>
+				<div className="absolute h-full w-full mt-1 z-10">
+					<div className="bg-black/70 rounded flex flex-col gap-1">
+						<Link className={itemClass} href={"/profile"}>
+							Profile
+						</Link>
+
+						{user.role.includes("admin") && (
+							<Link className={itemClass} href={"/admin"}>
+								Admin
+							</Link>
+						)}
+
+						<Button
+							className={clsx(itemClass, "text-left")}
+							onClick={handleLogout}
+						>
+							Logout
+						</Button>
 					</div>
 				</div>
 			)}
