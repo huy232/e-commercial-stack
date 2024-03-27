@@ -11,10 +11,8 @@ import { Logo } from "@/components"
 
 const AdminSidebar = () => {
 	const pathname = usePathname()
-
 	const [activeParentMenus, setActiveParentMenus] = useState<number[]>([])
 	const [activeSubmenus, setActiveSubmenus] = useState<number[]>([])
-
 	const handleShowTab = (option: AdminSidebarOption) => {
 		if (option.type === adminDashboardStatus.PARENT) {
 			if (activeParentMenus.includes(option.id)) {
@@ -34,7 +32,6 @@ const AdminSidebar = () => {
 			setActiveSubmenus([])
 		}
 	}
-
 	const computeClassName = (
 		option: AdminSidebarOption,
 		additionClassName?: string

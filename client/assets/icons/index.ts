@@ -17,6 +17,9 @@ export {
 	FaTty,
 	FaWindowClose,
 	FaPlusCircle,
+	FaHouseUser,
+	FaClipboardList,
+	FaShoppingCart,
 } from "react-icons/fa"
 export {
 	AiFillHome,

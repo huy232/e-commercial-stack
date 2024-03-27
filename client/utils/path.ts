@@ -16,5 +16,8 @@ export const path = {
 	CREATE_PRODUCTS: "create-products",
 
 	MEMEBER: "/member",
+
 	PROFILE: "/profile",
+	ORDERS: "orders",
+	WISHLIST: "wishlist",
 }

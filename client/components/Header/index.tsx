@@ -10,10 +10,6 @@ const Header: FC = () => {
 		setMounted(true)
 	}, [])
 
-	if (!mounted) {
-		return null
-	}
-
 	return (
 		<div className="w-main h-[110px] py-[35px] flex justify-between">
 			<Logo />
