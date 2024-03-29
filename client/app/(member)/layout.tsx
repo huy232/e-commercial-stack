@@ -1,4 +1,4 @@
-import { Footer, Header, Navbar } from "@/components"
+import { Footer, Header, Navbar, ProfileSidebar } from "@/components"
 import ReduxProvider from "@/context/reduxProvider"
 import clsx from "clsx"
 import { Poppins } from "next/font/google"
@@ -31,7 +31,12 @@ export default function RootLayout({
 				<ReduxProvider>
 					<Header />
 					<Navbar />
-					<div className="w-main flex-grow">{children}</div>
+					<div className="w-main flex-grow">
+						<div className="flex gap-1">
+							<ProfileSidebar />
+							{children}
+						</div>
+					</div>
 					<Footer />
 				</ReduxProvider>
 			</body>

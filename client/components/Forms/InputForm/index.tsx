@@ -7,10 +7,10 @@ interface CustomFieldError extends FieldError {
 	message: string
 }
 
-interface InputFormProps {
+interface InputFormProps<T extends FieldValues> {
 	label?: string
 	disabled?: boolean
-	register: UseFormRegister<FieldValues>
+	register: UseFormRegister<T>
 	errors: { [key: string]: CustomFieldError } | undefined
 	id?: string
 	validate?: (value: any) => boolean | string | Promise<boolean | string>
@@ -18,9 +18,10 @@ interface InputFormProps {
 	placeholder?: string
 	fullWidth?: boolean
 	defaultValue?: string
+	className?: string
 }
 
-const InputForm: FC<InputFormProps> = ({
+const InputForm: FC<InputFormProps<any>> = ({
 	label,
 	disabled,
 	register,
@@ -31,9 +32,15 @@ const InputForm: FC<InputFormProps> = ({
 	placeholder,
 	fullWidth,
 	defaultValue,
+	className,
 }) => {
+	const inputClass = clsx(
+		"form-input rounded",
+		fullWidth && "w-full",
+		className
+	)
 	return (
-		<div className="flex flex-col h-[80px] gap-2">
+		<div className="flex flex-col gap-2">
 			{label && <label htmlFor={id}>{label}</label>}
 			<input
 				type={type}
@@ -41,7 +48,7 @@ const InputForm: FC<InputFormProps> = ({
 				{...register(id || "", { validate })}
 				disabled={disabled}
 				placeholder={placeholder}
-				className={clsx("form-input", fullWidth && "w-full")}
+				className={inputClass}
 				defaultValue={defaultValue}
 			/>
 			{errors && id && errors[id]?.message && (

@@ -13,6 +13,7 @@ import {
 } from "@/assets/icons"
 import clsx from "clsx"
 import { deleteUser, updateUser } from "@/app/api"
+import { validateEmail } from "@/validators"
 
 interface CustomFieldError extends FieldError {
 	message: string
@@ -45,11 +46,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 		handleSubmit,
 		formState: { errors },
 	} = useForm()
-	const validateEmail = (value: string) => {
-		if (!value) return "Email is required"
-		if (!/\S+@\S+\.\S+/.test(value)) return "Invalid email address"
-		return true
-	}
+
 	const tdClass = (additionClassName?: string) =>
 		clsx("px-1 py-1 align-middle", additionClassName)
 

@@ -1,6 +1,6 @@
 "use client"
 import { ChangeEventHandler, useEffect, useState } from "react"
-import { RegisterOptions, UseFormRegister } from "react-hook-form"
+import { RegisterOptions, UseFormRegister, useForm } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
 
@@ -26,6 +26,7 @@ interface InputFieldProps {
 		| "onlyWords"
 		| "onlyNumbers"
 		| "password"
+		| "phoneNumber"
 		| "custom"
 		| undefined
 }
@@ -40,6 +41,7 @@ const validateTypePatterns: Record<
 	onlyWords: /^[A-Za-z\s]+$/,
 	onlyNumbers: /^[0-9]+$/,
 	password: /^[^\s]+$/,
+	phoneNumber: /^0\d{9,10}$/,
 	custom: undefined,
 }
 
@@ -61,7 +63,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	onChange,
 	disabled = false,
 }) => {
-	const [inputValue, setInputValue] = useState(value || "")
+	const { setValue } = useForm()
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
 	const togglePasswordVisibility = () => {
@@ -76,8 +78,8 @@ const InputField: React.FC<InputFieldProps> = ({
 			: undefined
 
 	useEffect(() => {
-		setInputValue(value || "")
-	}, [value])
+		setValue(name, value || "")
+	}, [setValue, name, value])
 
 	return (
 		<div className="w-[320px]">
@@ -107,9 +109,9 @@ const InputField: React.FC<InputFieldProps> = ({
 							})}
 							placeholder={placeholder}
 							autoComplete="true"
-							value={inputValue}
+							defaultValue={value || ""}
 							onChange={(e) => {
-								setInputValue(e.target.value)
+								setValue(name, e.target.value, { shouldDirty: true }) // Update value and mark as dirty
 								if (onChange) {
 									onChange(e)
 								}
