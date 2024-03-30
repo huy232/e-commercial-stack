@@ -279,3 +279,17 @@ export const deleteUser = async (_id: string) => {
 		throw error
 	}
 }
+
+export const updateUserProfile = async (formData: FormData) => {
+	try {
+		const response = await fetch(`${API}/user/user-update`, {
+			method: "PUT",
+			credentials: "include",
+			body: formData,
+		})
+		const responseData = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}

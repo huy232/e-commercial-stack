@@ -20,6 +20,7 @@ export {
 	FaHouseUser,
 	FaClipboardList,
 	FaShoppingCart,
+	FaFileUpload,
 } from "react-icons/fa"
 export {
 	AiFillHome,

@@ -9,12 +9,15 @@ export async function authorizeMiddleware(request: NextRequest) {
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
 		const response = await checkUserLogin(cookieHeader || undefined)
-
 		if (!response.success) {
 			return NextResponse.redirect(
-				`${process.env.NEXT_PUBLIC_CLIENT_URL}/${path.LOGIN}`
+				`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
 			)
 		}
+	} else {
+		return NextResponse.redirect(
+			`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
+		)
 	}
 
 	const response = NextResponse.next()
@@ -33,7 +36,7 @@ export async function loginMiddleware(request: NextRequest) {
 			return NextResponse.redirect(`${process.env.NEXT_PUBLIC_CLIENT_URL}/`)
 		} else {
 			return NextResponse.redirect(
-				`${process.env.NEXT_PUBLIC_CLIENT_URL}/${path.LOGIN}`
+				`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
 			)
 		}
 	}
@@ -51,12 +54,12 @@ export async function adminMiddleware(request: NextRequest) {
 		const adminResponse = await checkAdmin(cookieHeader || undefined)
 		if (!response.success || !adminResponse.success) {
 			return NextResponse.redirect(
-				`${process.env.NEXT_PUBLIC_CLIENT_URL}/${path.LOGIN}`
+				`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
 			)
 		}
 	} else {
 		return NextResponse.redirect(
-			`${process.env.NEXT_PUBLIC_CLIENT_URL}/${path.LOGIN}`
+			`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
 		)
 	}
 }

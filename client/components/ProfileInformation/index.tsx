@@ -1,27 +1,38 @@
 "use client"
-import { selectAuthUser, selectIsAuthenticated } from "@/store/slices/authSlice"
+import {
+	loginSuccess,
+	selectAuthUser,
+	selectIsAuthenticated,
+} from "@/store/slices/authSlice"
 import { AppDispatch, ProfileUser } from "@/types"
 import { useDispatch, useSelector } from "react-redux"
 import defaultAvatar from "@/assets/images/defaultAvatar.png"
 import { Button, CustomImage, InputForm } from "@/components"
-import { FieldError, useForm } from "react-hook-form"
-import { useCallback, useState } from "react"
+import { FieldError, FieldValues, useForm } from "react-hook-form"
+import { ChangeEvent, FC, useCallback, useState } from "react"
 import clsx from "clsx"
 import { useMounted } from "@/hooks"
 import moment from "moment"
 import { validatePhoneNumber } from "@/validators"
+import { getCurrentUser, updateUserProfile } from "@/app/api"
+import { FaFileUpload } from "@/assets/icons"
 interface CustomFieldError extends FieldError {
 	message: string
 }
-interface FormData {
+interface FormData extends FieldValues {
 	email: string
 	firstName: string
 	lastName: string
+	phone: number
+	address: string
 }
 const ProfileInformation = () => {
 	const dispatch = useDispatch<AppDispatch>()
 	const user: ProfileUser = useSelector(selectAuthUser)
-	const isAuthenticated = useSelector(selectIsAuthenticated)
+	const [imageAvatar, setImageAvatar] = useState<string | File | null>(
+		user?.avatar || null
+	)
+	const [removeAvatar, setRemoveAvatar] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const {
 		register,
@@ -33,15 +44,50 @@ const ProfileInformation = () => {
 			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
+			phone: user?.phone,
+			address: user?.address[0],
 		},
 	})
-	const onSubmit = useCallback(
-		async (data: any) => {
+
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		if (file) {
+			setImageAvatar(file)
+			setRemoveAvatar(true)
+		}
+	}
+
+	const handleRemoveImage = () => {
+		setImageAvatar(user?.avatar || null)
+		setRemoveAvatar(false)
+	}
+
+	const handleSubmitProfile = handleSubmit(
+		async (data: Record<string, string>) => {
 			if (!loading && isDirty) {
-				console.log(data)
+				let hasError = false
+				const formData = new FormData()
+				for (let [key, value] of Object.entries(data)) {
+					formData.append(key, value)
+				}
+				if (imageAvatar) {
+					formData.append("avatar", imageAvatar)
+				} else {
+					hasError = true
+				}
+				if (hasError) {
+					return
+				}
+				setLoading(true)
+				const response = await updateUserProfile(formData)
+				if (response.success) {
+					const response = await getCurrentUser()
+					const userData = response.data
+					dispatch(loginSuccess(userData))
+				}
+				setLoading(false)
 			}
-		},
-		[isDirty, loading]
+		}
 	)
 	const submitClass = clsx(
 		`border-2 hover-effect rounded p-1`,
@@ -51,18 +97,54 @@ const ProfileInformation = () => {
 	)
 	return (
 		<div className="flex w-full">
-			<div className="flex flex-col items-center">
-				<CustomImage
-					src={user?.avatar || defaultAvatar}
-					alt="Profile avatar"
-					width={60}
-					height={60}
-				/>
+			<div className="flex flex-col items-center w-1/5">
+				<div
+					className="relative h-[80px] w-[80px] rounded-full overflow-hidden group cursor-pointer"
+					onClick={() => document.getElementById("avatar-input")?.click()}
+				>
+					<CustomImage
+						src={
+							(imageAvatar &&
+								(imageAvatar === "string"
+									? imageAvatar
+									: URL.createObjectURL(imageAvatar as File))) ||
+							defaultAvatar
+						}
+						alt="Profile avatar"
+						width={80}
+						height={80}
+						className="absolute cursor-pointer"
+					/>
+					<label
+						className={clsx(
+							"absolute flex justify-center items-center opacity-0 group-hover:opacity-100 duration-300 text-xs w-full bottom-0 bg-gray-500 cursor-pointer p-1"
+						)}
+						htmlFor="avatar-input"
+						style={{ pointerEvents: "none" }}
+					>
+						<FaFileUpload />
+					</label>
+					<input
+						type="file"
+						id="avatar-input"
+						className="hidden"
+						onChange={handleFileChange}
+						accept="image/*"
+					/>
+				</div>
+				{removeAvatar && (
+					<button
+						className="hover-effect rounded border-2 border-red-500 hover:bg-red-500 hover:text-white my-1 p-1"
+						onClick={() => handleRemoveImage()}
+					>
+						Remove
+					</button>
+				)}
 				<span>
 					{user.firstName} {user.lastName}
 				</span>
 			</div>
-			<form onSubmit={handleSubmit(onSubmit)}>
+			<form onSubmit={handleSubmitProfile} className="w-4/5">
 				<div>
 					<InputForm
 						register={register}
