@@ -149,7 +149,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						label="Product name"
 						name="productName"
 						register={register}
-						required
+						required="Product name is required"
 						errorMessage={
 							errors.productName &&
 							(errors.productName.message?.toString() ||
@@ -166,7 +166,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						label="Price"
 						name="price"
 						register={register}
-						required
+						required="Price is required"
 						validateType={"onlyNumbers"}
 						errorMessage={
 							errors.price &&
@@ -178,7 +178,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						label="Quantity"
 						name="quantity"
 						register={register}
-						required
+						required="Quantity is required"
 						validateType={"onlyNumbers"}
 						errorMessage={
 							errors.quantity &&

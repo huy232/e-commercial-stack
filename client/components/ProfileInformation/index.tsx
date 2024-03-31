@@ -11,7 +11,6 @@ import { Button, CustomImage, InputForm } from "@/components"
 import { FieldError, FieldValues, useForm } from "react-hook-form"
 import { ChangeEvent, FC, useCallback, useState } from "react"
 import clsx from "clsx"
-import { useMounted } from "@/hooks"
 import moment from "moment"
 import { validatePhoneNumber } from "@/validators"
 import { getCurrentUser, updateUserProfile } from "@/app/api"
@@ -26,9 +25,12 @@ interface FormData extends FieldValues {
 	phone: number
 	address: string
 }
-const ProfileInformation = () => {
+
+interface ProfileInformationProps {
+	user: ProfileUser
+}
+const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 	const dispatch = useDispatch<AppDispatch>()
-	const user: ProfileUser = useSelector(selectAuthUser)
 	const [imageAvatar, setImageAvatar] = useState<string | File | null>(
 		user?.avatar || null
 	)

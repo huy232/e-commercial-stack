@@ -45,3 +45,13 @@ export interface UpdateUser {
 	isBlocked?: boolean
 	role?: string[]
 }
+
+export interface UpdateUserProfile {
+	_id: string
+	firstName: string
+	lastName: string
+	email: string
+	phone?: number
+	address?: string
+	avatar?: string
+}

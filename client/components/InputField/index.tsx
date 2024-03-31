@@ -1,6 +1,11 @@
 "use client"
 import { ChangeEventHandler, useEffect, useState } from "react"
-import { RegisterOptions, UseFormRegister, useForm } from "react-hook-form"
+import {
+	RegisterOptions,
+	UseFormRegister,
+	ValidationRule,
+	useForm,
+} from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
 
@@ -9,14 +14,13 @@ interface InputFieldProps {
 	name: string
 	label?: string
 	register: UseFormRegister<any>
-	required?: boolean
+	required?: boolean | string | ValidationRule<boolean>
 	pattern?: RegisterOptions["pattern"]
 	errorMessage?: string
 	placeholder?: string
 	togglePassword?: boolean
 	validate?: (value: string) => boolean | string
 	minLength?: number
-	value?: string | number
 	readOnly?: boolean
 	onChange?: ChangeEventHandler<HTMLInputElement>
 	disabled?: boolean
@@ -30,6 +34,7 @@ interface InputFieldProps {
 		| "custom"
 		| undefined
 }
+
 type ValidationPattern = RegExp | undefined
 
 const validateTypePatterns: Record<
@@ -50,7 +55,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	name,
 	label,
 	register,
-	required = false,
+	required,
 	pattern,
 	errorMessage,
 	placeholder,
@@ -58,29 +63,14 @@ const InputField: React.FC<InputFieldProps> = ({
 	validate,
 	minLength,
 	validateType,
-	value,
 	readOnly = false,
 	onChange,
 	disabled = false,
 }) => {
-	const { setValue } = useForm()
 	const [passwordVisible, setPasswordVisible] = useState(false)
-
 	const togglePasswordVisibility = () => {
 		setPasswordVisible(!passwordVisible)
 	}
-
-	const selectedPattern =
-		validateType !== undefined
-			? validateTypePatterns[
-					validateType as NonNullable<InputFieldProps["validateType"]>
-			  ]
-			: undefined
-
-	useEffect(() => {
-		setValue(name, value || "")
-	}, [setValue, name, value])
-
 	return (
 		<div className="w-[320px]">
 			<div className="flex flex-col gap-2 py-2">
@@ -95,27 +85,22 @@ const InputField: React.FC<InputFieldProps> = ({
 								togglePassword ? (passwordVisible ? "text" : "password") : type
 							}
 							{...register(name, {
-								required,
-								pattern: selectedPattern,
-								validate: (value) => {
-									if (minLength && value.length < minLength) {
-										return `Password must be at least ${minLength} characters`
-									}
+								required: required,
+								pattern: validateType
+									? validateTypePatterns[validateType]
+									: pattern,
+								validate: (inputValue) => {
 									if (validate) {
-										return validate(value)
+										return validate(inputValue)
+									}
+									if (minLength && inputValue.length < minLength) {
+										return `Password must be at least ${minLength} characters`
 									}
 									return true
 								},
 							})}
 							placeholder={placeholder}
 							autoComplete="true"
-							defaultValue={value || ""}
-							onChange={(e) => {
-								setValue(name, e.target.value, { shouldDirty: true }) // Update value and mark as dirty
-								if (onChange) {
-									onChange(e)
-								}
-							}}
 						/>
 						{togglePassword && (
 							<Button

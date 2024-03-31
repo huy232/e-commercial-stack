@@ -1,12 +1,17 @@
 "use client"
 import { FC, useCallback, useState } from "react"
-import { useForm } from "react-hook-form"
+import { SubmitHandler, useForm } from "react-hook-form"
 import { passwordHashingClient } from "@/utils"
-import { UserLogin, userLogin, userLogout } from "@/app/api"
-import { Button, InputField } from "@/components" // Import the InputField component
+import { UserLogin, userLogin } from "@/app/api"
+import { Button, InputField } from "@/components"
 import { useRouter } from "next/navigation"
 import { loginSuccess } from "@/store/slices/authSlice"
 import { useDispatch } from "react-redux"
+
+type LoginFormData = {
+	email: string
+	password: string
+}
 
 const LoginForm: FC = () => {
 	const dispatch = useDispatch()
@@ -15,7 +20,10 @@ const LoginForm: FC = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm()
+		watch,
+		getValues,
+		setValue,
+	} = useForm<LoginFormData>()
 	const [errorMessage, setErrorMessage] = useState("")
 
 	const login = useCallback(async (email: string, hashPassword: string) => {
@@ -26,76 +34,62 @@ const LoginForm: FC = () => {
 		return response
 	}, [])
 
-	const handleLogin = useCallback(
-		async (data: any) => {
-			const { email, password } = data as UserLogin
-			const hashPassword = await passwordHashingClient(password)
+	const handleLogin: SubmitHandler<LoginFormData> = async (data) => {
+		const { email, password } = data as UserLogin
+		const hashPassword = await passwordHashingClient(password)
+		try {
+			const response = await login(email, hashPassword)
 
-			try {
-				const response = await login(email, hashPassword)
-
-				if (!response.success) {
-					const responseErrorMessage =
-						response.message || "An error occurred while login"
-					setErrorMessage(responseErrorMessage)
-				} else {
-					dispatch(loginSuccess(response.userData))
-					router.push("/")
-					router.refresh()
-				}
-			} catch (error) {
-				setErrorMessage("An error occurred while login due to server")
+			if (!response.success) {
+				const responseErrorMessage =
+					response.message || "An error occurred while login"
+				setErrorMessage(responseErrorMessage)
+			} else {
+				dispatch(loginSuccess(response.userData))
+				router.push("/")
+				router.refresh()
 			}
-		},
-		[dispatch, login, router]
-	)
-
+		} catch (error) {
+			setErrorMessage("An error occurred while login due to server")
+		}
+	}
 	return (
-		<form
-			className="flex flex-col justify-center items-center"
-			onSubmit={handleSubmit(handleLogin)}
-		>
-			<div>
+		<>
+			<form
+				id="hook-form"
+				className="flex flex-col justify-center items-center"
+				onSubmit={handleSubmit(handleLogin)}
+			>
 				<InputField
 					label="Email"
 					name="email"
+					type="text"
 					register={register}
-					required
-					validateType="email"
-					errorMessage={
-						errors.email &&
-						(errors.email.message?.toString() ||
-							"Please enter a valid email address.")
-					}
+					required={"Email is required"}
+					errorMessage={errors.email?.message}
 				/>
-
 				<InputField
 					label="Password"
 					name="password"
 					type="password"
-					register={register}
-					required
-					togglePassword
-					errorMessage={
-						errors.password &&
-						(errors.password.message?.toString() || "Password is required")
-					}
 					minLength={6}
-					validateType="password"
+					register={register}
+					required={"Password is required"}
+					togglePassword
+					errorMessage={errors.password?.message}
 				/>
-			</div>
-
-			{errorMessage && (
-				<p className="text-main text-center hover-effect">{errorMessage}</p>
-			)}
-
-			<Button
-				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
-				type="submit"
-			>
-				Login
-			</Button>
-		</form>
+				<Button
+					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
+					type="submit"
+					form="hook-form"
+				>
+					Login
+				</Button>
+				{errorMessage && (
+					<p className="text-main text-center hover-effect">{errorMessage}</p>
+				)}
+			</form>
+		</>
 	)
 }
 

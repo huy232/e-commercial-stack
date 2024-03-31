@@ -53,7 +53,7 @@ const ForgotPasswordForm = () => {
 					label="Email"
 					name="email"
 					register={register}
-					required
+					required="Email is required"
 					pattern={/^\S+@\S+$/i}
 					errorMessage={errors.email && "Please enter a valid email address."}
 				/>

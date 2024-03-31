@@ -80,7 +80,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 					name="password"
 					type={showPassword ? "text" : "password"}
 					register={register}
-					required
+					required="Password is required"
 					errorMessage={errors.password && "Please enter a valid password."}
 				/>
 
@@ -89,7 +89,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 					name="confirmPassword"
 					type={showPassword ? "text" : "password"}
 					register={register}
-					required
+					required="Confirm password is required"
 					validate={(value) => value === watch("password")}
 					errorMessage={errors.confirmPassword && "Passwords do not match."}
 				/>
