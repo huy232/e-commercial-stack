@@ -5,6 +5,7 @@ import {
 	verifyAccessToken,
 	verifyRefreshToken,
 } from "../../middlewares/verifyToken"
+import { uploadCloudAvatarFolder } from "../../config/cloudinaryOption"
 
 const router = express.Router()
 
@@ -25,7 +26,13 @@ router.delete(
 	[verifyAccessToken, isAdmin],
 	UserController.deleteUser
 )
-router.put("/user-update", verifyAccessToken, UserController.updateUser)
+router.put(
+	"/user-update",
+	verifyAccessToken,
+
+	uploadCloudAvatarFolder.fields([{ name: "avatar", maxCount: 1 }]),
+	UserController.updateUser
+)
 router.put(
 	"/user-update/:uid",
 	[verifyAccessToken, isAdmin],

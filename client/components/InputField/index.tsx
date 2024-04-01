@@ -10,6 +10,7 @@ import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
 
 interface InputFieldProps {
+	value?: string | number
 	type?: string
 	name: string
 	label?: string
@@ -66,6 +67,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	readOnly = false,
 	onChange,
 	disabled = false,
+	value,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const togglePasswordVisibility = () => {
@@ -99,6 +101,7 @@ const InputField: React.FC<InputFieldProps> = ({
 									return true
 								},
 							})}
+							defaultValue={value}
 							placeholder={placeholder}
 							autoComplete="true"
 						/>

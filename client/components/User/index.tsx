@@ -13,8 +13,9 @@ import { AiOutlineLoading, FaUserCircle } from "@/assets/icons"
 import Link from "next/link"
 import { path } from "@/utils"
 import { useDropdown } from "@/hooks"
-import { Button } from "@/components"
+import { Button, CustomImage } from "@/components"
 import { AppDispatch } from "@/types"
+import defaultAvatar from "@/assets/images/defaultAvatar.png"
 import clsx from "clsx"
 
 const User = () => {
@@ -76,7 +77,13 @@ const User = () => {
 				className="flex gap-2 items-center cursor-pointer hover-effect hover:opacity-80 select-none"
 				onClick={toggleDropdown}
 			>
-				<FaUserCircle size={24} />
+				<CustomImage
+					src={user?.avatar || defaultAvatar}
+					alt="User's avatar"
+					className="rounded"
+					width={40}
+					height={40}
+				/>
 				{user ? (
 					<span>{user.firstName}</span>
 				) : (

@@ -27,7 +27,7 @@ const FeatureProducts: FC<FeatureProductsProps> = ({ featureProducts }) => {
 					<div>Loading...</div>
 				)}
 			</div>
-			<div className="flex justify-center items-center mt-12 gap-4">
+			{/* <div className="flex justify-center items-center mt-12 gap-4">
 				<div className="w-1/2 h-full">
 					<CustomImage src={BottomBanner1} alt="Bottom banner 1" fill />
 				</div>
@@ -42,6 +42,35 @@ const FeatureProducts: FC<FeatureProductsProps> = ({ featureProducts }) => {
 				<div className="w-1/4">
 					<CustomImage src={BottomBanner4} alt="Bottom banner 4" fill />
 				</div>
+			</div> */}
+			<div className="grid grid-cols-4 grid-rows-2 gap-4">
+				<CustomImage
+					src={BottomBanner1}
+					alt="Bottom banner 1"
+					fill
+					className="w-full h-full object-cover col-span-2 row-span-2"
+				/>
+
+				<CustomImage
+					src={BottomBanner2}
+					alt="Bottom banner 2"
+					fill
+					className="w-full h-full object-cover col-span-1 row-span-1"
+				/>
+
+				<CustomImage
+					src={BottomBanner4}
+					alt="Bottom banner 4"
+					fill
+					className="w-full h-full object-cover col-span-1 row-span-2"
+				/>
+
+				<CustomImage
+					src={BottomBanner3}
+					alt="Bottom banner 3"
+					fill
+					className="w-full h-full object-cover col-span-1 row-span-1"
+				/>
 			</div>
 		</div>
 	)

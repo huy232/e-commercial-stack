@@ -22,7 +22,7 @@ interface FormData extends FieldValues {
 	email: string
 	firstName: string
 	lastName: string
-	phone: number
+	mobile: number
 	address: string
 }
 
@@ -35,6 +35,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 		user?.avatar || null
 	)
 	const [removeAvatar, setRemoveAvatar] = useState(false)
+	const [isImageChanged, setIsImageChanged] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const {
 		register,
@@ -46,7 +47,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
-			phone: user?.phone,
+			mobile: user?.mobile,
 			address: user?.address[0],
 		},
 	})
@@ -56,17 +57,19 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 		if (file) {
 			setImageAvatar(file)
 			setRemoveAvatar(true)
+			setIsImageChanged(true)
 		}
 	}
 
 	const handleRemoveImage = () => {
 		setImageAvatar(user?.avatar || null)
 		setRemoveAvatar(false)
+		setIsImageChanged(false)
 	}
 
 	const handleSubmitProfile = handleSubmit(
 		async (data: Record<string, string>) => {
-			if (!loading && isDirty) {
+			if (!loading && (isDirty || isImageChanged)) {
 				let hasError = false
 				const formData = new FormData()
 				for (let [key, value] of Object.entries(data)) {
@@ -86,6 +89,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 					const response = await getCurrentUser()
 					const userData = response.data
 					dispatch(loginSuccess(userData))
+					setRemoveAvatar(false)
 				}
 				setLoading(false)
 			}
@@ -93,7 +97,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 	)
 	const submitClass = clsx(
 		`border-2 hover-effect rounded p-1`,
-		loading || !isDirty
+		loading || !(isDirty || isImageChanged)
 			? `border-gray-500 bg-gray-500 opacity-80 cursor-not-allowed`
 			: `border-red-500 hover:bg-red-500`
 	)
@@ -106,11 +110,11 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 				>
 					<CustomImage
 						src={
-							(imageAvatar &&
-								(imageAvatar === "string"
-									? imageAvatar
-									: URL.createObjectURL(imageAvatar as File))) ||
-							defaultAvatar
+							imageAvatar instanceof File || typeof imageAvatar === "string"
+								? imageAvatar instanceof File
+									? URL.createObjectURL(imageAvatar)
+									: imageAvatar
+								: defaultAvatar
 						}
 						alt="Profile avatar"
 						width={80}
@@ -182,8 +186,8 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 				<InputForm
 					register={register}
 					errors={errors as { [key: string]: CustomFieldError }}
-					id={"phone"}
-					defaultValue={user.phone ? user.phone.toString() : ""}
+					id={"mobile"}
+					defaultValue={user.mobile ? user.mobile.toString() : ""}
 					label="Phone number"
 					// validate={validatePhoneNumber}
 				/>
@@ -194,7 +198,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 				<Button
 					className={submitClass}
 					type="submit"
-					disabled={loading || !isDirty}
+					disabled={loading || !(isDirty || isImageChanged)}
 					loading={loading}
 				>
 					Update information

@@ -1,13 +1,14 @@
 import express from "express"
 import { ProductController } from "../../controllers"
 import { isAdmin, verifyAccessToken } from "../../middlewares/verifyToken"
-import uploadCloud from "../../config/cloudinary.config"
+import { uploadCloudECommercial } from "../../config/cloudinaryOption"
+
 const router = express.Router()
 
 router.post(
 	"/create-product",
 	[verifyAccessToken, isAdmin],
-	uploadCloud.fields([
+	uploadCloudECommercial.fields([
 		{ name: "productImages", maxCount: 10 },
 		{
 			name: "thumbnail",
@@ -21,7 +22,7 @@ router.get("/get-all-product", ProductController.getAllProducts)
 router.put(
 	"/update-product/:product_id",
 	[verifyAccessToken, isAdmin],
-	uploadCloud.fields([
+	uploadCloudECommercial.fields([
 		{ name: "productImages", maxCount: 10 },
 		{
 			name: "thumbnail",
@@ -43,13 +44,13 @@ router.put(
 router.put(
 	"/upload-image/:product_id",
 	[verifyAccessToken, isAdmin],
-	uploadCloud.array("images", 10),
+	uploadCloudECommercial.array("images", 10),
 	ProductController.uploadImagesProduct
 )
 router.put(
 	"/variant/:product_id",
 	[verifyAccessToken, isAdmin],
-	uploadCloud.fields([
+	uploadCloudECommercial.fields([
 		{ name: "productImages", maxCount: 10 },
 		{
 			name: "thumbnail",

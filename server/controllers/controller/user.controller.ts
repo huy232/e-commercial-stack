@@ -12,6 +12,7 @@ import crypto from "crypto"
 import * as Validators from "../../validators/userValidators"
 import { validationResult } from "express-validator"
 import { parseInteger } from "../../utils/parseInteger"
+import { UploadedFiles } from "../../types/uploadFile"
 
 class UserController {
 	register = async (req: Request, res: Response): Promise<void> => {
@@ -490,10 +491,24 @@ class UserController {
 	updateUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
-			if (!_id || Object.keys(req.body).length === 0) {
-				throw new Error("Missing inputs to update user")
+			const images = req.files as UploadedFiles
+			if (!_id) {
+				throw new Error("User ID is missing")
 			}
-			const response = await User.findByIdAndUpdate(_id, req.body, {
+			let updateData = {}
+
+			// Check if request body contains data
+			if (Object.keys(req.body).length > 0) {
+				updateData = { ...updateData, ...req.body }
+			}
+			// Check if request files contain avatar image
+			if (images && images.avatar) {
+				updateData = { ...updateData, avatar: images.avatar[0].path }
+			}
+			if (Object.keys(updateData).length === 0) {
+				throw new Error("No data to update")
+			}
+			const response = await User.findByIdAndUpdate(_id, updateData, {
 				new: true,
 			}).select("-password -refreshToken")
 			if (response) {

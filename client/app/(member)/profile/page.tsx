@@ -15,11 +15,11 @@ const Profile = (props: Props) => {
 	const router = useRouter()
 	const mounted = useMounted()
 	const user: ProfileUser = useSelector(selectAuthUser)
-	if (!user) {
-		router.push(`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`)
-	}
-	if (!mounted || !user) {
+	if (!mounted) {
 		return null
+	}
+	if (mounted && !user) {
+		router.push(`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`)
 	}
 	return <ProfileInformation user={user} />
 }

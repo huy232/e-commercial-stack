@@ -17,7 +17,7 @@ export interface ProfileUser {
 	wishlist: []
 	isBlocked: boolean
 	createdAt: string
-	phone: number
+	mobile: number
 }
 
 export interface Users {
@@ -34,7 +34,7 @@ export interface Users {
 	wishlist: []
 	isBlocked: boolean
 	createdAt: string
-	phone: number
+	mobile: number
 }
 
 export interface UpdateUser {
@@ -51,7 +51,7 @@ export interface UpdateUserProfile {
 	firstName: string
 	lastName: string
 	email: string
-	phone?: number
+	mobile?: number
 	address?: string
 	avatar?: string
 }

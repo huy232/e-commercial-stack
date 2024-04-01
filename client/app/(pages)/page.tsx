@@ -34,7 +34,7 @@ export default async function Home() {
 	const featureProducts = await getProducts({
 		limit: 9,
 		page: 1,
-		totalRatings: 5,
+		sort: `-totalRatings`,
 	})
 
 	return (
