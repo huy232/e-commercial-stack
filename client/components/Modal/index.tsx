@@ -1,6 +1,8 @@
 "use client"
-import { FC, ReactNode, useEffect, useRef } from "react"
+import { FC, ReactNode, useRef, useEffect } from "react"
+import { createPortal } from "react-dom"
 import clsx from "clsx"
+import { useClickOutside } from "@/hooks"
 
 interface ModalProps {
 	isOpen: boolean
@@ -10,27 +12,23 @@ interface ModalProps {
 
 const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 	const modalRef = useRef<HTMLDivElement>(null)
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				modalRef.current &&
-				!modalRef.current.contains(event.target as Node) &&
-				onClose
-			) {
-				onClose()
-			}
-		}
 
+	useEffect(() => {
 		if (isOpen) {
-			document.addEventListener("mousedown", handleClickOutside)
+			document.body.style.overflow = "hidden"
 		} else {
-			document.removeEventListener("mousedown", handleClickOutside)
+			document.body.style.overflow = ""
 		}
 
 		return () => {
-			document.removeEventListener("mousedown", handleClickOutside)
+			document.body.style.overflow = ""
 		}
-	}, [isOpen, onClose])
+	}, [isOpen])
+
+	useClickOutside(modalRef, () => {
+		if (onClose) onClose()
+	})
+
 	const modalClass = clsx(
 		"fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50",
 		{
@@ -38,13 +36,16 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 		}
 	)
 
-	return (
-		<div className={modalClass}>
-			<div className="bg-white p-4" ref={modalRef}>
-				{children}
-			</div>
-		</div>
-	)
+	return isOpen
+		? createPortal(
+				<div className={modalClass}>
+					<div className="bg-white p-4" ref={modalRef}>
+						{children}
+					</div>
+				</div>,
+				document.body
+		  )
+		: null
 }
 
 export default Modal
