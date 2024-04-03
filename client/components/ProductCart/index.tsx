@@ -30,7 +30,7 @@ const ProductCart: FC<ProductCartProps> = ({
 	return (
 		<>
 			{variants && (
-				<div className="grid grid-cols-2">
+				<div className="grid auto-cols-[minmax(0,_2fr)]">
 					{variants.map((variant, index) => (
 						<ProductVariantSelect
 							key={index}

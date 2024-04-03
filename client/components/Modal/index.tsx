@@ -30,19 +30,27 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 	})
 
 	const modalClass = clsx(
-		"fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50",
+		"fixed inset-0 flex items-center justify-center z-50 w-full h-full",
 		{
 			hidden: !isOpen,
 		}
 	)
 
+	const overlayClass = clsx("fixed inset-0 bg-black bg-opacity-50 z-40", {
+		hidden: !isOpen,
+	})
+
 	return isOpen
 		? createPortal(
-				<div className={modalClass}>
-					<div className="bg-white p-4" ref={modalRef}>
-						{children}
+				<>
+					<div className={overlayClass}>
+						<div className={modalClass}>
+							<div className="bg-white p-4" ref={modalRef}>
+								{children}
+							</div>
+						</div>
 					</div>
-				</div>,
+				</>,
 				document.body
 		  )
 		: null

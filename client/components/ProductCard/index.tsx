@@ -46,7 +46,7 @@ const ProductCard: FC<ProductProps> = ({
 				group-hover:flex 
 				group-hover:absolute"
 					>
-						<ProductOptions productSlug={product.slug} />
+						<ProductOptions productSlug={product.slug} product={product} />
 					</div>
 				)}
 			</div>

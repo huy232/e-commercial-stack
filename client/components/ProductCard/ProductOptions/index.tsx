@@ -1,13 +1,15 @@
 "use client"
 import { AiFillEye, AiOutlineMenu, BsFillSuitHeartFill } from "@/assets/icons"
-import { Modal } from "@/components"
-import { path } from "@/utils"
+import { CustomImage, Modal, ProductQuickView } from "@/components"
+import { ProductType } from "@/types"
+import { formatPrice, formatPriceNumber, path } from "@/utils"
 import clsx from "clsx"
 import Link from "next/link"
 import { FC, ReactNode, useState } from "react"
 
 interface ProductOptionsProps {
 	productSlug: string
+	product: ProductType
 }
 
 const productHoverOptions = [
@@ -16,7 +18,7 @@ const productHoverOptions = [
 	{ id: 3, icon: <BsFillSuitHeartFill /> },
 ]
 
-const ProductOptions: FC<ProductOptionsProps> = ({ productSlug }) => {
+const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 	const [showModal, setShowModal] = useState(false)
 
 	const optionClass = clsx(
@@ -34,7 +36,7 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug }) => {
 		<>
 			{showModal && (
 				<Modal isOpen={showModal} onClose={handleCloseQuickView}>
-					Product info
+					<ProductQuickView product={product} />
 				</Modal>
 			)}
 			{productHoverOptions.map((option, index) => {

@@ -41,7 +41,7 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 					<CustomImage
 						width={140}
 						height={140}
-						className="w-[140px] h-[140px]"
+						className="w-[140px] h-[140px] cursor-pointer"
 						src={image}
 						alt="Sub product"
 						key={index}
