@@ -1,15 +1,5 @@
 import { getProducts, getSpecificProduct } from "@/app/api"
-import {
-	Breadcrumb,
-	ProductCart,
-	ProductInformation,
-	ProductSlider,
-	ProductExtraInfo,
-	CustomSlider,
-	ProductDetail,
-} from "@/components"
-import { formatPrice, renderStarFromNumber } from "@/utils"
-import { productExtraInformation } from "@/constant"
+import { ProductDetail } from "@/components"
 
 export default async function Product({
 	params,

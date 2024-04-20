@@ -1,12 +1,6 @@
 "use client"
 
-import {
-	Button,
-	CustomImage,
-	ProductCart,
-	ProductQuantity,
-	ProductSlider,
-} from "@/components"
+import { ProductCart, ProductSlider } from "@/components"
 import { ProductType, VariantType } from "@/types"
 import { formatPrice, renderStarFromNumber } from "@/utils"
 import { FC, useState } from "react"
@@ -43,22 +37,23 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ product }) => {
 				>
 					<ProductSlider images={selectedVariantImages} />
 				</div>
-				<div className="w-2/5">
+				<div className="w-2/5 flex flex-col">
 					<h2 className="line-clamp-2 text-xl font-bold">{product.title}</h2>
 					<span>{formatPrice(product.price)}</span>
-					<span>Available: {productDetail.quantity}</span>
-					<span>Sold: 100</span>
+					<span className="text-xs">Available: {productDetail.quantity}</span>
+					<span className="text-xs">Sold: 100</span>
 					<span className="flex">
 						{renderStarFromNumber(productDetail.totalRatings)}
 					</span>
 					<span
-						className="line-clamp-5 text-xs"
+						className="line-clamp-5 text-sm"
 						dangerouslySetInnerHTML={{ __html: product.description }}
 					/>
 					<div className="flex flex-col gap-8">
 						<ProductCart
 							variants={productDetail.variants}
 							handleProductDetail={handleProductDetail}
+							product={productDetail}
 						/>
 					</div>
 				</div>

@@ -92,6 +92,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 						<ProductCart
 							variants={productDetail.variants}
 							handleProductDetail={handleProductDetail}
+							product={productDetail}
 						/>
 					</div>
 				</div>

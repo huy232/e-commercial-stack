@@ -1,16 +1,19 @@
 "use client"
 import { FC, memo, useState } from "react"
 import { Button, ProductQuantity, ProductVariantSelect } from "@/components"
-import { VariantType } from "@/types"
+import { ProductType, VariantType } from "@/types"
+import { UserProductCart, updateUserCart } from "@/app/api"
 
 interface ProductCartProps {
 	variants?: VariantType[]
+	product: ProductType
 	handleProductDetail: (variant: VariantType | null) => void
 }
 
 const ProductCart: FC<ProductCartProps> = ({
 	variants,
 	handleProductDetail,
+	product,
 }) => {
 	const [quantity, setQuantity] = useState(1)
 	const [selectedVariant, setSelectedVariant] = useState<VariantType | null>(
@@ -25,6 +28,17 @@ const ProductCart: FC<ProductCartProps> = ({
 			setSelectedVariant(variant)
 			handleProductDetail(variant)
 		}
+	}
+
+	const handleAddToCart = async (product: ProductType) => {
+		console.log(product)
+		// 	const addToCartResponse = await updateUserCart({
+		// 		quantity: product.quantity,
+		// _id: product._id,
+		// thumbnail: product.thumbnail,
+		// title: product.title,
+		// color: product.color
+		// 	})
 	}
 
 	return (
@@ -42,7 +56,10 @@ const ProductCart: FC<ProductCartProps> = ({
 				</div>
 			)}
 			<ProductQuantity quantity={quantity} setQuantity={setQuantity} />
-			<Button className="w-full bg-rose-500 text-white hover:opacity-80 hover-effect p-2 rounded">
+			<Button
+				className="w-full bg-rose-500 text-white hover:opacity-80 hover-effect p-2 rounded"
+				onClick={() => handleAddToCart(product)}
+			>
 				Add to cart
 			</Button>
 		</>

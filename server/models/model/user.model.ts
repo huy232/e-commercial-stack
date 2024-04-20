@@ -71,6 +71,7 @@ var userSchema = new mongoose.Schema<IUser>(
 				product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
 				quantity: Number,
 				color: String,
+				price: Number,
 			},
 		],
 		address: {

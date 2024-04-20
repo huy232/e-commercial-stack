@@ -216,6 +216,17 @@ class ProductController {
 			if (req.body && req.body.title) {
 				req.body.slug = slugify(req.body.title)
 			}
+			if (req.body.category) {
+				let categoriesSet = new Set(["Home"])
+				if (Array.isArray(req.body.category)) {
+					req.body.category.forEach((category: string) =>
+						categoriesSet.add(category)
+					)
+				} else {
+					categoriesSet.add(req.body.category as string)
+				}
+				req.body.category = Array.from(categoriesSet)
+			}
 			if (images.thumbnail) {
 				req.body.thumbnail = images.thumbnail[0].path
 			}
@@ -230,7 +241,6 @@ class ProductController {
 				const productImages = [...existingProductImages, ...productImageURLs]
 				req.body.images = productImages
 			}
-			console.log(req.body)
 			const updatedProduct = await Product.findByIdAndUpdate(
 				product_id,
 				req.body,

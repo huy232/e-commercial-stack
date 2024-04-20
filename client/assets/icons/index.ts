@@ -21,6 +21,7 @@ export {
 	FaClipboardList,
 	FaShoppingCart,
 	FaFileUpload,
+	FaStarHalfAlt,
 } from "react-icons/fa"
 export {
 	AiFillHome,

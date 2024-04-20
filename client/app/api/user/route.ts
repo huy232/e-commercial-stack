@@ -26,6 +26,14 @@ export interface GetUsersParams {
 	[key: string]: string | number | undefined | string[]
 }
 
+export interface UserProductCart {
+	quantity: number
+	_id: string
+	thumbnail: string
+	title: string
+	color: string
+}
+
 export const userRegister = async (
 	data: UserRegister
 ): Promise<ApiResponse<string>> => {
@@ -286,6 +294,20 @@ export const updateUserProfile = async (formData: FormData) => {
 			method: "PUT",
 			credentials: "include",
 			body: formData,
+		})
+		const responseData = await response.json()
+		return responseData
+	} catch (error) {
+		throw error
+	}
+}
+
+export const updateUserCart = async (productCart: UserProductCart) => {
+	try {
+		const response = await fetch(`${API}/user/update-cart`, {
+			method: "PUT",
+			credentials: "include",
+			body: JSON.stringify(productCart),
 		})
 		const responseData = await response.json()
 		return responseData

@@ -1,19 +1,16 @@
-import mongoose, { Document, Types, Schema } from "mongoose"
+import mongoose, { Document, Schema } from "mongoose"
 
 interface IRating {
 	star: number
-	postedBy: mongoose.Types.ObjectId | Types.ObjectId | string
+	postedBy: mongoose.Types.ObjectId | string
 	comment: string
 	updatedAt: Date
 }
 
 interface IVariant {
-	color: string
-	price: number
-	thumbnail: string
-	images: []
-	title: string
-	sku: string
+	[key: string]: string | number | undefined
+	stock: number
+	price?: number
 }
 
 interface IProduct extends Document {
@@ -22,24 +19,21 @@ interface IProduct extends Document {
 	description?: string
 	brand: string
 	price: number
-	category: String[]
+	category: string[]
 	quantity: number
 	sold: number
-	images: []
-	color: String[]
+	images: string[]
 	ratings: IRating[]
 	totalRatings: number
 	thumbnail: string
-	variants: IVariant[]
+	allowVariants: boolean
+	variants: IVariant[] | null
+	public: boolean
 }
 
-var productSchema = new mongoose.Schema<IProduct>(
+const productSchema = new Schema<IProduct>(
 	{
-		title: {
-			type: String,
-			required: true,
-			trim: true,
-		},
+		title: { type: String, required: true, trim: true },
 		slug: {
 			type: String,
 			required: true,
@@ -47,64 +41,26 @@ var productSchema = new mongoose.Schema<IProduct>(
 			lowercase: true,
 			trim: true,
 		},
-		description: {
-			type: String,
-			trim: true,
-		},
-		brand: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		thumbnail: String,
-		price: {
-			type: Number,
-			required: true,
-			trim: true,
-		},
-		category: {
-			type: [],
-			required: true,
-		},
-		quantity: {
-			type: Number,
-			default: 0,
-		},
-		sold: {
-			type: Number,
-			default: 0,
-		},
-		images: {
-			type: [],
-		},
-		color: {
-			type: [],
-			required: true,
-		},
+		description: { type: String, trim: true },
+		brand: { type: String, required: true, trim: true },
+		thumbnail: { type: String },
+		price: { type: Number, required: true },
+		category: { type: [String], required: true },
+		quantity: { type: Number, default: 0 },
+		sold: { type: Number, default: 0 },
+		images: { type: [String] },
 		ratings: [
 			{
 				star: { type: Number },
 				postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 				comment: { type: String },
-				updatedAt: {
-					type: Date,
-				},
+				updatedAt: { type: Date },
 			},
 		],
-		totalRatings: {
-			type: Number,
-			default: 0,
-		},
-		variants: [
-			{
-				color: String,
-				price: Number,
-				thumbnail: String,
-				images: Array,
-				title: String,
-				sku: String,
-			},
-		],
+		totalRatings: { type: Number, default: 0 },
+		allowVariants: { type: Boolean, required: true },
+		variants: [{ type: Schema.Types.Mixed }],
+		public: { type: Boolean, required: true },
 	},
 	{ timestamps: true }
 )

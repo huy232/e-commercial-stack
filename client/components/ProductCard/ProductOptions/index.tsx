@@ -46,6 +46,7 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 							className={optionClass}
 							onClick={handleQuickView}
 							key={option.id}
+							title="Quick view"
 						>
 							{option.icon}
 						</div>
@@ -53,7 +54,11 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 				}
 				if (option.id === 2) {
 					return (
-						<Link href={`${path.PRODUCTS}/${productSlug}`} key={option.id}>
+						<Link
+							href={`${path.PRODUCTS}/${productSlug}`}
+							key={option.id}
+							title="Product detail"
+						>
 							<div className={optionClass}>{option.icon}</div>
 						</Link>
 					)
@@ -64,6 +69,7 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 							key={option.id}
 							className={optionClass}
 							onClick={handleWishlist}
+							title="Add to your wishlist"
 						>
 							{option.icon}
 						</div>

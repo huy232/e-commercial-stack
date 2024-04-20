@@ -5,6 +5,10 @@ import { brandCategory } from "../../data/cate_brand"
 import slugify from "slugify"
 import asyncHandler from "express-async-handler"
 import { v4 as uuidv4 } from "uuid"
+import fs from "fs"
+import path from "path"
+import { promisify } from "util"
+import { writeFileSync } from "fs"
 
 interface ProductData {
 	category: string[]
@@ -14,8 +18,12 @@ interface ProductData {
 	images: string[]
 	price: string
 	description: string[]
-	variants: { label: string; variants: string[] }[]
-	infomations: { [key: string]: string }
+	variants: IVariant[]
+	infomations: {
+		[key: string]: string
+	}
+	allowVariants: boolean
+	public: boolean
 }
 
 interface CategoryBrandData {
@@ -24,10 +32,35 @@ interface CategoryBrandData {
 	image: string
 }
 
+interface IVariantOption {
+	value: string
+	price?: number
+}
+
+interface IVariant {
+	[key: string]: string | number | undefined
+	stock?: number
+	price?: number
+}
+
+interface IProduct {
+	category: string[]
+	name: string
+	brand: string
+	thumb: string
+	images: string[]
+	price: string
+	description: string[]
+	variants: IVariant[]
+	infomations: {
+		DESCRIPTION: string
+		WARRANTY: string
+		DELIVERY: string
+		PAYMENT: string
+	}
+}
+
 const insertProductFn = async (product: ProductData) => {
-	const colorVariant =
-		product.variants.find((element) => element.label === "Color")?.variants ||
-		[]
 	const priceMatch = product.price.match(/\d/g)
 	const priceNumeric = Number(priceMatch?.join(""))
 	const roundedPrice = Math.round(priceNumeric / 100)
@@ -44,9 +77,11 @@ const insertProductFn = async (product: ProductData) => {
 		quantity: Math.round(Math.random() * 1000),
 		sold: Math.round(Math.random() * 100),
 		images: product.images,
-		color: colorVariant,
 		thumbnail: product.thumb,
 		totalRatings: Math.floor(Math.random() * 5) + 1,
+		variants: product.variants,
+		allowVariants: product.allowVariants,
+		public: product.public,
 	})
 }
 
@@ -60,6 +95,87 @@ const insertCategoryFn = async (categoryBrand: CategoryBrandData) => {
 }
 
 class InsertDataController {
+	static generateRandomPrice(): number {
+		return Math.floor(Math.random() * (300000 - 100000 + 1)) + 100000
+	}
+
+	editProduct = async (req: Request, res: Response): Promise<void> => {
+		try {
+			const filePath = path.resolve(__dirname, "../../data/data2.json")
+			const rawData = fs.readFileSync(filePath, "utf8")
+			const products: ProductData[] = JSON.parse(rawData)
+
+			const modifiedData = products.map((product: ProductData) => {
+				const allowVariants = product.variants.length > 0
+				const publicValue = true
+				let modifiedVariants: IVariant[] = []
+
+				if (product.variants.length > 0) {
+					// Get all options from different variant types
+					const allOptions: any[] = []
+					product.variants.forEach((variantGroup: any) => {
+						const options = variantGroup.options.map((option: any) => {
+							return {
+								type: variantGroup.type.toLowerCase(),
+								value: option.value,
+								price:
+									option.price || Math.floor(Math.random() * 1000000) + 100000, // Use provided price if available, otherwise generate random price
+							}
+						})
+						allOptions.push(options)
+					})
+
+					// Generate combinations of options
+					const generateCombinations = (
+						arr: any[],
+						index: number,
+						current: any[]
+					) => {
+						if (index === arr.length) {
+							const variant: IVariant = {}
+							current.forEach((option) => {
+								variant[option.type] = option.value
+								variant.price = option.price
+							})
+							variant.stock = current.some(
+								(option) => option.stock !== undefined
+							)
+								? current.find((option) => option.stock !== undefined)?.stock
+								: Math.floor(Math.random() * 101)
+							modifiedVariants.push(variant)
+						} else {
+							arr[index].forEach((option: any) => {
+								generateCombinations(arr, index + 1, current.concat(option))
+							})
+						}
+					}
+
+					generateCombinations(allOptions, 0, [])
+				}
+
+				return {
+					category: product.category,
+					name: product.name,
+					brand: product.brand,
+					thumb: product.thumb,
+					images: product.images,
+					price: product.price,
+					description: product.description,
+					variants: modifiedVariants,
+					infomations: product.infomations,
+					allowVariants,
+					public: publicValue,
+				}
+			})
+
+			fs.writeFileSync(filePath, JSON.stringify(modifiedData, null, 2))
+
+			res.json("Done editing product data")
+		} catch (error) {
+			res.status(500).json({ message: "Error editing product data", error })
+		}
+	}
+
 	insertProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const promises = []

@@ -244,9 +244,15 @@ class UserController {
 	getCurrentUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
-			const user = await User.findById({ _id }).select(
-				"-refreshToken -password"
-			)
+			const user = await User.findById({ _id })
+				.select("-refreshToken -password")
+				.populate({
+					path: "cart",
+					populate: {
+						path: "product",
+						select: "title thumbnail price quantity",
+					},
+				})
 			if (user) {
 				res.status(200).json({
 					success: true,
@@ -581,9 +587,9 @@ class UserController {
 	updateUserCart = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
-			const { product_id, quantity, color } = req.body
+			const { product_id, quantity = 1, color } = req.body
 
-			if (!product_id || !quantity || !color) {
+			if (!product_id || !color) {
 				throw new Error("Missing inputs for updating user cart")
 			}
 

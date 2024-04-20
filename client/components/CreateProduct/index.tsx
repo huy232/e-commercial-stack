@@ -30,6 +30,7 @@ interface ProductFormData extends FieldValues {
 }
 
 const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
+	console.log(categories)
 	const {
 		register,
 		reset,
@@ -42,11 +43,11 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	const [thumbnail, setThumbnail] = useState<File | null>(null)
 	const [productImages, setProductImages] = useState<File[]>([])
 	const [value, setValue] = useState("")
-	const [selectedColors, setSelectedColors] = useState<string[]>([])
+	// const [selectedColors, setSelectedColors] = useState<string[]>([])
 	const [thumbnailError, setThumbnailError] = useState<string>("")
 	const [productImagesError, setProductImagesError] = useState<string>("")
 	const [descriptionError, setDescriptionError] = useState<string>("")
-	const [colorError, setColorError] = useState<string>("")
+	// const [colorError, setColorError] = useState<string>("")
 	const [loading, setLoading] = useState<boolean>(false)
 
 	const selectValueGetterTitle = (option: ProductCategoryType) => option.title
@@ -74,10 +75,10 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 		const updatedImages = productImages.filter((_, i) => i !== index)
 		setProductImages(updatedImages)
 	}
-	const handleColorChange = (colors: string[]) => {
-		setSelectedColors(colors)
-		setColorError("")
-	}
+	// const handleColorChange = (colors: string[]) => {
+	// 	setSelectedColors(colors)
+	// 	setColorError("")
+	// }
 
 	const handleSubmitProduct = handleSubmit(async (data) => {
 		let hasError = false
@@ -91,14 +92,14 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			setDescriptionError("Please enter description for the product")
 			hasError = true
 		}
-		if (selectedColors.length > 0) {
-			selectedColors.forEach((color) => {
-				formData.append("color[]", color)
-			})
-		} else {
-			setColorError("Please choose at least one color")
-			hasError = true
-		}
+		// if (selectedColors.length > 0) {
+		// 	selectedColors.forEach((color) => {
+		// 		formData.append("color[]", color)
+		// 	})
+		// } else {
+		// 	setColorError("Please choose at least one color")
+		// 	hasError = true
+		// }
 		if (thumbnail) {
 			formData.append("thumbnail", thumbnail)
 		} else {
@@ -123,9 +124,9 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 				setThumbnail(null)
 				setProductImages([])
 				setValue("")
-				setSelectedColors([])
+				// setSelectedColors([])
 				setDescriptionError("")
-				setColorError("")
+				// setColorError("")
 				setThumbnailError("")
 				setProductImagesError("")
 			})
@@ -156,14 +157,14 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 								"Please enter a valid product name.")
 						}
 					/>
-					<ColorSelect
+					{/* <ColorSelect
 						onColorsChange={handleColorChange}
 						selectedColors={selectedColors}
-					/>
+					/> */}
 				</div>
 				<div className="flex gap-4">
 					<InputField
-						label="Price"
+						label="Default price"
 						name="price"
 						register={register}
 						required="Price is required"
@@ -198,6 +199,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						getLabel={selectLabelGetterTitle}
 						onChange={handleCategoryChange}
 					/>
+					{console.log(selectedCategoryData.brand)}
 					{selectedCategoryData && (
 						<BrandSelect
 							name="brand"
@@ -243,7 +245,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 				{descriptionError && (
 					<span className="text-red-500">{descriptionError}</span>
 				)}
-				{colorError && <span className="text-red-500">{colorError}</span>}
+				{/* {colorError && <span className="text-red-500">{colorError}</span>} */}
 				<Button type="submit">Create product</Button>
 			</form>
 		</>

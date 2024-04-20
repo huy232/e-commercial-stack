@@ -10,5 +10,6 @@ router.delete(
 	"/delete-brand-category",
 	InsertDataController.deleteAllCategories
 )
+router.post("/edit-product", InsertDataController.editProduct)
 
 export { router as insertDataRoute }
