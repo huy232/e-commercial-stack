@@ -1,28 +1,48 @@
 "use client"
-import { AiFillEye, AiOutlineMenu, BsFillSuitHeartFill } from "@/assets/icons"
-import { CustomImage, Modal, ProductQuickView } from "@/components"
-import { ProductType } from "@/types"
-import { formatPrice, formatPriceNumber, path } from "@/utils"
+import {
+	AiFillEye,
+	AiOutlineLoading,
+	AiOutlineMenu,
+	BsFillSuitHeartFill,
+} from "@/assets/icons"
+import {
+	Button,
+	CustomImage,
+	Modal,
+	ProductQuickView,
+	Toast,
+	showToast,
+} from "@/components"
+import { useMounted } from "@/hooks"
+import { handleUserWishlist } from "@/store/actions"
+import { selectAuthUser } from "@/store/slices/authSlice"
+import { AppDispatch, ProductType } from "@/types"
+import { path } from "@/utils"
 import clsx from "clsx"
 import Link from "next/link"
-import { FC, ReactNode, useState } from "react"
+import { FC, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
-interface ProductOptionsProps {
+export interface ProductOptionsProps {
 	productSlug: string
 	product: ProductType
 }
 
-const productHoverOptions = [
+export const productHoverOptions = [
 	{ id: 1, icon: <AiFillEye /> },
 	{ id: 2, icon: <AiOutlineMenu /> },
 	{ id: 3, icon: <BsFillSuitHeartFill /> },
 ]
 
 const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
+	const dispatch = useDispatch<AppDispatch>()
+	const user = useSelector(selectAuthUser)
 	const [showModal, setShowModal] = useState(false)
+	const [loading, setLoading] = useState(false)
+	const mounted = useMounted()
 
 	const optionClass = clsx(
-		`w-10 h-10 bg-white rounded-full border-solid border-gray-500 border-[1px] shadow-md flex items-center justify-center hover:bg-gray-800 hover:text-white cursor-pointer hover:border-gray-800 duration-200 ease-linear`
+		`w-10 h-10 rounded-full border-solid border-gray-500 border-[1px] shadow-md flex items-center justify-center hover:bg-gray-800 hover:text-white cursor-pointer hover:border-gray-800 duration-200 ease-linear`
 	)
 	const handleQuickView = () => {
 		setShowModal(!showModal)
@@ -30,8 +50,18 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 	const handleCloseQuickView = () => {
 		setShowModal(false)
 	}
-	const handleWishlist = () => {}
-
+	const handleWishlist = async (product_id: string) => {
+		if (!user) {
+			showToast("Please login to add items to your wishlist", "warn")
+			return
+		}
+		setLoading(true)
+		await dispatch(handleUserWishlist(product_id))
+		setLoading(false)
+	}
+	if (!mounted) {
+		return null
+	}
 	return (
 		<>
 			{showModal && (
@@ -43,7 +73,7 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 				if (option.id === 1) {
 					return (
 						<div
-							className={optionClass}
+							className={clsx(optionClass, "bg-white")}
 							onClick={handleQuickView}
 							key={option.id}
 							title="Quick view"
@@ -59,20 +89,35 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 							key={option.id}
 							title="Product detail"
 						>
-							<div className={optionClass}>{option.icon}</div>
+							<div className={clsx(optionClass, "bg-white")}>{option.icon}</div>
 						</Link>
 					)
 				}
 				if (option.id === 3) {
 					return (
-						<div
+						<Button
 							key={option.id}
-							className={optionClass}
-							onClick={handleWishlist}
-							title="Add to your wishlist"
+							className={clsx(optionClass, {
+								"bg-red-500 text-white":
+									user && user.wishlist.includes(product._id),
+								"opacity-50 cursor-not-allowed": loading,
+							})}
+							onClick={() => handleWishlist(product._id)}
+							title={
+								user && user.wishlist.includes(product._id)
+									? "Remove from wishlist"
+									: "Add to wishlist"
+							}
+							disabled={loading}
 						>
-							{option.icon}
-						</div>
+							{loading ? (
+								<span className="animate-spin">
+									<AiOutlineLoading />
+								</span>
+							) : (
+								option.icon
+							)}
+						</Button>
 					)
 				}
 			})}

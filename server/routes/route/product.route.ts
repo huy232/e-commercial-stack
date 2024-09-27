@@ -61,5 +61,10 @@ router.put(
 )
 
 router.get("/daily-product", ProductController.getRandomProductWithFiveStars)
+router.get(
+	"/product-distribution",
+	verifyAccessToken,
+	ProductController.getProductCategoryCounts
+)
 
 export { router as productRouter }

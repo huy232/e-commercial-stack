@@ -1,38 +1,55 @@
-import mongoose from "mongoose"
+import mongoose, { Document, Schema } from "mongoose"
 
 interface IProductCategory extends Document {
 	title: string
-	brand: []
 	slug: string
-	image: string
+	brand: mongoose.Types.ObjectId[] // Reference to ProductBrand
+	image?: string
 	createdAt: Date
 	updatedAt: Date
+	option: { type: string; value: string[] }[]
 }
 
-var productCategorySchema = new mongoose.Schema<IProductCategory>(
+const productCategorySchema = new Schema<IProductCategory>(
 	{
 		title: {
 			type: String,
 			required: true,
 			unique: true,
-			index: true,
-		},
-		brand: {
-			type: [],
-			required: true,
+			trim: true,
 		},
 		slug: {
 			type: String,
 			required: true,
+			trim: true,
+			unique: true,
 		},
+		brand: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Brand",
+			},
+		],
 		image: {
 			type: String,
 		},
+		option: [
+			{
+				type: {
+					type: String,
+					trim: true,
+					unique: true,
+				},
+				value: {
+					type: [String],
+					trim: true,
+				},
+			},
+		],
 	},
 	{ timestamps: true }
 )
 
-//Export the model
 const ProductCategoryModel = mongoose.model<IProductCategory>(
 	"ProductCategory",
 	productCategorySchema

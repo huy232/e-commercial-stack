@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { getProductCategories } from "@/app/api"
 
 export const getCategoriesAction = createAsyncThunk(
 	"app/categories",

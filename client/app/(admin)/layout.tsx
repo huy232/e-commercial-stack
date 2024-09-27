@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
-import { Footer, Header, Navbar } from "@/components"
+import { Footer, Header, Navbar, Toast } from "@/components"
 import clsx from "clsx"
 import ReduxProvider from "@/context/reduxProvider"
 import "../globals.css"
@@ -32,11 +32,11 @@ export default function AdminLayout({
 		<html lang="en">
 			<body className={bodyClassName}>
 				<ReduxProvider>
+					<Toast />
 					<div className="flex flex-grow">
 						<AdminSidebar />
 						<div>{children}</div>
 					</div>
-					{/* <Footer /> */}
 				</ReduxProvider>
 			</body>
 		</html>

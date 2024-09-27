@@ -22,6 +22,7 @@ export {
 	FaShoppingCart,
 	FaFileUpload,
 	FaStarHalfAlt,
+	FaTrash,
 } from "react-icons/fa"
 export {
 	AiFillHome,
@@ -40,4 +41,18 @@ export { BiShow, BiHide } from "react-icons/bi"
 export { TbBrandProducthunt } from "react-icons/tb"
 export { LuMenuSquare } from "react-icons/lu"
 export { FaArrowDownShortWide, FaCircleXmark } from "react-icons/fa6"
-export { IoMdCheckmarkCircleOutline } from "react-icons/io"
+export { IoMdCheckmarkCircleOutline, IoIosCloseCircle } from "react-icons/io"
+export { CiSearch } from "react-icons/ci"
+
+export { FaPercentage } from "react-icons/fa"
+export { FaBoltLightning } from "react-icons/fa6"
+export { FaQuestionCircle } from "react-icons/fa"
+export { FaStar } from "react-icons/fa"
+export { MdOutlinePayment } from "react-icons/md"
+export { FaHeadset } from "react-icons/fa"
+
+export { FaFacebook } from "react-icons/fa"
+export { BsTwitterX } from "react-icons/bs"
+export { FaPinterest } from "react-icons/fa"
+export { FaTiktok } from "react-icons/fa"
+export { FaInstagramSquare } from "react-icons/fa"

@@ -1,4 +1,5 @@
 "use client"
+import { Brand } from "@/types"
 import { UseFormRegister } from "react-hook-form"
 
 interface BrandSelectProps {
@@ -6,7 +7,7 @@ interface BrandSelectProps {
 	label?: string
 	register: UseFormRegister<any>
 	required?: boolean
-	options: string[]
+	options: Brand[]
 	value?: string | undefined
 	disabled?: boolean
 }
@@ -33,9 +34,9 @@ const BrandSelect: React.FC<BrandSelectProps> = ({
 					defaultValue={normalizedValue}
 					disabled={disabled}
 				>
-					{options.map((brand, index) => (
-						<option key={index} value={brand}>
-							{brand}
+					{options.map((brand) => (
+						<option key={brand._id} value={brand._id}>
+							{brand.title}
 						</option>
 					))}
 				</select>

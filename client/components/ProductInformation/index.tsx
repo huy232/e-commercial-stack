@@ -1,10 +1,9 @@
 "use client"
 import { FC, useCallback, useState } from "react"
-import { productInformationTabs } from "@/constant"
+import { URL, productInformationTabs } from "@/constant"
 import clsx from "clsx"
 import { memo } from "react"
 import { Review, ReviewComment } from "@/components"
-import { productRating } from "@/app/api"
 import { ProductType } from "@/types"
 import { useMounted } from "@/hooks"
 
@@ -48,10 +47,26 @@ const ProductInformation: FC<ProductInformationProps> = ({
 			}
 			try {
 				const updatedAt = Date.now()
-				const response = await productRating(star, value, productId, updatedAt)
+				const ratingResponse = await fetch(URL + "/api/product/rating", {
+					method: "PUT",
+					cache: "no-cache",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						star,
+						comment: value,
+						product_id: productId,
+						updatedAt,
+					}),
+				})
+				const rating = await ratingResponse.json()
+				console.log(rating)
 				const productResponse = await updateReviews()
+				console.log(productResponse)
 				setBaseProduct(productResponse)
-				setReviews(response.data.ratings)
+				setReviews(rating.data.ratings)
 				closeVoteModal()
 			} catch (error) {
 				console.log(error)

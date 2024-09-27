@@ -1,9 +1,11 @@
+"use client"
 import { ProductType } from "@/types/product"
 import { FC } from "react"
 import { CustomImage, ProductOptions } from "@/components/"
 import { formatPrice, renderStarFromNumber } from "@/utils/"
 import clsx from "clsx"
 import { NoProductImage } from "@/assets/images"
+import Link from "next/link"
 
 interface ProductProps {
 	product: ProductType
@@ -27,7 +29,6 @@ const ProductCard: FC<ProductProps> = ({
 		{ "bg-red-100 text-red-800 border-red-400": markLabel === "Trending" },
 		{ "bg-blue-100 text-blue-800 border-blue-400": markLabel === "New" }
 	)
-
 	return (
 		<div className="w-full text-base px-1">
 			<div className="border p-4 flex flex-col items-center relative group">
@@ -52,14 +53,23 @@ const ProductCard: FC<ProductProps> = ({
 			</div>
 			<div className="flex flex-col gap-1 mt-4 items-star w-full">
 				{enableTitle && (
-					<span className="line-clamp-2 h-[60px]">{product.title}</span>
+					<Link
+						href={`/products/${product.slug}`}
+						className="line-clamp-2 h-[60px] font-bold hover-effect hover:opacity-70 duration-300 ease-in-out hover:underline"
+					>
+						{product.title}
+					</Link>
 				)}
 				{enableStars && (
 					<span className="flex h-4">
 						{renderStarFromNumber(product.totalRatings)}
 					</span>
 				)}
-				{enablePrice && <span>{formatPrice(product.price)}</span>}
+				{enablePrice && (
+					<span className="text-sm font-light text-green-500">
+						{formatPrice(product.price)}
+					</span>
+				)}
 			</div>
 		</div>
 	)

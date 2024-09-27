@@ -6,6 +6,8 @@ class BrandController {
 	createBrand = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const response = await Brand.create(req.body)
+			const io = req.app.get("io")
+			io.emit("brandUpdate")
 			res.json({
 				success: response ? true : false,
 				message: response

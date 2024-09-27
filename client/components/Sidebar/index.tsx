@@ -8,11 +8,12 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ categories }) => {
-	const products = categories.data
-	if (products) {
+	const categoriesSidebar = categories.data
+
+	if (categoriesSidebar) {
 		return (
 			<div className="flex flex-col">
-				{products.map((category: CategoryType) => (
+				{categoriesSidebar.map((category: CategoryType) => (
 					<Link
 						key={category._id}
 						href={`/products?category=${category.slug}`}

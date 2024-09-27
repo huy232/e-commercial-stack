@@ -3,7 +3,7 @@ import { FieldValues, useForm } from "react-hook-form"
 import {
 	BrandSelect,
 	Button,
-	ColorSelect,
+	Checkbox,
 	ImagePreview,
 	ImageUpload,
 	InputField,
@@ -11,10 +11,12 @@ import {
 	Modal,
 	Select,
 	TextEditor,
+	VariantOptions,
 } from "@/components"
-import { FC, useState } from "react"
-import { ProductCategoryType } from "@/types"
-import { createProduct } from "@/app/api"
+import { FC, useEffect, useState } from "react"
+import { CategoryType, ProductCategoryType } from "@/types"
+import { useMounted } from "@/hooks"
+import { URL } from "@/constant"
 
 interface CreateProductProps {
 	categories: ProductCategoryType[]
@@ -30,34 +32,45 @@ interface ProductFormData extends FieldValues {
 }
 
 const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
-	console.log(categories)
 	const {
 		register,
 		reset,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<ProductFormData>()
+		setValue,
+	} = useForm<ProductFormData>({
+		defaultValues: {
+			productName: "",
+			price: "0",
+			quantity: "0",
+		},
+	})
+	const mounted = useMounted()
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(
 		categories.length > 0 ? categories[0].title : null
 	)
+	const [allowVariants, setAllowVariants] = useState<boolean>(false)
+	const [variantFields, setVariantFields] = useState<any[]>([])
+	const [description, setDescription] = useState("")
 	const [thumbnail, setThumbnail] = useState<File | null>(null)
 	const [productImages, setProductImages] = useState<File[]>([])
-	const [value, setValue] = useState("")
-	// const [selectedColors, setSelectedColors] = useState<string[]>([])
+	const [publicProduct, setPublicProduct] = useState<boolean>(false)
+
+	const [loading, setLoading] = useState<boolean>(false)
+
 	const [thumbnailError, setThumbnailError] = useState<string>("")
 	const [productImagesError, setProductImagesError] = useState<string>("")
 	const [descriptionError, setDescriptionError] = useState<string>("")
-	// const [colorError, setColorError] = useState<string>("")
-	const [loading, setLoading] = useState<boolean>(false)
 
-	const selectValueGetterTitle = (option: ProductCategoryType) => option.title
+	const selectValueGetterTitle = (option: ProductCategoryType) => option._id
 	const selectLabelGetterTitle = (option: ProductCategoryType) => option.title
 	const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedCategory(e.target.value)
 	}
-	const selectedCategoryData =
-		selectedCategory &&
-		categories.find((category) => category.title === selectedCategory)
+	const selectedCategoryData = categories.find(
+		(category) => category.title === selectedCategory
+	) as CategoryType
+
 	const handleThumbnailUpload = (files: File[]) => {
 		if (files.length > 0) {
 			setThumbnail(files[0])
@@ -75,31 +88,39 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 		const updatedImages = productImages.filter((_, i) => i !== index)
 		setProductImages(updatedImages)
 	}
-	// const handleColorChange = (colors: string[]) => {
-	// 	setSelectedColors(colors)
-	// 	setColorError("")
-	// }
+	const handleAllowVariantsChange = (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
+		setAllowVariants(e.target.checked)
+		if (!e.target.checked) {
+			setValue("quantity", "0")
+		}
+	}
+	const handlePublicProduct = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setPublicProduct(e.target.checked)
+	}
 
 	const handleSubmitProduct = handleSubmit(async (data) => {
 		let hasError = false
 		const formData = new FormData()
-		for (let i of Object.entries(data)) {
-			formData.append(i[0], i[1])
+		console.log(data)
+		for (let [key, value] of Object.entries(data)) {
+			if (key === "price" || key === "quantity") {
+				value = value = value.replace(/[^0-9]/g, "")
+				console.log("Key: ", key, " --- ", "Value: ", value)
+				formData.append(key, value)
+			} else {
+				console.log("Key: ", key, " --- ", "Value: ", value)
+				formData.append(key, value)
+			}
 		}
-		if (value) {
-			formData.append("description", value)
+		formData.append("allowVariants", JSON.stringify(allowVariants))
+		if (description) {
+			formData.append("description", description)
 		} else {
 			setDescriptionError("Please enter description for the product")
 			hasError = true
 		}
-		// if (selectedColors.length > 0) {
-		// 	selectedColors.forEach((color) => {
-		// 		formData.append("color[]", color)
-		// 	})
-		// } else {
-		// 	setColorError("Please choose at least one color")
-		// 	hasError = true
-		// }
 		if (thumbnail) {
 			formData.append("thumbnail", thumbnail)
 		} else {
@@ -114,27 +135,52 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			setProductImagesError("Please choose a picture for product")
 			hasError = true
 		}
+		formData.append("publicProduct", JSON.stringify(publicProduct))
+		formData.append("variants", JSON.stringify(variantFields))
 		if (hasError) {
 			return
 		}
+
 		setLoading(true)
-		await createProduct(formData)
-			.then(() => {
-				reset()
-				setThumbnail(null)
-				setProductImages([])
-				setValue("")
-				// setSelectedColors([])
-				setDescriptionError("")
-				// setColorError("")
-				setThumbnailError("")
-				setProductImagesError("")
+
+		const createProductResponse = await fetch(URL + "/api/product", {
+			method: "POST",
+			body: formData,
+		})
+		const responseData = await createProductResponse.json()
+		if (responseData.success) {
+			reset({
+				quantity: "0",
+				price: "0",
+				productName: "",
 			})
-			.finally(() => {
-				setLoading(false)
-			})
+			setValue("quantity", "0")
+			setThumbnail(null)
+			setProductImages([])
+			setDescription("")
+			setAllowVariants(false)
+			setPublicProduct(false)
+		}
+		setLoading(false)
 	})
 
+	useEffect(() => {
+		if (variantFields.length > 0) {
+			const totalQuantityStock = variantFields.reduce((acc, currentStock) => {
+				const numberValue = currentStock.stock
+				const parsedValue = parseInt(
+					numberValue.toString().replace(/,/g, ""),
+					10
+				)
+				return acc + (isNaN(parsedValue) ? 0 : parsedValue)
+			}, 0)
+			setValue("quantity", totalQuantityStock.toLocaleString())
+		}
+	}, [variantFields, allowVariants, setValue])
+
+	if (!mounted) {
+		return <></>
+	}
 	return (
 		<>
 			{loading && (
@@ -157,10 +203,6 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 								"Please enter a valid product name.")
 						}
 					/>
-					{/* <ColorSelect
-						onColorsChange={handleColorChange}
-						selectedColors={selectedColors}
-					/> */}
 				</div>
 				<div className="flex gap-4">
 					<InputField
@@ -171,8 +213,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						validateType={"onlyNumbers"}
 						errorMessage={
 							errors.price &&
-							(errors.price.message?.toString() ||
-								"Please enter a valid price.")
+							(errors.price.message?.toString() || "Please enter a valid price")
 						}
 					/>
 					<InputField
@@ -186,12 +227,13 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 							(errors.quantity.message?.toString() ||
 								"Please enter a valid quantity.")
 						}
+						disabled={allowVariants}
 					/>
 				</div>
 				<div className="flex gap-4">
 					<Select
-						name="category"
 						label="Category"
+						name="category"
 						register={register}
 						required
 						options={categories}
@@ -199,8 +241,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						getLabel={selectLabelGetterTitle}
 						onChange={handleCategoryChange}
 					/>
-					{console.log(selectedCategoryData.brand)}
-					{selectedCategoryData && (
+					{selectedCategoryData && selectedCategoryData.brand && (
 						<BrandSelect
 							name="brand"
 							label="Brand"
@@ -210,9 +251,28 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						/>
 					)}
 				</div>
-				<div className="h-[200px]">
-					<TextEditor value={value} onChange={setValue} />
+				<div>
+					{selectedCategoryData.option &&
+					selectedCategoryData.option.length > 0 ? (
+						<Checkbox
+							label="Allow Variants"
+							name="allowVariants"
+							checked={allowVariants}
+							onChange={handleAllowVariantsChange}
+						/>
+					) : (
+						<div>Currently supported no variant</div>
+					)}
+					{allowVariants && selectedCategory && (
+						<VariantOptions
+							category={selectedCategory}
+							variantFields={variantFields}
+							setVariantFields={setVariantFields}
+							categories={categories}
+						/>
+					)}
 				</div>
+				<TextEditor value={description} onChange={setDescription} />
 				<div className="w-full h-full">
 					<h3 className="font-semibold">Thumbnail preview</h3>
 					<div className="flex items-center">
@@ -236,6 +296,12 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 					</div>
 					<ImageUpload multiple onUpload={handleProductImagesUpload} />
 				</div>
+				<Checkbox
+					label="Public right away?"
+					name="public"
+					checked={publicProduct}
+					onChange={handlePublicProduct}
+				/>
 				{thumbnailError && (
 					<span className="text-red-500">{thumbnailError}</span>
 				)}
@@ -245,7 +311,6 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 				{descriptionError && (
 					<span className="text-red-500">{descriptionError}</span>
 				)}
-				{/* {colorError && <span className="text-red-500">{colorError}</span>} */}
 				<Button type="submit">Create product</Button>
 			</form>
 		</>

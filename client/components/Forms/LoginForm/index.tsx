@@ -2,11 +2,12 @@
 import { FC, useCallback, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { passwordHashingClient } from "@/utils"
-import { UserLogin, userLogin } from "@/app/api"
 import { Button, InputField } from "@/components"
 import { useRouter } from "next/navigation"
 import { loginSuccess } from "@/store/slices/authSlice"
 import { useDispatch } from "react-redux"
+import { API, URL } from "@/constant"
+import { AppDispatch } from "@/types"
 
 type LoginFormData = {
 	email: string
@@ -14,40 +15,44 @@ type LoginFormData = {
 }
 
 const LoginForm: FC = () => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const router = useRouter()
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-		watch,
-		getValues,
-		setValue,
 	} = useForm<LoginFormData>()
 	const [errorMessage, setErrorMessage] = useState("")
-
 	const login = useCallback(async (email: string, hashPassword: string) => {
-		const response = await userLogin({
-			email,
-			password: hashPassword,
+		const loginResponse = await fetch(API + "/user/login", {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				email,
+				password: hashPassword,
+			}),
 		})
+
+		const response = await loginResponse.json()
 		return response
 	}, [])
 
 	const handleLogin: SubmitHandler<LoginFormData> = async (data) => {
-		const { email, password } = data as UserLogin
+		const { email, password } = data
 		const hashPassword = await passwordHashingClient(password)
 		try {
 			const response = await login(email, hashPassword)
-
 			if (!response.success) {
 				const responseErrorMessage =
 					response.message || "An error occurred while login"
 				setErrorMessage(responseErrorMessage)
 			} else {
-				dispatch(loginSuccess(response.userData))
+				await dispatch(loginSuccess(response.userData))
 				router.push("/")
-				router.refresh()
+				// router.refresh()
 			}
 		} catch (error) {
 			setErrorMessage("An error occurred while login due to server")
@@ -67,6 +72,7 @@ const LoginForm: FC = () => {
 					register={register}
 					required={"Email is required"}
 					errorMessage={errors.email?.message}
+					pattern={/^\S+@\S+$/i}
 				/>
 				<InputField
 					label="Password"

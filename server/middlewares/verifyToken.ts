@@ -13,7 +13,6 @@ const verifyToken = async (
 ): Promise<void> => {
 	try {
 		const cookies = req.headers.cookie
-
 		if (cookies) {
 			const cookieArray = cookies.split("; ")
 			const tokenCookie = cookieArray.find((cookie) =>
@@ -62,7 +61,6 @@ const verifyAccessToken = asyncHandler(
 			const tokenCookie = cookieArray.find((cookie) =>
 				cookie.startsWith("accessToken=")
 			)
-
 			if (!tokenCookie && req.cookies.refreshToken) {
 				try {
 					const responseToken = await jwt.verify(

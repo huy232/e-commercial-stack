@@ -1,165 +1,56 @@
 import { API } from "@/constant"
-import {
-	ProductType,
-	ApiResponse,
-	ApiProductResponse,
-	CreateProductType,
-} from "@/types"
+import { NextRequest, NextResponse } from "next/server"
+export const dynamic = "force-dynamic"
 
-interface GetProductsParams {
-	limit?: number
-	page?: number
-	[key: string]: string | number | undefined | string[]
-}
-
-export const getProducts = async (
-	params: GetProductsParams
-): Promise<ApiProductResponse<ProductType[]>> => {
+export async function GET(request: NextRequest) {
 	try {
-		const queryParamsArray: Array<[string, string]> = []
+		const searchParams = request.nextUrl.searchParams
+		const queryParams = new URLSearchParams(searchParams)
 
-		for (const [key, value] of Object.entries(params)) {
-			if (value !== undefined) {
-				if (Array.isArray(value)) {
-					for (const item of value) {
-						queryParamsArray.push([key, item.toString()])
-					}
-				} else {
-					queryParamsArray.push([key, value.toString()])
-				}
-			}
+		let url = `${API}/product/get-all-product`
+		if (queryParams) {
+			url = `${API}/product/get-all-product?${queryParams.toString()}`
 		}
-
-		const queryParams = new URLSearchParams(queryParamsArray)
-		const url = `${API}/product/get-all-product?${queryParams.toString()}`
-
 		const response = await fetch(url, {
 			method: "GET",
 		})
-
-		const responseData: ApiProductResponse<ProductType[]> =
-			await response.json()
-		return responseData
-	} catch (error) {
-		throw error
-	}
+		const data = await response.json()
+		return Response.json(data)
+	} catch (error) {}
 }
 
-export const getDailyDeal = async (): Promise<ApiResponse<ProductType[]>> => {
+export async function POST(request: NextRequest) {
 	try {
-		const response = await fetch(`${API}/product/daily-product`, {
-			method: "GET",
+		const formData = await request.formData()
+		const cookieArray = request.cookies.getAll()
+		const cookieString = cookieArray
+			.map((cookie) => `${cookie.name}=${cookie.value}`)
+			.join("; ")
+		console.log("Cookie: ", cookieString)
+		const response = await fetch(`${API}/product/create-product`, {
+			method: "POST",
 			cache: "no-cache",
+			headers: {
+				Cookie: cookieString,
+			},
+			credentials: "include",
+			body: formData,
 		})
-
-		const responseData: ApiResponse<ProductType[]> = await response.json()
-
-		return responseData
-	} catch (error) {
-		throw error
-	}
-}
-
-export const getSpecificProduct = async (
-	productSlug: string
-): Promise<ApiResponse<ProductType>> => {
-	try {
-		const response = await fetch(`${API}/product/get-product/${productSlug}`, {
-			method: "GET",
-			cache: "no-cache",
-		})
-		const responseData: ApiResponse<ProductType> = await response.json()
-		return responseData
-	} catch (error) {
-		throw error
-	}
-}
-
-export const productRating = async (
-	star: number,
-	comment: string,
-	pid: string,
-	updatedAt: number
-): Promise<ApiResponse<ProductType>> => {
-	try {
-		const response = await fetch(`${API}/product/rating-product`, {
-			method: "PUT",
-			cache: "no-cache",
+		const data = await response.json()
+		return new Response(JSON.stringify(data), {
+			status: response.status,
 			headers: {
 				"Content-Type": "application/json",
 			},
-			credentials: "include",
-			body: JSON.stringify({
-				star,
-				comment,
-				product_id: pid,
-				updatedAt,
-			}),
 		})
-		const responseData: ApiResponse<ProductType> = await response.json()
-		return responseData
 	} catch (error) {
-		throw error
-	}
-}
-
-export const createProduct = async (formData: FormData) => {
-	try {
-		const response = await fetch(`${API}/product/create-product`, {
-			method: "POST",
-			credentials: "include",
-			body: formData,
-		})
-		const responseData = await response.json()
-		return responseData
-	} catch (error) {
-		throw error
-	}
-}
-
-export const updateProduct = async (product_id: string, formData: FormData) => {
-	try {
-		const response = await fetch(
-			`${API}/product/update-product/${product_id}`,
+		console.error("Error creating product:", error)
+		return NextResponse.json(
 			{
-				method: "PUT",
-				credentials: "include",
-				body: formData,
-			}
+				success: false,
+				message: "Error creating product",
+			},
+			{ status: 500 }
 		)
-		const responseData = await response.json()
-		return responseData
-	} catch (error) {
-		throw error
-	}
-}
-
-export const removeProduct = async (product_id: string) => {
-	try {
-		const response = await fetch(
-			`${API}/product/delete-product/${product_id}`,
-			{ method: "DELETE", credentials: "include" }
-		)
-		const responseData = await response.json()
-		return responseData
-	} catch (error) {
-		throw error
-	}
-}
-
-export const updateProductVariant = async (
-	product_id: string,
-	formData: FormData
-) => {
-	try {
-		const response = await fetch(`${API}/product/variant/${product_id}`, {
-			method: "PUT",
-			credentials: "include",
-			body: formData,
-		})
-		const responseData = await response.json()
-		return responseData
-	} catch (error) {
-		throw error
 	}
 }

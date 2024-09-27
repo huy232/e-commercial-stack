@@ -12,22 +12,54 @@ interface UpdateCoupon {
 class CouponController {
 	createNewCoupon = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const { name, discount, expiry } = req.body
-			if (!name || !discount || !expiry) {
-				throw new Error("Missing inputs required")
+			const { name, code, discount, discountType, expiry, usageLimit } =
+				req.body
+			if (!name || !code || !discount || !discountType) {
+				res
+					.status(400)
+					.json({ success: false, message: "Missing inputs required" })
+				return
 			}
-			const calculatedExpiry = calculateExpiry(expiry)
+
+			const calculatedExpiry = expiry ? calculateExpiry(expiry) : undefined
 			const response = await Coupon.create({
-				...req.body,
+				name,
+				code,
+				discount,
+				discountType,
 				expiry: calculatedExpiry,
+				usageLimit,
 			})
 			res.json({
 				success: response ? true : false,
 				message: response
-					? "Success created a coupon"
+					? "Successfully created a coupon"
 					: "Something went wrong while creating a coupon",
 				data: response ? response : {},
 			})
+		}
+	)
+
+	getSpecificCoupon = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			const { couponCode } = req.params
+			const response = await Coupon.findOne({
+				code: new RegExp(`^${couponCode}$`, "i"),
+			}).select("-createdAt -updatedAt")
+
+			if (!response) {
+				res.json({
+					success: false,
+					message: "This coupon code doesn't exist or expired",
+					data: null,
+				})
+			} else {
+				res.json({
+					success: true,
+					message: "Successfully retrieved coupon",
+					data: response,
+				})
+			}
 		}
 	)
 
@@ -37,19 +69,21 @@ class CouponController {
 			res.json({
 				success: response ? true : false,
 				message: response
-					? "Success getting coupons"
+					? "Successfully retrieved coupons"
 					: "Something went wrong while getting coupons",
 				data: response ? response : {},
 			})
 		}
 	)
+
 	updateCoupon = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { coupon_id } = req.params
 			const { expiry, discount, name } = req.body
 
 			if (Object.keys(req.body).length === 0) {
-				throw new Error("Missing inputs")
+				res.status(400).json({ success: false, message: "Missing inputs" })
+				return
 			}
 
 			let updateObject: UpdateCoupon = {}
@@ -58,7 +92,7 @@ class CouponController {
 				updateObject.expiry = calculatedExpiry
 			}
 
-			if (discount) {
+			if (discount !== undefined) {
 				updateObject.discount = discount
 			}
 			if (name) {
@@ -72,12 +106,31 @@ class CouponController {
 			res.json({
 				success: response ? true : false,
 				message: response
-					? "Success update coupon"
-					: "Something went wrong while update coupon",
+					? "Successfully updated coupon"
+					: "Something went wrong while updating coupon",
 				data: response ? response : {},
 			})
 		}
 	)
+
+	updateCouponsQuick = asyncHandler(async (req: Request, res: Response) => {
+		try {
+			const response = await Coupon.updateMany(
+				{ activeCouple: { $exists: false } },
+				{ $set: { activeCouple: true } }
+			)
+			console.log("Print this: ", response)
+			res.json({
+				success: response ? true : false,
+				data: response ? response : [],
+			})
+		} catch (err) {
+			res.status(500).json({
+				success: false,
+				message: err,
+			})
+		}
+	})
 
 	deleteCoupon = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
@@ -88,11 +141,12 @@ class CouponController {
 			res.json({
 				success: response ? true : false,
 				message: response
-					? "Success delete coupon"
-					: "Something went wrong while delete coupon",
+					? "Successfully deleted coupon"
+					: "Something went wrong while deleting coupon",
 				data: response ? response : {},
 			})
 		}
 	)
 }
+
 export default new CouponController()

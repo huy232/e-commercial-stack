@@ -1,9 +1,9 @@
 "use client"
 
-import { forgotPassword } from "@/app/api"
 import { useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
 import { InputField } from "@/components"
+import { URL } from "@/constant"
 
 const ForgotPasswordForm = () => {
 	const {
@@ -18,11 +18,17 @@ const ForgotPasswordForm = () => {
 	const handleForgotPassword = useCallback(async (data: any) => {
 		try {
 			const { email } = data
-			const response = await forgotPassword(email)
+			const response = await fetch(URL + `/api/user/forgot-password`, {
+				method: "POST",
+				body: JSON.stringify({ email }),
+				headers: { "Content-Type": "application/json" },
+			})
+			const forgotPasswordResponse = await response.json()
 
-			if (!response.success) {
+			if (!forgotPasswordResponse.success) {
 				const responseErrorMessage =
-					response.message || "An error occurred while resetting password"
+					forgotPasswordResponse.message ||
+					"An error occurred while resetting password"
 				setErrorMessage(responseErrorMessage)
 				setConfirm(false)
 			} else {

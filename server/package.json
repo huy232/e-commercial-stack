@@ -46,7 +46,8 @@
     "nodemailer": "^6.9.7",
     "pino": "^8.16.2",
     "slugify": "^1.6.6",
-    "stripe": "^14.7.0",
+    "socket.io": "^4.7.5",
+    "stripe": "^14.25.0",
     "tsconfig-paths": "^4.2.0",
     "uuid": "^9.0.1",
     "vnpay": "^0.2.1"

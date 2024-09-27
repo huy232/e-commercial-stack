@@ -1,15 +1,14 @@
 "use client"
-import { getCurrentUser, userLogout } from "@/app/api"
 import {
-	checkAuthentication,
 	loginSuccess,
 	logout,
 	selectAuthUser,
 	selectIsAuthenticated,
 } from "@/store/slices/authSlice"
+import { checkAuthentication } from "@/store/actions/"
 import { useEffect, useCallback, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { AiOutlineLoading, FaUserCircle } from "@/assets/icons"
+import { AiOutlineLoading } from "@/assets/icons"
 import Link from "next/link"
 import { path } from "@/utils"
 import { useDropdown } from "@/hooks"
@@ -17,6 +16,7 @@ import { Button, CustomImage } from "@/components"
 import { AppDispatch } from "@/types"
 import defaultAvatar from "@/assets/images/defaultAvatar.png"
 import clsx from "clsx"
+import { API } from "@/constant"
 
 const User = () => {
 	const [loading, setLoading] = useState(true)
@@ -25,9 +25,26 @@ const User = () => {
 	const user = useSelector(selectAuthUser)
 	const isAuthenticated = useSelector(selectIsAuthenticated)
 
+	const requestLogout = async () => {
+		try {
+			const response = await fetch(API + `/user/logout`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+
+			const responseData = await response.json()
+			return responseData
+		} catch (error) {
+			throw error
+		}
+	}
+
 	const handleLogout = useCallback(async () => {
-		await userLogout()
-		dispatch(logout())
+		await requestLogout()
+		await dispatch(logout())
 	}, [dispatch])
 
 	useEffect(() => {
@@ -35,25 +52,27 @@ const User = () => {
 			try {
 				const response = await dispatch(checkAuthentication())
 				if (response.payload) {
-					if (!user) {
-						const response = await getCurrentUser()
-						const userData = response.data
-						dispatch(loginSuccess(userData))
-					}
-				} else {
-					await userLogout()
+					const response = await fetch(`${API}/user/current`, {
+						method: "GET",
+						credentials: "include",
+					})
+					const userCheck = await response.json()
+					const userData = userCheck.data
+					dispatch(loginSuccess(userData))
+				} else if (!response.payload) {
 					dispatch(logout())
 				}
 			} catch (error) {
-				await userLogout()
 				dispatch(logout())
 			} finally {
 				setLoading(false)
 			}
 		}
 
-		fetchData()
-	}, [dispatch, user, isAuthenticated])
+		if (loading) {
+			fetchData()
+		}
+	}, [dispatch, user, loading])
 
 	if (loading) {
 		return (
@@ -72,24 +91,28 @@ const User = () => {
 	)
 
 	return (
-		<div>
-			<div
-				className="flex gap-2 items-center cursor-pointer hover-effect hover:opacity-80 select-none"
-				onClick={toggleDropdown}
-			>
-				<CustomImage
-					src={user?.avatar || defaultAvatar}
-					alt="User's avatar"
-					className="rounded"
-					width={40}
-					height={40}
-				/>
-				{user ? (
+		<div className="flex items-center justify-center gap-2 px-6 relative">
+			{user ? (
+				<div
+					className="flex gap-2 items-center cursor-pointer hover-effect hover:opacity-80 select-none"
+					onClick={toggleDropdown}
+				>
+					<CustomImage
+						src={user?.avatar || defaultAvatar}
+						alt="User's avatar"
+						className="rounded"
+						width={40}
+						height={40}
+					/>
+
 					<span>{user.firstName}</span>
-				) : (
-					<Link href={path.LOGIN}>Login</Link>
-				)}
-			</div>
+				</div>
+			) : (
+				<Link className="hover-effect hover:opacity-80" href={path.LOGIN}>
+					Login
+				</Link>
+			)}
+
 			{user && isOpen && (
 				<div className="absolute h-full w-full mt-1 z-10">
 					<div className="bg-black/70 rounded flex flex-col gap-1">

@@ -2,11 +2,17 @@
 
 import { useForm } from "react-hook-form"
 import { useState, useCallback } from "react"
-import { UserRegister, userRegister } from "@/app/api"
-import axios from "axios"
 import { passwordHashingClient, path } from "@/utils"
 import { Button, InputField } from "@/components"
 import Link from "next/link"
+import { API, URL } from "@/constant"
+
+type ErrorMessage = {
+	location: string
+	msg: string
+	path: string
+	type: string
+}
 
 const SignUpForm = () => {
 	const {
@@ -18,36 +24,30 @@ const SignUpForm = () => {
 	const [errorsField, setErrorsField] = useState<[] | undefined>([])
 	const [showSignUpComplete, setShowSignUpComplete] = useState(false)
 
-	const handleRegister = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault()
-			try {
-				await handleSubmit(async (data) => {
-					const { firstName, lastName, email, password } = data as UserRegister
-					const hashPassword = await passwordHashingClient(password)
-					const response = await userRegister({
-						firstName,
-						lastName,
-						email,
-						password: hashPassword,
-					})
+	const handleRegister = handleSubmit(async (data) => {
+		const { firstName, lastName, email, password } = data
+		const hashPassword = await passwordHashingClient(password)
 
-					if (response.success) {
-						setShowSignUpComplete(true)
-					} else {
-						setErrorsField(response.errors || [])
-					}
-				})(event)
-			} catch (err: unknown) {
-				if (axios.isAxiosError(err)) {
-					setErrorMessage(err.response?.data?.message || "An error occurred")
-				} else {
-					setErrorMessage("An error occured")
-				}
-			}
-		},
-		[handleSubmit]
-	)
+		const registerResponse = await fetch(API + "/user/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				firstName: firstName,
+				lastName: lastName,
+				email: email,
+				password: hashPassword,
+			}),
+			cache: "no-cache",
+		})
+		const response = await registerResponse.json()
+		if (response.success) {
+			setShowSignUpComplete(true)
+		} else {
+			setErrorsField(response.errors || [])
+		}
+	})
 
 	return showSignUpComplete ? (
 		<div>
@@ -114,6 +114,12 @@ const SignUpForm = () => {
 				{errorMessage && (
 					<p className="text-main text-center hover-effect">{errorMessage}</p>
 				)}
+				{errorsField &&
+					errorsField.map((errorMessage: ErrorMessage, index: number) => (
+						<p key={index} className="text-main text-center">
+							{errorMessage.msg}
+						</p>
+					))}
 				<Button
 					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"

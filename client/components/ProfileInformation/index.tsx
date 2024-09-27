@@ -13,8 +13,8 @@ import { ChangeEvent, FC, useCallback, useState } from "react"
 import clsx from "clsx"
 import moment from "moment"
 import { validatePhoneNumber } from "@/validators"
-import { getCurrentUser, updateUserProfile } from "@/app/api"
 import { FaFileUpload } from "@/assets/icons"
+import { API } from "@/constant"
 interface CustomFieldError extends FieldError {
 	message: string
 }
@@ -84,11 +84,24 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 					return
 				}
 				setLoading(true)
-				const response = await updateUserProfile(formData)
-				if (response.success) {
-					const response = await getCurrentUser()
-					const userData = response.data
-					dispatch(loginSuccess(userData))
+				// const response = await updateUserProfile(formData)
+				const updateUserResponse = await fetch(API + "/user/user-update", {
+					method: "PUT",
+					credentials: "include",
+					body: formData,
+				})
+				const updateUser = await updateUserResponse.json()
+				if (updateUser.success) {
+					const currentUserResponse = await fetch(`${API}/user/current`, {
+						method: "GET",
+						credentials: "include",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					})
+					const currentUser = await currentUserResponse.json()
+					const userData = currentUser.data
+					await dispatch(loginSuccess(userData))
 					setRemoveAvatar(false)
 				}
 				setLoading(false)

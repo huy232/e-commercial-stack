@@ -1,10 +1,10 @@
 "use client"
 import { FC, useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
-import { resetPassword } from "@/app/api"
 import Link from "next/link"
 import { passwordHashingClient, path } from "@/utils"
 import { Button, InputField } from "@/components"
+import { URL } from "@/constant"
 
 type ResetPasswordFormData = {
 	password: string
@@ -39,11 +39,19 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				return
 			}
 			const hashPassword = await passwordHashingClient(confirmPassword)
-			const response = await resetPassword(hashPassword, token)
-
-			if (!response.success) {
+			// const response = await resetPassword(hashPassword, token)
+			const response = await fetch(URL + "/api/user/reset-password", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ password: hashPassword, token }),
+			})
+			const resetPasswordResponse = await response.json()
+			if (!resetPasswordResponse.success) {
 				const responseErrorMessage =
-					response.message || "An error occurred while resetting the password"
+					resetPasswordResponse.message ||
+					"An error occurred while resetting the password"
 				setErrorMessage(responseErrorMessage)
 				setConfirm(false)
 			} else {

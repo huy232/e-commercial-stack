@@ -1,24 +1,40 @@
-import { API } from "@/constant"
-import { ProductCategory, ApiResponse } from "@/types"
+// import { NextApiRequest, NextApiResponse } from "next"
+// import { getProductCategories } from "@/services/productCategoryService"
+// import { NextRequest, NextResponse } from "next/server"
 
-export const getProductCategories = async (): Promise<
-	ApiResponse<ProductCategory[]>
-> => {
+// const handleGet = async (req: NextRequest, res: NextResponse) => {
+// 	try {
+// 		const responseData = await getProductCategories()
+// 		res.status(200).json(responseData)
+// 	} catch (error) {
+// 		res.status(500).json({
+// 			data: [],
+// 			message: "Error fetching product categories",
+// 			success: false,
+// 		})
+// 	}
+// }
+
+// export { handleGet as GET }
+import { API } from "@/constant"
+
+export async function GET(request: Request) {
 	try {
 		const response = await fetch(`${API}/product-category`, {
 			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
 		})
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch product categories. Status: ${response.status}`
-			)
-		}
-
-		const responseData: ApiResponse<ProductCategory[]> = await response.json()
-
-		return responseData
+		const data = await response.json()
+		return new Response(JSON.stringify(data))
 	} catch (error) {
 		console.error("Error fetching product categories:", error)
-		throw error
+		return new Response(JSON.stringify({ error: "Failed to fetch data" }), {
+			status: 500,
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
 	}
 }

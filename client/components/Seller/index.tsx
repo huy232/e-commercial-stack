@@ -5,14 +5,13 @@ import { ProductType } from "@/types/product"
 import { BannerLeft, BannerRight } from "@/assets/images"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
-import { ApiProductResponse } from "@/types"
+import { URL } from "@/constant"
 
 interface SellerProps {
-	fetchProducts: (params: {}) => Promise<ApiProductResponse<ProductType[]>>
 	initialProducts: ProductType[] | []
 }
 
-const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
+const Seller: FC<SellerProps> = ({ initialProducts }) => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Best sellers", sort: "-sold", markLabel: "Trending" },
@@ -29,14 +28,18 @@ const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
 	const fetchProductsComponent = useCallback(
 		async (sort: {}, tabId: number) => {
 			try {
-				const response = await fetchProducts(sort)
-				setProducts(response.data)
+				const response = await fetch(
+					URL + `/api/product?` + new URLSearchParams(sort),
+					{ method: "GET", cache: "no-cache" }
+				)
+				const data = await response.json()
+				setProducts(data.data)
 				setTitleId(tabId)
 			} catch (error) {
 				console.error("Error fetching products:", error)
 			}
 		},
-		[fetchProducts]
+		[]
 	)
 
 	const titleClass = (id: number) =>
@@ -44,7 +47,6 @@ const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
 			`rounded border-rose-500 p-1 hover:bg-rose-500 hover-effect`,
 			titleId === id && "bg-red-500"
 		)
-
 	return (
 		<div className="w-full">
 			<div className="flex flex-row gap-2">
@@ -59,7 +61,7 @@ const Seller: FC<SellerProps> = ({ fetchProducts, initialProducts }) => {
 				))}
 			</div>
 
-			<CustomSlider products={products} supportHover={true} />
+			<CustomSlider products={products} supportHover />
 			<div className="w-full flex gap-4 mt-8">
 				<div className="w-1/2">
 					<CustomImage src={BannerLeft} alt="Banner left" fill />

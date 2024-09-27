@@ -21,3 +21,13 @@ export const productTableHeaders = [
 	"Created at",
 	"Actions",
 ]
+
+export const orderTableHeaders = [
+	"#",
+	"Order ID",
+	"User ID",
+	"Shipment status",
+	"Coupon",
+	"Bill payment",
+	"Date",
+]

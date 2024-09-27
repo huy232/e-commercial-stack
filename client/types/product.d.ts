@@ -11,11 +11,10 @@ export type Review = {
 }
 
 export type VariantType = {
-	color: string
-	images: string[]
-	thumbnail: string
+	[key: string]: any
 	price: number
-	title: string
+	stock: number
+	_id: string
 }
 
 export type ProductType = {
@@ -36,6 +35,8 @@ export type ProductType = {
 	_id: string
 	thumbnail: string
 	variants?: VariantType[]
+	publicProduct: boolean
+	allowVariants: boolean
 }
 
 export interface DailyDealType extends ProductType {

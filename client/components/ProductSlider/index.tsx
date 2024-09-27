@@ -12,9 +12,7 @@ interface ProductSliderProps {
 
 const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 	const [displayImage, setDisplayImage] = useState(images[0])
-	useEffect(() => {
-		setDisplayImage(images[0])
-	}, [images])
+
 	const settings = {
 		dots: false,
 		infinite: false,

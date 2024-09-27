@@ -7,35 +7,41 @@ import {
 	Sidebar,
 	HotCollections,
 	Blog,
+	Introduce,
+	Brand,
+	Social,
+	Promotion,
 } from "@/components"
-import { getDailyDeal, getProductCategories, getProducts } from "@/app/api"
+import { URL } from "@/constant"
 
 export default async function Home() {
-	const productCategories = await getProductCategories()
-	const dailyDeal = await getDailyDeal()
-	const fetchProducts = async (params: {}) => {
-		"use server"
-		try {
-			const response = await getProducts(params)
-			return response
-		} catch (error) {
-			console.error("Error fetching products:", error)
-			return {
-				success: false,
-				data: [],
-				counts: 0,
-				totalPage: 0,
-				currentPage: 0,
-			}
-		}
-	}
-
-	const { data: initialProducts } = await getProducts({ sort: "-sold" })
-	const featureProducts = await getProducts({
-		limit: 9,
-		page: 1,
-		sort: `-totalRatings`,
+	const productCategoryAPI = await fetch(URL + `/api/category`, {
+		method: "GET",
+		cache: "no-cache",
 	})
+	const dailyDealAPI = await fetch(URL + `/api/product/daily-deal`, {
+		method: "GET",
+		cache: "no-cache",
+	})
+	const initialProductsAPI = await fetch(
+		URL + `/api/product?` + new URLSearchParams({ sort: "-sold" }),
+		{ method: "GET", cache: "no-cache" }
+	)
+	const featureProductsAPI = await fetch(
+		URL +
+			`/api/product?` +
+			new URLSearchParams({
+				limit: "9",
+				page: "1",
+				sort: `-totalRatings`,
+			}),
+		{ method: "GET", cache: "no-cache" }
+	)
+
+	const productCategories = await productCategoryAPI.json()
+	const dailyDeal = await dailyDealAPI.json()
+	const initialProducts = await initialProductsAPI.json()
+	const featureProducts = await featureProductsAPI.json()
 
 	return (
 		<main className="w-main">
@@ -46,26 +52,25 @@ export default async function Home() {
 				</div>
 				<div className="w-[75%] flex flex-col gap-5 flex-auto pl-5">
 					<Banner />
-					<Seller
-						fetchProducts={fetchProducts}
-						initialProducts={initialProducts}
-					/>
+					<Seller initialProducts={initialProducts.data} />
 				</div>
 			</div>
+			<Introduce />
 			<div className="my-8">
-				<FeatureProducts featureProducts={featureProducts} />
+				<FeatureProducts featureProducts={featureProducts.data} />
+				<Promotion />
 			</div>
 			<div className="my-8">
-				<NewArrivals
-					fetchProducts={fetchProducts}
-					initialProducts={initialProducts}
-				/>
+				<NewArrivals initialProducts={initialProducts.data} />
 			</div>
 			<div className="my-8">
 				<HotCollections categories={productCategories} />
 			</div>
 			<div className="my-8">
-				<Blog />
+				<Brand />
+			</div>
+			<div className="my-8">
+				<Social />
 			</div>
 		</main>
 	)

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express"
+import { Request, Response } from "express"
 import { Product } from "../../models"
 import asyncHandler from "express-async-handler"
 import slugify from "slugify"
@@ -9,6 +9,8 @@ import { DailyDeal } from "../../models/model/dailyDeal.model"
 import { ProductType } from "../../../client/types/product"
 import { UploadedFile, UploadedFiles } from "../../types/uploadFile"
 import { v4 as uuidv4 } from "uuid"
+import { filterCategory } from "../../data/filterCategory"
+import { getVariantFilters } from "../../utils/getVariantFilters"
 
 class ProductController {
 	static cachedDailyDeal: {
@@ -18,25 +20,27 @@ class ProductController {
 
 	createProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const { productName, price, description, brand, category, color } =
-				req.body
+			const {
+				productName,
+				price,
+				description,
+				brand,
+				category,
+				allowVariants,
+				publicProduct,
+				variants,
+			} = req.body
 			const images = req.files as UploadedFiles
 			if (!images || !images.thumbnail || !images.productImages) {
 				res.status(400).json({ message: "No images uploaded" })
 				return
 			}
-			if (
-				!(productName && price && description && brand && category && color)
-			) {
+			if (!(productName && price && description && brand && category)) {
 				throw new Error("Missing inputs")
 			}
 			const productImageURLs = images.productImages.map(
 				(image: UploadedFile) => image.path
 			)
-			const colorMod = color.map((colorEdit: string) => colorEdit.toUpperCase())
-			const categoriesArray = Array.isArray(category) ? category : [category]
-			const updatedCategories = ["Home", ...categoriesArray]
-
 			req.body.images = productImageURLs
 			req.body.slug = slugify(productName)
 			req.body.totalRatings = 0
@@ -44,8 +48,10 @@ class ProductController {
 			req.body.sold = 0
 			req.body.thumbnail = images.thumbnail[0].path
 			req.body.title = productName
-			req.body.color = colorMod
-			req.body.category = updatedCategories
+			req.body.category = category
+			req.body.allowVariants = allowVariants
+			req.body.public = publicProduct
+			req.body.variants = JSON.parse(variants)
 			const newProduct = await Product.create(req.body)
 			res.status(200).json({
 				success: !!newProduct,
@@ -60,7 +66,6 @@ class ProductController {
 	getProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_slug } = req.params
-
 			try {
 				const product = await Product.findOne({ slug: product_slug }).populate({
 					path: "ratings",
@@ -99,7 +104,6 @@ class ProductController {
 				const queries = { ...req.query }
 				const excludeFields = ["limit", "sort", "page", "fields"]
 				excludeFields.forEach((element) => delete queries[element])
-
 				let queryString = JSON.stringify(queries)
 				queryString = queryString.replace(
 					/\b(gte|gt|lt|lte)\b/g,
@@ -108,8 +112,6 @@ class ProductController {
 				const formattedQueries = JSON.parse(queryString)
 				const priceFilter: any = {}
 
-				console.log(queries)
-
 				// Filtering
 				if (queries.search as string) {
 					delete formattedQueries.search
@@ -117,26 +119,35 @@ class ProductController {
 						{ title: { $regex: req.query.search, $options: "i" } },
 					]
 				}
+				// TITLE
 				if (queries.title) {
-					console.log("Normal queries:", queries.title)
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
-					console.log("Formatted queries:", formattedQueries)
 				}
+				// CATEGORY FILTER
 				if (queries.category) {
 					formattedQueries.category = {
 						$regex: queries.category,
 						$options: "i",
 					}
 				}
-				if (queries.color) {
-					const formattedColorArray = formattedQueries.color.split(",")
-					const colorQuery = formattedColorArray.map((color: string) => ({
-						color: { $regex: color.trim(), $options: "i" },
-					}))
-
-					formattedQueries.$or = colorQuery
-					delete formattedQueries.color
+				const variantFilters = getVariantFilters(filterCategory)
+				const variantQueries: any = {}
+				variantFilters.forEach((field) => {
+					const queryField = field.toLowerCase()
+					if (queries[queryField]) {
+						const values = (queries[queryField] as string).split(",")
+						variantQueries[`${queryField}`] = {
+							$in: values.map((value) => new RegExp(value, "i")),
+						}
+						// Remove from main queries to avoid conflict
+						delete formattedQueries[queryField]
+					}
+				})
+				if (Object.keys(variantQueries).length > 0) {
+					formattedQueries.variants = { $elemMatch: variantQueries }
 				}
+
+				// PRICE
 				if (queries.from) {
 					priceFilter.$gte = parseInt(queries.from as string)
 					delete formattedQueries.from
@@ -186,7 +197,7 @@ class ProductController {
 				const response = await query.exec()
 				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
-				const totalPage = Math.ceil(counts / limit) || 1
+				const totalPages = Math.ceil(counts / limit) || 1
 				const currentPage = page
 
 				res.status(200).json({
@@ -196,7 +207,7 @@ class ProductController {
 						: "Something went wrong while finding all products",
 					data: response ? response : {},
 					counts,
-					totalPage,
+					totalPages,
 					currentPage,
 				})
 			} catch (err: any) {
@@ -309,7 +320,11 @@ class ProductController {
 				)
 			}
 
-			const updatedProduct = await Product.findById(product_id)
+			const updatedProduct = await Product.findById(product_id).populate({
+				path: "ratings.postedBy",
+				select: "firstName lastName avatar",
+			})
+
 			if (updatedProduct) {
 				const ratingCalculate = updatedProduct.ratings.length
 				const sumRating = updatedProduct.ratings.reduce(
@@ -512,6 +527,32 @@ class ProductController {
 				res
 					.status(500)
 					.json({ success: false, message: "An unexpected error occurred." })
+			}
+		}
+	)
+
+	getProductCategoryCounts = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			try {
+				// Aggregation pipeline to filter, unwind, group, and count
+				const categoryCounts = await Product.aggregate([
+					// Match documents where the category array exists and is not empty
+					{ $match: { category: { $exists: true, $not: { $size: 0 } } } },
+					// Unwind the category array to process each category individually
+					{ $unwind: "$category" },
+					// Match again to exclude "Home" after unwind
+					{ $match: { category: { $ne: "Home" } } },
+					// Group by category and count the number of products in each category
+					{ $group: { _id: "$category", count: { $sum: 1 } } },
+					// Sort the categories by count in descending order
+					{ $sort: { count: -1 } },
+				])
+
+				res.status(200).json(categoryCounts)
+			} catch (error) {
+				res
+					.status(500)
+					.json({ message: "Error retrieving product category counts", error })
 			}
 		}
 	)

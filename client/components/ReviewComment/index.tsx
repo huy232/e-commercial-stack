@@ -22,7 +22,7 @@ const ReviewComment: FC<ReviewComment> = ({ reviews }) => {
 								className="rounded full"
 								height={30}
 								width={30}
-								src={DefaultAvatar}
+								src={review.postedBy.avatar || DefaultAvatar}
 								alt="User avatar"
 							/>
 						</div>

@@ -1,5 +1,5 @@
-import { getProducts } from "@/app/api"
 import { Breadcrumb, ProductList } from "@/components"
+import { URL } from "@/constant"
 
 type Props = {
 	params: {}
@@ -20,15 +20,19 @@ export default function Products(props: Props) {
 	const fetchProducts = async (params: {}) => {
 		"use server"
 		try {
-			const response = await getProducts(params)
-			return response
+			const response = await fetch(
+				URL + "/api/product/all-product?" + new URLSearchParams(params),
+				{ method: "GET" }
+			)
+			const data = await response.json()
+			return data
 		} catch (error) {
 			console.error("Error fetching products:", error)
 			return {
 				success: false,
 				data: [],
 				counts: 0,
-				totalPage: 0,
+				totalPages: 0,
 				currentPage: 0,
 			}
 		}

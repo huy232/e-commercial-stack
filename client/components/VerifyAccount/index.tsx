@@ -1,8 +1,8 @@
 "use client"
-import { verifyAccount } from "@/app/api"
 import { FC, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
+import { URL } from "@/constant"
 
 const VerifyAccount: FC = () => {
 	const [errorMessage, setErrorMessage] = useState("")
@@ -15,12 +15,16 @@ const VerifyAccount: FC = () => {
 			const handleVerifyAccount = async () => {
 				const tokenValue = Array.isArray(token) ? token[0] : token
 				try {
-					const response = await verifyAccount(tokenValue)
-					if (response.success && response.message) {
-						setSuccessVerify(response.message)
+					const response = await fetch(URL + "/api/user/verify", {
+						method: "POST",
+						body: tokenValue,
+					})
+					const verifyResponse = await response.json()
+					if (verifyResponse.success && verifyResponse.message) {
+						setSuccessVerify(verifyResponse.message)
 					} else {
 						setErrorMessage(
-							response.message || "An error occurred during verification"
+							verifyResponse.message || "An error occurred during verification"
 						)
 					}
 				} catch (error) {

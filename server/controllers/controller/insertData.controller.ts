@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import { Request, Response } from "express"
 import { Product, ProductCategory } from "../../models"
 import data from "../../data/data2.json"
@@ -19,11 +20,11 @@ interface ProductData {
 	price: string
 	description: string[]
 	variants: IVariant[]
-	infomations: {
+	informations: {
 		[key: string]: string
 	}
 	allowVariants: boolean
-	public: boolean
+	publicProduct: boolean
 }
 
 interface CategoryBrandData {
@@ -52,7 +53,7 @@ interface IProduct {
 	price: string
 	description: string[]
 	variants: IVariant[]
-	infomations: {
+	informations: {
 		DESCRIPTION: string
 		WARRANTY: string
 		DELIVERY: string
@@ -66,7 +67,10 @@ const insertProductFn = async (product: ProductData) => {
 	const roundedPrice = Math.round(priceNumeric / 100)
 
 	const uniqueSlug = slugify(product.name) + "-" + uuidv4()
-
+	const variants = product.variants.map((variant: any) => ({
+		...variant,
+		_id: new mongoose.Types.ObjectId(), // Ensure an ObjectId is generated
+	}))
 	await Product.create({
 		title: product.name,
 		slug: uniqueSlug,
@@ -79,9 +83,9 @@ const insertProductFn = async (product: ProductData) => {
 		images: product.images,
 		thumbnail: product.thumb,
 		totalRatings: Math.floor(Math.random() * 5) + 1,
-		variants: product.variants,
+		variants,
 		allowVariants: product.allowVariants,
-		public: product.public,
+		publicProduct: product.publicProduct,
 	})
 }
 
@@ -162,9 +166,9 @@ class InsertDataController {
 					price: product.price,
 					description: product.description,
 					variants: modifiedVariants,
-					infomations: product.infomations,
+					informations: product.informations,
 					allowVariants,
-					public: publicValue,
+					publicProduct: publicValue,
 				}
 			})
 
@@ -186,7 +190,9 @@ class InsertDataController {
 
 			await Promise.all(promises)
 
-			res.json("Done product data")
+			res.status(200).json({
+				message: "Done creating product",
+			})
 		}
 	)
 

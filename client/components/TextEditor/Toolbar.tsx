@@ -95,7 +95,6 @@ const Toolbar = ({ editor, content }: Props) => {
 				>
 					<Heading2 className="w-5 h-5" />
 				</button>
-
 				<button
 					onClick={(e) => {
 						e.preventDefault()
@@ -138,7 +137,7 @@ const Toolbar = ({ editor, content }: Props) => {
 				<button
 					onClick={(e) => {
 						e.preventDefault()
-						editor.chain().focus().setCode().run()
+						editor.chain().focus().toggleCode().run()
 					}}
 					className={
 						editor.isActive("code")
@@ -153,11 +152,7 @@ const Toolbar = ({ editor, content }: Props) => {
 						e.preventDefault()
 						editor.chain().focus().undo().run()
 					}}
-					className={
-						editor.isActive("undo")
-							? "bg-sky-700 text-white p-2 rounded-lg"
-							: "text-sky-400 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
-					}
+					className="text-sky-400 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
 				>
 					<Undo className="w-5 h-5" />
 				</button>
@@ -166,11 +161,7 @@ const Toolbar = ({ editor, content }: Props) => {
 						e.preventDefault()
 						editor.chain().focus().redo().run()
 					}}
-					className={
-						editor.isActive("redo")
-							? "bg-sky-700 text-white p-2 rounded-lg"
-							: "text-sky-400 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
-					}
+					className="text-sky-400 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
 				>
 					<Redo className="w-5 h-5" />
 				</button>

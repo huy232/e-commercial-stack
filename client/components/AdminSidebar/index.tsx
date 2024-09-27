@@ -6,7 +6,7 @@ import Link from "next/link"
 import clsx from "clsx"
 import { AdminSidebarOption } from "@/types"
 import { FaArrowDownShortWide } from "@/assets/icons"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { Logo } from "@/components"
 
 const AdminSidebar = () => {

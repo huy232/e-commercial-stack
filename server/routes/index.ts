@@ -10,7 +10,9 @@ import {
 	productCategoryRouter,
 	productRouter,
 	userRouter,
+	visitRouter,
 } from "./route"
+
 const initRoutes = (app: Express): void => {
 	app.use("/api/user", userRouter)
 	app.use("/api/product", productRouter)
@@ -21,7 +23,9 @@ const initRoutes = (app: Express): void => {
 	app.use("/api/coupon", couponRouter)
 	app.use("/api/order", orderRouter)
 	app.use("/api/insert-data", insertDataRoute)
+	app.use("/api/visit", visitRouter)
 
+	// Error handling middleware
 	app.use(notFound)
 	app.use(errorHandler)
 }

@@ -12,7 +12,7 @@ export interface ApiProductResponse<T> {
 	error?: string
 	message?: string
 	counts: number
-	totalPage: number
+	totalPages: number
 	currentPage: number
 }
 
@@ -47,7 +47,7 @@ export interface ApiUsersResponse<T> {
 	error?: string
 	message?: string
 	counts: number
-	totalPage: number
+	totalPages: number
 	currentPage: number
 }
 
@@ -57,6 +57,6 @@ export interface ApiProductCategoryResponse<T> {
 	error?: string
 	message?: string
 	counts: number
-	totalPage: number
+	totalPages: number
 	currentPage: number
 }

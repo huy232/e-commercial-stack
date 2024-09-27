@@ -12,7 +12,7 @@ export const adminSidebarOptions = [
 		id: 1,
 		type: adminDashboardStatus.SINGLE,
 		text: "Dashboard",
-		path: `${path.ADMIN}/${path.DASHBOARD}`,
+		path: `${path.ADMIN}`,
 		icon: <AiOutlineDashboard />,
 	},
 	{
@@ -41,8 +41,60 @@ export const adminSidebarOptions = [
 			},
 		],
 	},
+	// {
+	// 	id: 4,
+	// 	type: adminDashboardStatus.PARENT,
+	// 	text: "Manage brands",
+	// 	path: null,
+	// 	icon: <TbBrandProducthunt />,
+	// 	subMenu: [
+	// 		{
+	// 			id: 41,
+	// 			text: "Create brand",
+	// 			path: `${path.ADMIN}/${path.CREATE_BRAND}`,
+	// 		},
+	// 		{
+	// 			id: 42,
+	// 			text: "Manage brand",
+	// 			path: `${path.ADMIN}/${path.MANAGE_BRANDS}`,
+	// 		},
+	// 	],
+	// },
+	// {
+	// 	id: 5,
+	// 	type: adminDashboardStatus.PARENT,
+	// 	text: "Manage categories",
+	// 	path: null,
+	// 	icon: <TbBrandProducthunt />,
+	// 	subMenu: [
+	// 		{
+	// 			id: 51,
+	// 			text: "Create category",
+	// 			path: `${path.ADMIN}/${path.CREATE_CATEGORY}`,
+	// 		},
+	// 		{
+	// 			id: 52,
+	// 			text: "Manage categories",
+	// 			path: `${path.ADMIN}/${path.MANAGE_CATEGORIES}`,
+	// 		},
+	// 	],
+	// },
 	{
-		id: 4,
+		id: 5,
+		type: adminDashboardStatus.SINGLE,
+		text: "Manage brands",
+		path: `${path.ADMIN}/${path.MANAGE_BRANDS}`,
+		icon: <LuMenuSquare />,
+	},
+	{
+		id: 6,
+		type: adminDashboardStatus.SINGLE,
+		text: "Manage categories",
+		path: `${path.ADMIN}/${path.MANAGE_CATEGORIES}`,
+		icon: <LuMenuSquare />,
+	},
+	{
+		id: 7,
 		type: adminDashboardStatus.SINGLE,
 		text: "Orders",
 		path: `${path.ADMIN}/${path.MANAGE_ORDERS}`,

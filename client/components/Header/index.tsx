@@ -1,7 +1,7 @@
 "use client"
-import { BsHandbagFill, MdEmail, RiPhoneFill } from "@/assets/icons"
+import { MdEmail, RiPhoneFill } from "@/assets/icons"
 import { FC, useEffect, useState } from "react"
-import { Logo, User } from "@/components"
+import { Logo, SidebarCart, User } from "@/components"
 
 const Header: FC = () => {
 	const [mounted, setMounted] = useState(false)
@@ -28,13 +28,8 @@ const Header: FC = () => {
 					</span>
 					<span>Support 24/7</span>
 				</div>
-				<div className="flex items-center justify-center gap-2 px-6 border-r">
-					<BsHandbagFill color="red" />
-					<span>0 item(s)</span>
-				</div>
-				<div className="flex items-center justify-center gap-2 px-6 relative">
-					{mounted ? <User /> : <></>}
-				</div>
+				{mounted && <SidebarCart />}
+				{mounted && <User />}
 			</div>
 		</div>
 	)

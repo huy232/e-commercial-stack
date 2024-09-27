@@ -3,7 +3,7 @@ import { FC, useState } from "react"
 import { Users } from "@/types"
 import { FieldError, FieldErrors, useForm } from "react-hook-form"
 import { InputForm } from "@/components"
-import { roleSelection, tableHeaders } from "@/constant"
+import { URL, roleSelection, tableHeaders } from "@/constant"
 import moment from "moment"
 import {
 	FaCircleXmark,
@@ -12,7 +12,6 @@ import {
 	MdEdit,
 } from "@/assets/icons"
 import clsx from "clsx"
-import { deleteUser, updateUser } from "@/app/api"
 import { validateEmail } from "@/validators"
 
 interface CustomFieldError extends FieldError {
@@ -74,10 +73,12 @@ const UserTableRow: FC<UserTableRowProps> = ({
 				role: editedUser.role,
 			}
 			try {
-				const updateUserInformation = await updateUser(
-					editedUser._id,
-					userInformation
-				)
+				const updateUserInformationResponse = await fetch(URL + "/api/admin", {
+					method: "PUT",
+					credentials: "include",
+					body: JSON.stringify({ ...userInformation, _id: editedUser._id }),
+				})
+				const updateUserInformation = await updateUserInformationResponse.json()
 				if (updateUserInformation.success) {
 					onUserListChange()
 				}
@@ -88,9 +89,15 @@ const UserTableRow: FC<UserTableRowProps> = ({
 	})
 
 	const handleDeleteUser = async (_id: string) => {
-		const deleteUserResponse = await deleteUser(_id)
-		onUserListChange()
-		console.log(deleteUserResponse)
+		const deleteUserResponse = await fetch(URL + "/api/admin", {
+			method: "DELETE",
+			credentials: "include",
+			body: JSON.stringify({ _id }),
+		})
+		const deleteUser = await deleteUserResponse.json()
+		if (deleteUser.success) {
+			onUserListChange()
+		}
 	}
 
 	return (

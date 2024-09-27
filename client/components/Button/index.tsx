@@ -24,7 +24,7 @@ const Button: React.FC<ButtonProps> = ({
 	return (
 		<button className={buttonClass} disabled={disabled || loading} {...rest}>
 			{loading ? (
-				<div className="flex items-center">
+				<div className="flex items-center justify-center">
 					<div className="animate-spin mr-2 w-4 h-4 border-t-2 border-blue-500 border-r-2 rounded-full"></div>
 					Loading...
 				</div>

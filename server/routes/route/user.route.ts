@@ -43,7 +43,8 @@ router.put(
 	verifyAccessToken,
 	UserController.updateUserAddress
 )
-router.put("/update-cart", verifyAccessToken, UserController.updateUserCart)
+router.post("/update-cart", verifyAccessToken, UserController.updateUserCart)
+router.put("/update-cart", verifyAccessToken, UserController.updateBulkUserCart)
 router.get(
 	"/validate-refresh-token",
 	verifyRefreshToken,
@@ -65,5 +66,7 @@ router.get(
 	[verifyAccessToken, isAdmin],
 	UserController.checkAdmin
 )
+router.post("/wishlist", verifyAccessToken, UserController.userWishlist)
+router.get("/wishlist", verifyAccessToken, UserController.getUserWishlist)
 
 export { router as userRouter }

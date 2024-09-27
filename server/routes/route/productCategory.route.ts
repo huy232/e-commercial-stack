@@ -15,6 +15,11 @@ router.put(
 	[verifyAccessToken, isAdmin],
 	ProductCategoryController.updateCategory
 )
+router.put(
+	"/option/:productCategory_id",
+	[verifyAccessToken, isAdmin],
+	ProductCategoryController.updateCategoryOption
+)
 router.delete(
 	"/:productCategory_id",
 	[verifyAccessToken, isAdmin],

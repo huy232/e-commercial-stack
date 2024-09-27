@@ -37,11 +37,13 @@ const Select = <T extends any>({
 					value={value}
 					disabled={disabled}
 				>
-					{options.map((option, index) => (
-						<option key={index} value={getValue(option)}>
-							{getLabel(option)}
-						</option>
-					))}
+					{options.map((option, index) => {
+						return (
+							<option key={index} value={getValue(option)}>
+								{getLabel(option)}
+							</option>
+						)
+					})}
 				</select>
 			</div>
 		</div>

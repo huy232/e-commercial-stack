@@ -9,4 +9,6 @@ router.get("/", CouponController.getCoupons)
 router.put("/:coupon_id", CouponController.updateCoupon)
 router.delete("/:coupon_id", CouponController.deleteCoupon)
 
+router.get("/:couponCode", CouponController.getSpecificCoupon)
+router.post("/update-coupons-quick", CouponController.updateCouponsQuick)
 export { router as couponRouter }

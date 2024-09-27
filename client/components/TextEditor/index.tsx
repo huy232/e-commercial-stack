@@ -1,10 +1,9 @@
 "use client"
-import { useState } from "react"
-import { useEditor, EditorContent } from "@tiptap/react"
+import { useState, useEffect } from "react"
+import { useEditor, EditorContent, Editor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
-import Toolbar from "./Toolbar"
 import Underline from "@tiptap/extension-underline"
-import { Editor } from "@tiptap/react"
+import Toolbar from "./Toolbar"
 
 type TextEditorProps = {
 	value: string
@@ -16,17 +15,26 @@ const TextEditor = ({ value, onChange }: TextEditorProps) => {
 
 	const editor = useEditor({
 		extensions: [StarterKit, Underline],
+		content: content, // Set initial content
 		editorProps: {
 			attributes: {
 				class:
 					"flex flex-col px-4 py-3 justify-start border-b border-r border-l border-gray-700 text-gray-400 items-start w-full gap-3 font-medium text-[16px] pt-4 rounded-bl-md rounded-br-md outline-none",
 			},
 		},
-		onUpdate: ({ editor }: { editor: Editor }) => {
-			setContent(editor.getHTML())
-			onChange(editor.getHTML()) // Call onChange to update the parent component's state
+		onUpdate: ({ editor }) => {
+			const html = editor.getHTML()
+			setContent(html)
+			onChange(html)
 		},
 	})
+
+	// Update editor content when value prop changes
+	useEffect(() => {
+		if (editor && editor.getHTML() !== value) {
+			editor.commands.setContent(value)
+		}
+	}, [value, editor])
 
 	return (
 		<div className="w-full px-4">

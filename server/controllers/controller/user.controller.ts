@@ -1,4 +1,11 @@
-import { User } from "../../models"
+import {
+	ICartItem,
+	ICartItemPopulate,
+	IProduct,
+	IVariant,
+	Product,
+	User,
+} from "../../models"
 import asyncHandler from "express-async-handler"
 import { Request, Response } from "express"
 import {
@@ -13,10 +20,12 @@ import * as Validators from "../../validators/userValidators"
 import { validationResult } from "express-validator"
 import { parseInteger } from "../../utils/parseInteger"
 import { UploadedFiles } from "../../types/uploadFile"
+import { transformCartItems } from "../../utils/cartUtils"
 
 class UserController {
 	register = async (req: Request, res: Response): Promise<void> => {
 		try {
+			console.log("BODY: ", req.body)
 			await Promise.all(
 				Validators.validateRegisterUser.map((validation) => validation.run(req))
 			)
@@ -105,6 +114,7 @@ class UserController {
 	verifyRegister = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { token } = req.query
+			console.log("Token: ", token)
 			if (!token) {
 				res.status(400).json({
 					success: false,
@@ -171,7 +181,7 @@ class UserController {
 
 	checkAdmin = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			console.log("Admin check: ", req.user)
+			// console.log("Admin check: ", req.user)
 			res.status(200).json({ success: true, message: "Valid role" })
 		}
 	)
@@ -181,8 +191,10 @@ class UserController {
 			Validators.validateLogin.forEach((validation) => validation.run(req))
 			Validators.runValidation(req, res, async () => {
 				let { email, password } = req.body
-
-				const user = await User.findOne({ email })
+				const user = await User.findOne({ email }).populate({
+					path: "cart.product_id",
+					select: "title thumbnail price allowVariants variants quantity",
+				})
 
 				if (!user) {
 					res.status(400).json({
@@ -220,10 +232,35 @@ class UserController {
 						secure: true,
 					})
 
+					// const populatedCart = user.cart.map((item: ICartItem) => {
+					// 	const productDetails = item.product_id as unknown as IProduct
+					// 	const variantDetails = item.variant_id
+					// 		? productDetails.variants?.find(
+					// 				(v) => v._id.toString() === item.variant_id?.toString()
+					// 		  )
+					// 		: undefined
+
+					// 	return {
+					// 		product: {
+					// 			_id: productDetails._id,
+					// 			title: productDetails.title,
+					// 			thumbnail: productDetails.thumbnail,
+					// 			price: productDetails.price,
+					// 			allowVariants: productDetails.allowVariants,
+					// 			// variants: productDetails.variants,
+					// 			quantity: productDetails.quantity,
+					// 		},
+					// 		variant: variantDetails || undefined,
+					// 		quantity: item.quantity,
+					// 	}
+					// })
+					const populatedCart = transformCartItems(user.cart)
+					// const { io } = req.app.get("io")
+					// io.emit("userLoggedIn")
 					res.status(200).json({
 						success: true,
 						message: "Login successfully",
-						userData: { ...rest },
+						userData: { ...rest, cart: populatedCart },
 						accessToken,
 					})
 				} else {
@@ -247,16 +284,19 @@ class UserController {
 			const user = await User.findById({ _id })
 				.select("-refreshToken -password")
 				.populate({
-					path: "cart",
-					populate: {
-						path: "product",
-						select: "title thumbnail price quantity",
-					},
+					path: "cart.product_id",
+					select: "title thumbnail price allowVariants variants quantity",
 				})
 			if (user) {
+				const populatedCart = transformCartItems(user.cart)
+				const transformedUser = {
+					...user.toObject(),
+					cart: populatedCart,
+				}
+
 				res.status(200).json({
 					success: true,
-					data: user,
+					data: transformedUser,
 				})
 			} else {
 				res.status(404).json({
@@ -295,6 +335,7 @@ class UserController {
 	logout = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const cookies = req.cookies
+			const { io } = req.app.get("io")
 			if (!cookies && !cookies.refreshToken) {
 				throw new Error("No refresh token in cookies")
 			}
@@ -307,6 +348,7 @@ class UserController {
 
 			res.clearCookie("refreshToken", { httpOnly: true, secure: true })
 			res.clearCookie("accessToken", { httpOnly: true, secure: true })
+			io.emit("userLoggedOut")
 			res.status(200).json({
 				success: true,
 				message: "Successfully logout",
@@ -318,6 +360,7 @@ class UserController {
 		async (req: Request, res: Response): Promise<void> => {
 			try {
 				const { email } = req.body
+				console.log("Forgot password: ", req.body)
 				if (!email) {
 					throw new Error("Missing email")
 				}
@@ -459,7 +502,7 @@ class UserController {
 			const response = await query.exec()
 			// Count the documents
 			const counts = await User.countDocuments(formattedQueries)
-			const totalPage = Math.ceil(counts / limit) || 1
+			const totalPages = Math.ceil(counts / limit) || 1
 			const currentPage = page
 
 			// const response = await User.find().select("-password -refreshToken")
@@ -467,7 +510,7 @@ class UserController {
 				success: response ? true : false,
 				users: response,
 				counts,
-				totalPage,
+				totalPages,
 				currentPage,
 			})
 		}
@@ -587,65 +630,147 @@ class UserController {
 	updateUserCart = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
-			const { product_id, quantity = 1, color } = req.body
+			const { product_id, variant_id, quantity = 1 } = req.body
+			console.log("Body: ", req.body)
 
-			if (!product_id || !color) {
-				throw new Error("Missing inputs for updating user cart")
+			if (!product_id) {
+				res.status(400).json({ success: false, message: "Missing product ID" })
+				return
 			}
 
 			try {
-				const user = await User.findById(_id).select("cart")
+				// Validate product
+				const product = await Product.findById(product_id)
+				if (!product) {
+					res.status(404).json({ success: false, message: "Product not found" })
+					return
+				}
 
+				// Validate variant if provided
+				let variant: IVariant | null = null
+				if (
+					variant_id &&
+					product.allowVariants &&
+					product.variants &&
+					product.variants.length > 0
+				) {
+					variant =
+						product.variants.find((v) => v._id.toString() === variant_id) ||
+						null
+					if (!variant) {
+						res
+							.status(404)
+							.json({ success: false, message: "Variant not found" })
+						return
+					}
+				}
+
+				// Update user cart
+				const user = await User.findById(_id).select("cart")
 				if (!user) {
 					res.status(404).json({ success: false, message: "User not found" })
 					return
 				}
 
-				let updatedUserCart
-
-				// Check if the product already exists in the cart with the same color
-				const existingProductIndex = user.cart.findIndex(
-					(element) =>
-						element.product?.toString() === product_id &&
-						element.color === color
+				// Check if product and variant (if provided) are already in the cart
+				const cartItemIndex = user.cart.findIndex(
+					(item) =>
+						item.product_id.toString() === product_id &&
+						(!variant_id || item.variant_id?.toString() === variant_id)
 				)
 
-				if (existingProductIndex !== -1) {
-					// Update the quantity of the existing product
-					updatedUserCart = user.cart.map((cartItem, index) =>
-						index === existingProductIndex
-							? { ...cartItem, quantity }
-							: cartItem
-					)
+				if (cartItemIndex > -1) {
+					// Update quantity if item already in cart
+					user.cart[cartItemIndex].quantity += quantity
 				} else {
-					// Add a new product to the cart
-					updatedUserCart = [
-						...user.cart,
-						{ product: product_id, quantity, color },
-					]
+					// Add new item to cart
+					user.cart.push({
+						product_id,
+						variant_id,
+						quantity,
+					} as ICartItem)
 				}
 
-				// Update the user document with the modified cart
-				const updatedUser = await User.findByIdAndUpdate(
-					_id,
-					{ cart: updatedUserCart },
-					{ new: true }
-				)
+				await user.save()
 
-				// Modify the structure of cart before sending the response
-				const updatedUserCartResponse = updatedUser?.cart.map(
-					(cartItem: any) => ({
-						product: cartItem.product,
-						quantity: cartItem.quantity,
-						color: cartItem.color,
-						_id: cartItem._id,
+				// Populate cart with product details
+				const populatedUserCart = await User.findById(_id)
+					.populate({
+						path: "cart.product_id",
+						select: "title thumbnail price allowVariants variants quantity",
 					})
-				)
+					.exec()
+
+				if (!populatedUserCart) {
+					res.status(500).json({
+						success: false,
+						message: "An unexpected error occurred during population.",
+					})
+					return
+				}
+
+				// Map the populated cart to the expected ICartItemPopulate type
+				const populatedCart = transformCartItems(populatedUserCart.cart)
 
 				res.status(200).json({
 					success: true,
 					message: "User cart updated",
-					cart: updatedUserCartResponse,
+					cart: populatedCart,
+				})
+			} catch (error) {
+				console.error("Error updating user cart:", error)
+				res.status(500).json({
+					success: false,
+					message: "An unexpected error occurred.",
+				})
+			}
+		}
+	)
+
+	updateBulkUserCart = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			const { _id } = req.user
+			const newCart = req.body
+
+			if (!Array.isArray(newCart)) {
+				res.status(400).json({ success: false, message: "Invalid cart data" })
+				return
+			}
+			try {
+				// Update user cart
+				const user = await User.findById(_id).select("cart")
+				if (!user) {
+					res.status(404).json({ success: false, message: "User not found" })
+					return
+				}
+
+				// Replace user's cart with the new cart array
+				user.cart = newCart
+				await user.save()
+
+				// Populate cart with product details
+				const populatedUserCart = await User.findById(_id)
+					.populate({
+						path: "cart.product_id",
+						select: "title thumbnail price allowVariants variants quantity",
+					})
+					.exec()
+
+				if (!populatedUserCart) {
+					res.status(500).json({
+						success: false,
+						message: "An unexpected error occurred during population.",
+					})
+					return
+				}
+
+				// Map the populated cart to the expected ICartItemPopulate type
+				const populatedCart = transformCartItems(populatedUserCart.cart)
+
+				res.status(200).json({
+					success: true,
+					message: "User cart updated",
+					cart: populatedCart,
 				})
 			} catch (error) {
 				console.error("Error updating user cart:", error)
@@ -671,8 +796,83 @@ class UserController {
 
 	checkAuth = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			console.log("Auth check: ", req.user)
+			// console.log("Auth check: ", req.user)
 			res.status(200).json({ success: true, message: "Valid user" })
+		}
+	)
+	userWishlist = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			const { _id } = req.user
+			const { product_id } = req.body
+			if (!_id || !product_id) {
+				res.status(400).json({
+					success: false,
+					message: "User ID and Product ID are required",
+				})
+				return
+			}
+			const user = await User.findById(_id)
+
+			if (!user) {
+				res.status(404).json({ success: false, message: "User not found" })
+				return
+			}
+			const productIndex = user.wishlist.indexOf(product_id)
+			if (productIndex > -1) {
+				// If product_id exists in the wishlist, remove it
+				user.wishlist.splice(productIndex, 1)
+			} else {
+				// If product_id does not exist, add it
+				user.wishlist.push(product_id)
+			}
+			user.save()
+			res.status(200).json({
+				success: true,
+				message: "Wishlist updated successfully",
+				data: user.wishlist,
+			})
+		}
+	)
+
+	getUserWishlist = asyncHandler(
+		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+			const { _id } = req.user
+			const { page = 1, limit = 10 } = req.query // Default to page 1 and limit 10
+
+			if (!_id) {
+				res.status(400).json({
+					success: false,
+					message: "User ID is required",
+				})
+				return
+			}
+
+			const user = await User.findById(_id).populate("wishlist")
+
+			if (!user) {
+				res.status(404).json({ success: false, message: "User not found" })
+				return
+			}
+
+			const wishlist = user.wishlist
+			const totalItems = wishlist.length
+			const totalPages = Math.ceil(totalItems / Number(limit))
+			const currentPage = Number(page)
+			const hasNextPage = currentPage < totalPages
+
+			const startIndex = (currentPage - 1) * Number(limit)
+			const endIndex = startIndex + Number(limit)
+			const paginatedWishlist = wishlist.slice(startIndex, endIndex)
+
+			res.status(200).json({
+				success: true,
+				message: "Get wishlist successfully",
+				data: paginatedWishlist,
+				totalPages,
+				currentPage,
+				hasNextPage,
+				totalItems,
+			})
 		}
 	)
 }

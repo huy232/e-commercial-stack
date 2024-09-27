@@ -1,38 +1,29 @@
-import mongoose, { Document } from "mongoose"
-import { IProduct } from "./product.model"
+import mongoose, { Document, Schema } from "mongoose"
 
 interface IOrder extends Document {
-	products: IProduct[]
+	products: []
 	status: "Cancelled" | "Processing" | "Success" | "Refund" | "Delivering"
-	total: Number
-	coupon: mongoose.Schema.Types.ObjectId
-	orderBy: mongoose.Schema.Types.ObjectId // Correct type for 'orderBy'
+	total: number
+	coupon: mongoose.Schema.Types.ObjectId | null
+	orderBy: mongoose.Schema.Types.ObjectId
+	visible: boolean
 }
 
-var orderSchema = new mongoose.Schema<IOrder>({
-	products: [
-		{
-			product: { type: mongoose.Types.ObjectId, ref: "Product" },
-			count: Number,
-			color: String,
+const orderSchema = new Schema<IOrder>(
+	{
+		products: { type: [], required: true },
+		status: {
+			type: String,
+			default: "Processing",
+			enum: ["Cancelled", "Processing", "Success", "Refund", "Delivering"],
 		},
-	],
-	status: {
-		type: String,
-		default: "Processing",
-		enum: ["Cancelled", "Processing", "Success", "Refund", "Delivering"],
+		total: { type: Number, required: true },
+		coupon: { type: mongoose.Types.ObjectId, ref: "Coupon", default: null },
+		orderBy: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+		visible: { type: Boolean, required: true, default: false },
 	},
-	total: Number,
-	coupon: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "Coupon",
-	},
-	orderBy: {
-		type: mongoose.Schema.Types.ObjectId, // Correct type for 'orderBy'
-		ref: "User",
-	},
-})
-
+	{ timestamps: true }
+)
 const orderModel = mongoose.model<IOrder>("Order", orderSchema)
 
 export { orderModel as Order, IOrder }

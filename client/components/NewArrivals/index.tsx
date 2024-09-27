@@ -4,16 +4,13 @@ import { ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
 import { ApiProductResponse } from "@/types"
+import { URL } from "@/constant"
 
 interface NewArrivalsProps {
-	fetchProducts: (params: {}) => Promise<ApiProductResponse<ProductType[]>>
 	initialProducts: ProductType[] | []
 }
 
-const NewArrivals: FC<NewArrivalsProps> = ({
-	fetchProducts,
-	initialProducts,
-}) => {
+const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Smartphone", sort: "-sold" },
@@ -31,14 +28,18 @@ const NewArrivals: FC<NewArrivalsProps> = ({
 	const fetchProductsComponent = useCallback(
 		async (sort: {}, tabId: number) => {
 			try {
-				const response = await fetchProducts(sort)
-				setProducts(response.data)
+				const response = await fetch(
+					URL + `/api/product?` + new URLSearchParams(sort),
+					{ method: "GET" }
+				)
+				const data = await response.json()
+				setProducts(data.data)
 				setTitleId(tabId)
 			} catch (error) {
 				console.error("Error fetching products:", error)
 			}
 		},
-		[fetchProducts]
+		[]
 	)
 
 	const titleClass = (id: number) =>
@@ -50,7 +51,7 @@ const NewArrivals: FC<NewArrivalsProps> = ({
 	return (
 		<div className="w-full">
 			<div className="flex flex-row items-center justify-center gap-2">
-				<h2 className="font-semibold text-xl">New arrivals</h2>
+				<h2 className="font-semibold text-xl">Suggested section</h2>
 				<div className="ml-auto flex gap-2 text-xs">
 					{tabs.map((tab) => (
 						<button
@@ -63,7 +64,7 @@ const NewArrivals: FC<NewArrivalsProps> = ({
 					))}
 				</div>
 			</div>
-			<CustomSlider products={products} />
+			<CustomSlider products={products} supportHover supportDetail />
 		</div>
 	)
 }

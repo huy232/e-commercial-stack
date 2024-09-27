@@ -1,5 +1,4 @@
-import { verifyAccount } from "@/app/api"
-import { VerifyAccount } from "@/components"
+import { API, URL } from "@/constant"
 import Link from "next/link"
 
 type Props = {
@@ -9,7 +8,6 @@ type Props = {
 
 export default async function CompleteRegistration(props: Props) {
 	const token = props.searchParams.token as string | undefined
-
 	if (!token) {
 		console.error("Token is undefined")
 		return (
@@ -30,13 +28,25 @@ export default async function CompleteRegistration(props: Props) {
 		)
 	}
 
-	const response = await verifyAccount(token)
-	if (!response.success) {
+	const response = await fetch(
+		API + `/user/complete-registration?token=${token}`,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}
+	)
+	const verifyResponse = await response.json()
+	console.log(verifyResponse)
+	if (!verifyResponse.success) {
 		return (
 			<div className="w-main">
 				<div className="flex flex-col gap-2 items-center">
 					<span className="text-rose-500 italic">
-						Something went wrong, please goes back and try sign up again.
+						{verifyResponse.message
+							? verifyResponse.message
+							: "Something went wrong, please goes back and try sign up again."}
 					</span>
 					<span>Please try sign up again.</span>
 					<Link

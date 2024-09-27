@@ -2,13 +2,12 @@
 import { FC, useState } from "react"
 import { ProductType } from "@/types"
 import { CustomImage, LoadingSpinner } from "@/components"
-import { productTableHeaders, roleSelection, tableHeaders } from "@/constant"
+import { URL, productTableHeaders } from "@/constant"
 import moment from "moment"
 import clsx from "clsx"
-import { formatPriceNumber } from "../../../utils/formatPrice"
-import { FaPlusCircle, MdDelete, MdEdit } from "@/assets/icons"
+import { MdDelete, MdEdit } from "@/assets/icons"
 import Link from "next/link"
-import { removeProduct } from "@/app/api"
+import { formatPrice } from "@/utils"
 
 interface ProductTableRowProps {
 	productList: ProductType[] | []
@@ -28,7 +27,10 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 	const handleRemoveProduct = async (product_id: string, index: number) => {
 		setLoadingRemove((prevState) => [...prevState, index.toString()])
 		try {
-			await removeProduct(product_id)
+			await fetch(URL + "/api/product/delete-product/" + product_id, {
+				method: "DELETE",
+				credentials: "include",
+			})
 		} catch (error) {
 			console.error("Error removing product:", error)
 		} finally {
@@ -67,9 +69,7 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 						</td>
 						<td className={tdClass(`text-xs`)}>{product.category[1]}</td>
 						<td className={tdClass(`text-xs`)}>{product.brand}</td>
-						<td className={tdClass(`text-xs`)}>
-							{formatPriceNumber(product.price)}
-						</td>
+						<td className={tdClass(`text-xs`)}>{formatPrice(product.price)}</td>
 						<td className={tdClass(`text-xs`)}>{product.quantity}</td>
 						<td className={tdClass(`text-xs`)}>
 							{moment(product.createdAt).fromNow()}
@@ -94,12 +94,6 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 										<MdDelete />
 									</button>
 								)}
-								<Link
-									className={buttonClass}
-									href={`/admin/variants/${product.slug}`}
-								>
-									<FaPlusCircle />
-								</Link>
 							</div>
 						</td>
 					</tr>

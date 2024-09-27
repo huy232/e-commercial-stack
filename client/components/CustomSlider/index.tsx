@@ -1,11 +1,12 @@
 "use client"
-import Slider from "react-slick"
 import { ProductCard } from "@/components"
 import { ProductType } from "@/types"
-import { FC, useCallback, useEffect, useState } from "react"
-import clsx from "clsx"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
+import { FC } from "react"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Navigation, Pagination } from "swiper/modules"
+import "swiper/css" // Import Swiper styles
+import "swiper/css/navigation"
+import "swiper/css/pagination"
 
 interface CustomSliderProps {
 	products: ProductType[] | null
@@ -20,7 +21,7 @@ interface CustomSliderProps {
 
 const CustomSlider: FC<CustomSliderProps> = ({
 	products,
-	slideToShow,
+	slideToShow = 3,
 	headingTitle,
 	headingClassName,
 	headingTabClassName,
@@ -28,28 +29,27 @@ const CustomSlider: FC<CustomSliderProps> = ({
 	supportDetail,
 	markLabel,
 }) => {
-	const slickSettings = {
-		dots: false,
-		infinite: true,
-		speed: 500,
-		slidesToShow: slideToShow || 3,
-		slidesToScroll: 1,
-	}
-
 	return (
-		<div className="w-full">
-			<Slider {...slickSettings} className="mt-4">
-				{products &&
-					products.map((item: ProductType) => (
+		<Swiper
+			modules={[Navigation, Pagination]}
+			spaceBetween={30}
+			slidesPerView={slideToShow}
+			loop={true}
+			navigation={true} // Enable navigation buttons
+			// pagination={{ clickable: true }} // Enable pagination
+			className="mt-4"
+		>
+			{products &&
+				products.map((item: ProductType) => (
+					<SwiperSlide key={item._id}>
 						<ProductCard
-							key={item._id}
 							product={item}
 							markLabel={markLabel}
 							enableOptions={supportHover}
 						/>
-					))}
-			</Slider>
-		</div>
+					</SwiperSlide>
+				))}
+		</Swiper>
 	)
 }
 

@@ -12,7 +12,7 @@ export interface ProfileUser {
 	mobile: number
 	password: string
 	role: string[]
-	cart: []
+	cart: UserCart[]
 	address: string
 	wishlist: []
 	isBlocked: boolean
@@ -29,7 +29,7 @@ export interface Users {
 	mobile: number
 	password: string
 	role: string[]
-	cart: []
+	cart: UserCart[]
 	address: string
 	wishlist: []
 	isBlocked: boolean
@@ -54,4 +54,22 @@ export interface UpdateUserProfile {
 	mobile?: number
 	address?: string
 	avatar?: string
+}
+
+export interface UserCart {
+	product: {
+		_id: string
+		title: string
+		thumbnail: string
+		quantity: number
+		price: number
+		allowVariants: boolean
+	}
+	variant: {
+		price: number
+		stock: number
+		[key: string]: any
+		_id: string
+	}
+	quantity: number
 }

@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { checkAdmin, checkUserLogin } from "./app/api"
 import { path } from "./utils"
+import { API, URL } from "./constant"
 
 export async function authorizeMiddleware(request: NextRequest) {
 	let refreshTokenCookie = request.cookies.get("refreshToken")
 	let accessTokenCookie = request.cookies.get("accessToken")
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const response = await checkUserLogin(cookieHeader || undefined)
+		const checkUserResponse = await fetch(API + "/user/check-auth", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Cookie: cookieHeader || "",
+			},
+			credentials: "include",
+		})
+		const response = await checkUserResponse.json()
 		if (!response.success) {
-			return NextResponse.redirect(
-				`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
-			)
+			return NextResponse.redirect(`${URL}${path.LOGIN}`)
 		}
 	} else {
-		return NextResponse.redirect(
-			`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
-		)
+		return NextResponse.redirect(`${URL}${path.LOGIN}`)
 	}
 
 	const response = NextResponse.next()
@@ -30,14 +34,20 @@ export async function loginMiddleware(request: NextRequest) {
 
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const response = await checkUserLogin(cookieHeader || undefined)
+		const checkUserResponse = await fetch(API + "/user/check-auth", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Cookie: cookieHeader || "",
+			},
+			credentials: "include",
+		})
+		const response = await checkUserResponse.json()
 
 		if (response.success) {
-			return NextResponse.redirect(`${process.env.NEXT_PUBLIC_CLIENT_URL}/`)
+			return NextResponse.redirect(`${URL}/`)
 		} else {
-			return NextResponse.redirect(
-				`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
-			)
+			return NextResponse.redirect(`${URL}${path.LOGIN}`)
 		}
 	}
 
@@ -50,17 +60,23 @@ export async function adminMiddleware(request: NextRequest) {
 	let accessTokenCookie = request.cookies.get("accessToken")
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const response = await checkUserLogin(cookieHeader || undefined)
-		const adminResponse = await checkAdmin(cookieHeader || undefined)
-		if (!response.success || !adminResponse.success) {
-			return NextResponse.redirect(
-				`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
-			)
+		const checkAdminResponse = await fetch(API + "/user/check-admin", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Cookie: cookieHeader || "",
+			},
+			credentials: "include",
+		})
+		const adminResponse = await checkAdminResponse.json()
+		// if (!response.success || !adminResponse.success) {
+		// 	return NextResponse.redirect(`${URL}${path.LOGIN}`)
+		// }
+		if (!adminResponse.success) {
+			return NextResponse.redirect(`${URL}${path.LOGIN}`)
 		}
 	} else {
-		return NextResponse.redirect(
-			`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`
-		)
+		return NextResponse.redirect(`${URL}${path.LOGIN}`)
 	}
 }
 
@@ -97,5 +113,7 @@ export const config = {
 		"/admin/:path*",
 		"/profile",
 		"/profile/:path*",
+		"/cart",
+		"/((?!api|_next/static|_next/image|favicon.ico).*)",
 	],
 }

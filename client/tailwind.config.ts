@@ -42,10 +42,17 @@ const config: Config = {
 						transform: "translateY(-20px)",
 					},
 				},
+				"infinite-horizontal-scroll": {
+					"0%": { transform: "translateX(0)" },
+					"100%": { transform: "translateX(calc(-50% + 10px))" },
+				},
 			},
 			animation: {
 				"slide-up":
 					"slide-up 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both",
+				paused: "paused",
+				"infinite-horizontal-scroll":
+					"infinite-horizontal-scroll 40s linear infinite",
 			},
 			listStyleType: {
 				none: "none",

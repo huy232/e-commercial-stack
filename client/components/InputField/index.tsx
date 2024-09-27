@@ -4,7 +4,6 @@ import {
 	RegisterOptions,
 	UseFormRegister,
 	ValidationRule,
-	useForm,
 } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
@@ -45,7 +44,7 @@ const validateTypePatterns: Record<
 	email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
 	noSpaceNoNumber: /^[^\s0-9]+$/,
 	onlyWords: /^[A-Za-z\s]+$/,
-	onlyNumbers: /^[0-9]+$/,
+	onlyNumbers: /^[0-9,.]+$/,
 	password: /^[^\s]+$/,
 	phoneNumber: /^0\d{9,10}$/,
 	custom: undefined,
@@ -67,12 +66,35 @@ const InputField: React.FC<InputFieldProps> = ({
 	readOnly = false,
 	onChange,
 	disabled = false,
-	value,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
+
 	const togglePasswordVisibility = () => {
 		setPasswordVisible(!passwordVisible)
 	}
+	const formatInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		let { value } = e.target
+
+		if (validateType === "onlyNumbers") {
+			// Remove any non-numeric characters
+			value = value.replace(/[^0-9]/g, "")
+
+			// Check if value is empty, set to "0"
+			if (value === "") {
+				value = "0"
+			}
+
+			// Convert to number and format with commas
+			const numberValue = parseFloat(value)
+			if (!isNaN(numberValue)) {
+				e.target.value = numberValue.toLocaleString()
+			} else {
+				e.target.value = value
+			}
+		}
+		onChange && onChange(e)
+	}
+
 	return (
 		<div className="w-[320px]">
 			<div className="flex flex-col gap-2 py-2">
@@ -87,11 +109,12 @@ const InputField: React.FC<InputFieldProps> = ({
 								togglePassword ? (passwordVisible ? "text" : "password") : type
 							}
 							{...register(name, {
-								required: required,
+								required,
 								pattern: validateType
 									? validateTypePatterns[validateType]
 									: pattern,
 								validate: (inputValue) => {
+									console.log("Input value: ", inputValue)
 									if (validate) {
 										return validate(inputValue)
 									}
@@ -100,10 +123,11 @@ const InputField: React.FC<InputFieldProps> = ({
 									}
 									return true
 								},
+								onChange: formatInput,
 							})}
-							defaultValue={value}
 							placeholder={placeholder}
 							autoComplete="true"
+							onBlur={formatInput}
 						/>
 						{togglePassword && (
 							<Button

@@ -1,5 +1,6 @@
 "use client"
 import { ProfileInformation } from "@/components"
+import { URL } from "@/constant"
 import { useMounted } from "@/hooks"
 import { selectAuthUser } from "@/store/slices/authSlice"
 import { ProfileUser } from "@/types"
@@ -19,8 +20,9 @@ const Profile = (props: Props) => {
 		return null
 	}
 	if (mounted && !user) {
-		router.push(`${process.env.NEXT_PUBLIC_CLIENT_URL}${path.LOGIN}`)
+		router.push(`${URL}${path.LOGIN}`)
+	} else {
+		return <ProfileInformation user={user} />
 	}
-	return <ProfileInformation user={user} />
 }
 export default Profile

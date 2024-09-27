@@ -1,19 +1,22 @@
 "use client"
 
 import { ApiResponse, ProductCategoryType, ProductType } from "@/types"
-import { Dispatch, FC, SetStateAction, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import {
 	BrandSelect,
 	Button,
-	ColorSelect,
+	Checkbox,
 	ImagePreview,
 	ImageUpload,
 	InputField,
+	LoadingSpinner,
+	Modal,
 	Select,
 	TextEditor,
+	VariantOptions,
 } from "@/components"
-import { updateProduct } from "@/app/api"
+import { URL } from "@/constant"
 
 interface UpdateProductProps {
 	productResponse: ApiResponse<ProductType>
@@ -34,41 +37,52 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	categories,
 }) => {
 	const {
+		allowVariants,
+		brand,
+		category,
+		description,
+		images,
+		price,
+		publicProduct,
+		quantity,
+		thumbnail,
+		variants,
+		title,
+	} = productResponse.data
+
+	const {
 		register,
-		reset,
 		handleSubmit,
 		setValue,
 		formState: { errors },
-	} = useForm<ProductFormData>()
-	const initialCategory = productResponse.data.category[1]
-	const initialBrand = productResponse.data.brand
-	const [selectedCategory, setSelectedCategory] = useState<string | null>(
-		productResponse.data.category[1]
-	)
-	const [value, setValueEditor] = useState<string>(
-		productResponse.data.description
-	)
-	const [selectedColors, setSelectedColors] = useState<string[]>(
-		productResponse.data.color
-	)
+	} = useForm<ProductFormData>({
+		defaultValues: {
+			productName: title,
+			price: price.toLocaleString(),
+			quantity: quantity.toLocaleString(),
+			category: category[1],
+			brand: brand,
+		},
+	})
 
-	const [thumbnail, setThumbnail] = useState<string | File | null>(
-		productResponse.data.thumbnail
+	const [selectedCategory, setSelectedCategory] = useState<string>(category[1])
+	const [descriptionText, setDescriptionText] = useState<string>(description)
+	const [thumbnailImage, setThumbnailImage] = useState<string | File | null>(
+		thumbnail
 	)
-	const [productImages, setProductImages] = useState<Array<string | File>>(
-		productResponse.data.images
-	)
+	const [productImages, setProductImages] =
+		useState<Array<string | File>>(images)
+	const [totalStock, setTotalStock] = useState(quantity)
+	const [allowVariantsProduct, setAllowVariantsProduct] =
+		useState(allowVariants)
+	const [variantFields, setVariantFields] = useState<any[]>(variants || [])
+	const [allowPublicProduct, setAllowPublicProduct] = useState(publicProduct)
 
 	const [thumbnailError, setThumbnailError] = useState<string>("")
 	const [productImagesError, setProductImagesError] = useState<string>("")
 	const [descriptionError, setDescriptionError] = useState<string>("")
-	const [colorError, setColorError] = useState<string>("")
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const handleColorChange = (colors: string[]) => {
-		setSelectedColors(colors)
-		setColorError("")
-	}
 	const selectValueGetterTitle = (option: ProductCategoryType) => option.title
 	const selectLabelGetterTitle = (option: ProductCategoryType) => option.title
 	const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -80,7 +94,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 
 	const handleThumbnailUpload = (files: File[]) => {
 		if (files.length > 0) {
-			setThumbnail(files[0])
+			setThumbnailImage(files[0])
 			setThumbnailError("")
 		}
 	}
@@ -89,40 +103,42 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		setProductImagesError("")
 	}
 	const handleDeleteThumbnail = () => {
-		setThumbnail(null)
+		setThumbnailImage(null)
 	}
 	const handleDeleteProductImage = (index: number) => {
 		const updatedImages = [...productImages]
 		updatedImages.splice(index, 1)
 		setProductImages(updatedImages)
 	}
-
-	if (!productResponse.success) {
-		return (
-			<div>
-				Something went wrong with the product itself. Can not proceed to update
-			</div>
-		)
+	const handleAllowVariantsChange = (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
+		setAllowVariantsProduct(e.target.checked)
+		if (!e.target.checked) {
+			setTotalStock(0)
+		}
+	}
+	const handlePublicProduct = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setAllowPublicProduct(e.target.checked)
 	}
 
 	const handleSubmitProduct = handleSubmit(async (data) => {
 		let hasError = false
 		const formData = new FormData()
-		for (let i of Object.entries(data)) {
-			formData.append(i[0], i[1])
+		for (let [key, value] of Object.entries(data)) {
+			if (key === "price" || key === "quantity") {
+				value = value = value.replace(/[^0-9]/g, "")
+				console.log("Key: ", key, "Value: ", value)
+				formData.append(key, value)
+			} else {
+				formData.append(key, value)
+			}
 		}
-		if (value) {
-			formData.append("description", value)
+		formData.append("allowVariants", JSON.stringify(allowVariants))
+		if (descriptionText) {
+			formData.append("description", descriptionText)
 		} else {
 			setDescriptionError("Please enter description for the product")
-			hasError = true
-		}
-		if (selectedColors.length > 0) {
-			selectedColors.forEach((color) => {
-				formData.append("color[]", color)
-			})
-		} else {
-			setColorError("Please choose at least one color")
 			hasError = true
 		}
 		if (thumbnail) {
@@ -139,130 +155,191 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			setProductImagesError("Please choose a picture for product")
 			hasError = true
 		}
+		formData.append("publicProduct", JSON.stringify(allowPublicProduct))
+		formData.append("variants", JSON.stringify(variantFields))
 		if (hasError) {
 			return
 		}
 		setLoading(true)
-		await updateProduct(productResponse.data._id, formData)
-			.then(() => {
-				setDescriptionError("")
-				setColorError("")
-				setThumbnailError("")
-				setProductImagesError("")
-			})
-			.finally(() => {
-				setLoading(false)
-			})
+		const updateProductResponse = await fetch(URL + "/api/product/", {
+			method: "PUT",
+			body: formData,
+		})
+		const responseData = await updateProductResponse.json()
+		console.log(responseData)
+		setLoading(false)
+		// await updateProduct(productResponse.data._id, formData)
+		// 	.then(() => {
+		// 		setDescriptionError("")
+		// 		setThumbnailError("")
+		// 		setProductImagesError("")
+		// 	})
+		// 	.finally(() => {
+		// 		setLoading(false)
+		// 	})
 	})
 
-	return (
-		<form onSubmit={handleSubmitProduct} className="w-full flex flex-col">
+	useEffect(() => {
+		if (variantFields.length > 0) {
+			const totalQuantityStock = variantFields.reduce((acc, currentStock) => {
+				const numberValue = currentStock.stock
+				const parsedValue = parseInt(
+					numberValue.toString().replace(/,/g, ""),
+					10
+				)
+				return acc + (isNaN(parsedValue) ? 0 : parsedValue)
+			}, 0)
+			setValue("quantity", totalQuantityStock.toLocaleString())
+		}
+	}, [variantFields, allowVariants, setValue])
+
+	if (!productResponse.success) {
+		return (
 			<div>
-				<InputField
-					label="Product name"
-					name="productName"
-					register={register}
-					required
-					errorMessage={
-						errors.productName &&
-						(errors.productName.message?.toString() ||
-							"Please enter a valid product name.")
-					}
-					value={productResponse.data.title}
-					disabled={loading}
-				/>
-				<ColorSelect
-					onColorsChange={handleColorChange}
-					selectedColors={selectedColors}
-					disabled={loading}
-				/>
+				Something went wrong with the product itself. Can not proceed to update
 			</div>
-			<div className="flex gap-4">
-				<InputField
-					label="Price"
-					name="price"
-					register={register}
-					required
-					validateType={"onlyNumbers"}
-					errorMessage={
-						errors.price &&
-						(errors.price.message?.toString() || "Please enter a valid price.")
-					}
-					value={productResponse.data.price}
-					disabled={loading}
-				/>
-				<InputField
-					label="Quantity"
-					name="quantity"
-					register={register}
-					required
-					validateType={"onlyNumbers"}
-					errorMessage={
-						errors.quantity &&
-						(errors.quantity.message?.toString() ||
-							"Please enter a valid quantity.")
-					}
-					value={productResponse.data.quantity}
-					disabled={loading}
-				/>
-			</div>
-			<div className="flex gap-4">
-				<Select
-					name="category"
-					label="Category"
-					register={register}
-					required
-					options={categories}
-					getValue={selectValueGetterTitle}
-					getLabel={selectLabelGetterTitle}
-					onChange={handleCategoryChange}
-					value={initialCategory}
-					disabled={loading}
-				/>
-				{selectedCategoryData && (
-					<BrandSelect
-						name="brand"
-						label="Brand"
+		)
+	}
+
+	return (
+		<>
+			{loading && (
+				<Modal isOpen={true}>
+					<div>
+						<LoadingSpinner color="red-500" text="Updating product..." />
+					</div>
+				</Modal>
+			)}
+			<form onSubmit={handleSubmitProduct} className="w-full flex flex-col">
+				<div>
+					<InputField
+						label="Product name"
+						name="productName"
 						register={register}
 						required
-						options={selectedCategoryData.brand}
-						value={initialBrand}
+						errorMessage={
+							errors.productName &&
+							(errors.productName.message?.toString() ||
+								"Please enter a valid product name.")
+						}
 						disabled={loading}
 					/>
-				)}
-			</div>
-			<div className="h-[200px]">
-				<TextEditor value={value} onChange={setValueEditor} />
-			</div>
-			<div className="w-full h-full">
-				<h3 className="font-semibold">Thumbnail preview</h3>
-				<div className="flex items-center">
-					{thumbnail && (
-						<ImagePreview
-							images={thumbnail}
-							onDelete={handleDeleteThumbnail}
+				</div>
+				<div className="flex gap-4">
+					<InputField
+						label="Price"
+						name="price"
+						register={register}
+						required="Price is required"
+						validateType={"onlyNumbers"}
+						errorMessage={
+							errors.price &&
+							(errors.price.message?.toString() ||
+								"Please enter a valid price.")
+						}
+						disabled={loading}
+					/>
+					<InputField
+						label="Quantity"
+						name="quantity"
+						register={register}
+						required="Quantity is required"
+						validateType={"onlyNumbers"}
+						errorMessage={
+							errors.quantity &&
+							(errors.quantity.message?.toString() ||
+								"Please enter a valid quantity.")
+						}
+						disabled={loading || variantFields.length > 0}
+					/>
+				</div>
+				<div className="flex gap-4">
+					<Select
+						name="category"
+						label="Category"
+						register={register}
+						required
+						options={categories}
+						getValue={selectValueGetterTitle}
+						getLabel={selectLabelGetterTitle}
+						onChange={handleCategoryChange}
+						value={selectedCategory}
+						disabled={loading}
+					/>
+					{selectedCategoryData && (
+						<BrandSelect
+							name="brand"
+							label="Brand"
+							register={register}
+							required
+							options={selectedCategoryData.brand}
+							value={brand}
 							disabled={loading}
 						/>
 					)}
 				</div>
-				<ImageUpload onUpload={handleThumbnailUpload} />
+				<div>
+					<Checkbox
+						label="Allow Variants"
+						name="allowVariants"
+						checked={allowVariantsProduct}
+						onChange={handleAllowVariantsChange}
+					/>
+					{allowVariantsProduct && selectedCategory && (
+						<VariantOptions
+							category={selectedCategory}
+							variantFields={variantFields}
+							setVariantFields={setVariantFields}
+						/>
+					)}
+				</div>
+				<TextEditor value={descriptionText} onChange={setDescriptionText} />
 
-				<h3 className="font-semibold">Product images</h3>
-				<div className="flex items-center">
-					{productImages.length > 0 && (
-						<ImagePreview
-							images={productImages}
-							onDelete={handleDeleteProductImage}
-							disabled={loading}
-						/>
-					)}
+				<div className="w-full h-full">
+					<h3 className="font-semibold">Thumbnail preview</h3>
+					<div className="flex items-center">
+						{thumbnailImage && (
+							<ImagePreview
+								images={thumbnailImage}
+								onDelete={handleDeleteThumbnail}
+								disabled={loading}
+							/>
+						)}
+					</div>
+					<ImageUpload onUpload={handleThumbnailUpload} />
+
+					<h3 className="font-semibold">Product images</h3>
+					<div className="flex items-center">
+						{productImages.length > 0 && (
+							<ImagePreview
+								images={productImages}
+								onDelete={handleDeleteProductImage}
+								disabled={loading}
+							/>
+						)}
+					</div>
+					<ImageUpload multiple onUpload={handleProductImagesUpload} />
 				</div>
-				<ImageUpload multiple onUpload={handleProductImagesUpload} />
-			</div>
-			<Button disabled={loading} type="submit">
-				Update product
-			</Button>
-		</form>
+				<Checkbox
+					label="Public right away?"
+					name="public"
+					checked={publicProduct}
+					onChange={handlePublicProduct}
+				/>
+				{thumbnailError && (
+					<span className="text-red-500">{thumbnailError}</span>
+				)}
+				{productImagesError && (
+					<span className="text-red-500">{productImagesError}</span>
+				)}
+				{descriptionError && (
+					<span className="text-red-500">{descriptionError}</span>
+				)}
+				<Button disabled={loading} type="submit">
+					Update product
+				</Button>
+			</form>
+		</>
 	)
 }
 
