@@ -66,6 +66,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	readOnly = false,
 	onChange,
 	disabled = false,
+	value,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -98,7 +99,9 @@ const InputField: React.FC<InputFieldProps> = ({
 	return (
 		<div className="w-[320px]">
 			<div className="flex flex-col gap-2 py-2">
-				{label && <label className="text-md font-medium">{label}</label>}
+				{label && (
+					<label className="text-md font-medium capitalize">{label}</label>
+				)}
 				<div className="flex items-center gap-4">
 					<div className="w-full">
 						<input
@@ -108,13 +111,13 @@ const InputField: React.FC<InputFieldProps> = ({
 							type={
 								togglePassword ? (passwordVisible ? "text" : "password") : type
 							}
+							value={value === null ? "" : value?.toString()} // Set the value here
 							{...register(name, {
 								required,
 								pattern: validateType
 									? validateTypePatterns[validateType]
 									: pattern,
 								validate: (inputValue) => {
-									console.log("Input value: ", inputValue)
 									if (validate) {
 										return validate(inputValue)
 									}

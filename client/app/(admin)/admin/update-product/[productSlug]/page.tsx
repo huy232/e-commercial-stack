@@ -12,8 +12,12 @@ export default async function AdminUpdateProduct(props: Props) {
 	const { productSlug } = props.params
 	const productResponse = await fetch(URL + `/api/product/` + productSlug, {
 		method: "GET",
+		cache: "no-cache",
 	})
-	const categoryResponse = await fetch(URL + "/api/category", { method: "GET" })
+	const categoryResponse = await fetch(URL + "/api/category", {
+		method: "GET",
+		cache: "no-cache",
+	})
 
 	const product = await productResponse.json()
 	const categories = await categoryResponse.json()

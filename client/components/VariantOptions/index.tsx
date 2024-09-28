@@ -1,9 +1,8 @@
 "use client"
 import { FC, useState } from "react"
-import { filterCategory } from "@/constant/"
 import { InputField } from "@/components"
 import { FieldValues, useForm } from "react-hook-form"
-import { CategoryType, ProductCategory } from "@/types"
+import { CategoryType } from "@/types"
 
 interface Option {
 	type: string
@@ -16,7 +15,7 @@ interface Variant {
 
 interface VariantOptionsProps {
 	category: string
-	variantFields: any[]
+	variantFields: any[] // Assuming this contains your stock and price at the start
 	setVariantFields: React.Dispatch<React.SetStateAction<Variant[]>>
 	categories: CategoryType[]
 }
@@ -27,11 +26,14 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 	setVariantFields,
 	categories,
 }) => {
+	// Initialize form with variant fields as default values
 	const {
 		register,
 		formState: { errors },
-		setValue,
-	} = useForm<FieldValues>()
+		reset,
+	} = useForm<FieldValues>({
+		defaultValues: variantFields.length > 0 ? variantFields : [],
+	})
 
 	const [checkedOptions, setCheckedOptions] = useState<string[]>(
 		variantFields.length > 0
@@ -44,42 +46,45 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 		variantFields.length > 0
 	)
 
-	console.log("Category in variant option: ", category)
-	console.log("Categories: ", categories)
-
 	const categoryOptions: Option[] | undefined = categories.find(
-		(cat: CategoryType) => cat.title === category
+		(cat: CategoryType) => cat._id === category
 	)?.option
 
-	const handleCreateVariant = () => {
-		// Filter out the options based on checkedOptions
+	// Helper function to create a blank new variant object
+	const createBlankVariant = () => {
+		const newVariant: Variant = {}
 		const selectedOptions = categoryOptions?.filter((option) =>
 			checkedOptions
 				.map((opt) => opt.toLowerCase())
 				.includes(option.type.toLowerCase())
 		)
 
-		// Create a new variant based on selected options
-		const newVariant: Variant = {}
 		selectedOptions?.forEach((option) => {
 			newVariant[option.type] = option.value[0]
 		})
 		newVariant.price = 0
 		newVariant.stock = 0
-		// Add the new variant to the existing variantFields
-		setVariantFields([...variantFields, newVariant])
+		return newVariant
+	}
 
+	const handleCreateVariant = () => {
+		const newVariant = {
+			price: 0,
+			stock: 0,
+			...createBlankVariant(), // Add other default options
+		}
+		setVariantFields([...variantFields, newVariant])
+		reset()
 		setVariantsCreated(true)
 	}
 
 	const handleDeleteVariant = (index: number) => {
-		const updatedFields = [...variantFields]
-		updatedFields.splice(index, 1)
+		const updatedFields = variantFields.filter((_, i) => i !== index)
 		setVariantFields(updatedFields)
 
-		// Enable the checkboxes once all variants are deleted
 		if (updatedFields.length === 0) {
 			setVariantsCreated(false)
+			setCheckedOptions([]) // Clear checked options if all variants are deleted
 		}
 	}
 
@@ -90,11 +95,14 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 			setCheckedOptions(checkedOptions.filter((item) => item !== type))
 		}
 	}
+
 	const handlePriceChange = (variantIndex: number, value: string) => {
+		const numericValue = value.replace(/[^\d.-]/g, "") // Remove non-numeric characters like commas
 		const updatedFields = [...variantFields]
-		updatedFields[variantIndex].price = Number(value)
+		updatedFields[variantIndex].price = Number(numericValue)
 		setVariantFields(updatedFields)
 	}
+
 	const handleSelectChange = (
 		variantIndex: number,
 		type: string,
@@ -104,11 +112,14 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 		updatedFields[variantIndex][type] = value
 		setVariantFields(updatedFields)
 	}
+
 	const handleStockChange = (variantIndex: number, value: string) => {
+		const numericValue = value.replace(/[^\d.-]/g, "") // Remove non-numeric characters
 		const updatedFields = [...variantFields]
-		updatedFields[variantIndex].stock = value
+		updatedFields[variantIndex].stock = Number(numericValue)
 		setVariantFields(updatedFields)
 	}
+
 	return (
 		<div>
 			{categoryOptions &&
@@ -128,13 +139,15 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 						<label htmlFor={option.type}>{option.type}</label>
 					</div>
 				))}
-			<button
-				onClick={handleCreateVariant}
-				className="rounded bg-green-500 p-1 m-1 text-xs"
-				type="button"
-			>
-				Create Variant
-			</button>
+			{checkedOptions.length > 0 && (
+				<button
+					onClick={handleCreateVariant}
+					className="rounded bg-green-500 p-1 m-1 text-xs"
+					type="button"
+				>
+					Create Variant
+				</button>
+			)}
 			{variantFields.map((variant, index) => (
 				<div
 					key={index}
@@ -150,30 +163,28 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 					{Object.entries(variant).map(
 						([type, value]) =>
 							type !== "_id" && (
-								<div key={type}>
+								<div key={`${type}-${index}`}>
 									{type === "price" || type === "stock" ? (
-										<div>
-											<InputField
-												label={type.charAt(0).toUpperCase() + type.slice(1)}
-												name={`${type}-${index}`}
-												register={register}
-												required={`${type} is required`}
-												validateType={"onlyNumbers"}
-												errorMessage={
-													errors[type] &&
-													(errors[type]?.message?.toString() ||
-														`Please enter a valid ${type}.`)
+										<InputField
+											label={type}
+											name={`${type}-${index}`}
+											register={register}
+											required={`${type}-${index} is required`}
+											validateType={"onlyNumbers"}
+											errorMessage={
+												errors[type] &&
+												(errors[type]?.message?.toString() ||
+													`Please enter a valid ${type}.`)
+											}
+											value={value === null ? "" : value?.toString()}
+											onChange={(e) => {
+												if (type === "price") {
+													handlePriceChange(index, e.target.value)
+												} else if (type === "stock") {
+													handleStockChange(index, e.target.value)
 												}
-												value={variant[type] as number | string}
-												onChange={(e) => {
-													if (type === "price") {
-														handlePriceChange(index, e.target.value)
-													} else if (type === "stock") {
-														handleStockChange(index, e.target.value)
-													}
-												}}
-											/>
-										</div>
+											}}
+										/>
 									) : (
 										<div>
 											<label
@@ -188,16 +199,16 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 													handleSelectChange(index, type, e.target.value)
 												}
 											>
-												{(
-													categoryOptions?.find(
+												{categoryOptions
+													?.find(
 														(option) =>
 															option.type.toLowerCase() === type.toLowerCase()
-													)?.value || []
-												).map((option: string) => (
-													<option key={option} value={option}>
-														{option}
-													</option>
-												))}
+													)
+													?.value.map((option: string) => (
+														<option key={option} value={option}>
+															{option}
+														</option>
+													))}
 											</select>
 										</div>
 									)}

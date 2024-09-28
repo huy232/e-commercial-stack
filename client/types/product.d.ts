@@ -19,8 +19,7 @@ export type VariantType = {
 
 export type ProductType = {
 	brand: string
-	category: string[]
-	color: string[]
+	category: string
 	createdAt: Date
 	description: string
 	images: string[]

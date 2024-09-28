@@ -47,7 +47,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	})
 	const mounted = useMounted()
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(
-		categories.length > 0 ? categories[0].title : null
+		categories[0]._id
 	)
 	const [allowVariants, setAllowVariants] = useState<boolean>(false)
 	const [variantFields, setVariantFields] = useState<any[]>([])
@@ -68,7 +68,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 		setSelectedCategory(e.target.value)
 	}
 	const selectedCategoryData = categories.find(
-		(category) => category.title === selectedCategory
+		(category) => category._id === selectedCategory
 	) as CategoryType
 
 	const handleThumbnailUpload = (files: File[]) => {
@@ -103,14 +103,11 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	const handleSubmitProduct = handleSubmit(async (data) => {
 		let hasError = false
 		const formData = new FormData()
-		console.log(data)
 		for (let [key, value] of Object.entries(data)) {
 			if (key === "price" || key === "quantity") {
 				value = value = value.replace(/[^0-9]/g, "")
-				console.log("Key: ", key, " --- ", "Value: ", value)
 				formData.append(key, value)
 			} else {
-				console.log("Key: ", key, " --- ", "Value: ", value)
 				formData.append(key, value)
 			}
 		}
@@ -142,7 +139,6 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 		}
 
 		setLoading(true)
-
 		const createProductResponse = await fetch(URL + "/api/product", {
 			method: "POST",
 			body: formData,
@@ -158,6 +154,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			setThumbnail(null)
 			setProductImages([])
 			setDescription("")
+			setVariantFields([])
 			setAllowVariants(false)
 			setPublicProduct(false)
 		}
@@ -175,6 +172,8 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 				return acc + (isNaN(parsedValue) ? 0 : parsedValue)
 			}, 0)
 			setValue("quantity", totalQuantityStock.toLocaleString())
+		} else {
+			setValue("quantity", "0")
 		}
 	}, [variantFields, allowVariants, setValue])
 

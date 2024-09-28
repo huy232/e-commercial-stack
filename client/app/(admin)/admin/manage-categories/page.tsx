@@ -4,9 +4,11 @@ import { API } from "@/constant"
 export default async function AdminManageCategories() {
 	const brandResponse = await fetch(API + "/brand", {
 		method: "GET",
+		cache: "no-cache",
 	})
 	const categoryResponse = await fetch(API + "/product-category", {
 		method: "GET",
+		cache: "no-cache",
 	})
 	const { data: brandData } = await brandResponse.json()
 	const { data: categoriesData } = await categoryResponse.json()

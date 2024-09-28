@@ -60,12 +60,13 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			productName: title,
 			price: price.toLocaleString(),
 			quantity: quantity.toLocaleString(),
-			category: category[1],
+			category: category,
 			brand: brand,
 		},
 	})
 
-	const [selectedCategory, setSelectedCategory] = useState<string>(category[1])
+	const [selectedCategory, setSelectedCategory] = useState<string>(category)
+	console.log("Selected category: ", selectedCategory)
 	const [descriptionText, setDescriptionText] = useState<string>(description)
 	const [thumbnailImage, setThumbnailImage] = useState<string | File | null>(
 		thumbnail
@@ -76,6 +77,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	const [allowVariantsProduct, setAllowVariantsProduct] =
 		useState(allowVariants)
 	const [variantFields, setVariantFields] = useState<any[]>(variants || [])
+	console.log(variants)
 	const [allowPublicProduct, setAllowPublicProduct] = useState(publicProduct)
 
 	const [thumbnailError, setThumbnailError] = useState<string>("")
@@ -83,14 +85,14 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	const [descriptionError, setDescriptionError] = useState<string>("")
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const selectValueGetterTitle = (option: ProductCategoryType) => option.title
-	const selectLabelGetterTitle = (option: ProductCategoryType) => option.title
+	const selectValueGetter = (option: ProductCategoryType) => option._id
+	const selectLabelGetter = (option: ProductCategoryType) => option.title
 	const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedCategory(e.target.value)
 	}
-	const selectedCategoryData =
-		selectedCategory &&
-		categories.find((category) => category.title === selectedCategory)
+	const selectedCategoryData = categories.find(
+		(category) => category._id === selectedCategory
+	)
 
 	const handleThumbnailUpload = (files: File[]) => {
 		if (files.length > 0) {
@@ -190,6 +192,8 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 				return acc + (isNaN(parsedValue) ? 0 : parsedValue)
 			}, 0)
 			setValue("quantity", totalQuantityStock.toLocaleString())
+		} else {
+			setValue("quantity", "0")
 		}
 	}, [variantFields, allowVariants, setValue])
 
@@ -260,11 +264,11 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 						register={register}
 						required
 						options={categories}
-						getValue={selectValueGetterTitle}
-						getLabel={selectLabelGetterTitle}
-						onChange={handleCategoryChange}
+						getValue={selectValueGetter}
+						getLabel={selectLabelGetter}
 						value={selectedCategory}
 						disabled={loading}
+						onChange={handleCategoryChange}
 					/>
 					{selectedCategoryData && (
 						<BrandSelect
@@ -290,6 +294,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 							category={selectedCategory}
 							variantFields={variantFields}
 							setVariantFields={setVariantFields}
+							categories={categories}
 						/>
 					)}
 				</div>
