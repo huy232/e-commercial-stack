@@ -1,6 +1,12 @@
 "use client"
 
-import { ApiResponse, ProductCategoryType, ProductType } from "@/types"
+import {
+	ApiResponse,
+	Brand,
+	ProductCategoryType,
+	ProductExtraType,
+	ProductType,
+} from "@/types"
 import { FC, useEffect, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import {
@@ -19,7 +25,7 @@ import {
 import { URL } from "@/constant"
 
 interface UpdateProductProps {
-	productResponse: ApiResponse<ProductType>
+	productResponse: ApiResponse<ProductExtraType>
 	categories: ProductCategoryType[]
 }
 
@@ -29,7 +35,6 @@ interface ProductFormData extends FieldValues {
 	quantity: string
 	category: string
 	brand: string
-	colors: string[]
 }
 
 const UpdateProduct: FC<UpdateProductProps> = ({
@@ -49,24 +54,22 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		variants,
 		title,
 	} = productResponse.data
-
 	const {
 		register,
 		handleSubmit,
 		setValue,
+		getValues,
 		formState: { errors },
 	} = useForm<ProductFormData>({
 		defaultValues: {
 			productName: title,
-			price: price.toLocaleString(),
-			quantity: quantity.toLocaleString(),
-			category: category,
-			brand: brand,
+			price: price ? price.toLocaleString() : "0",
+			quantity: quantity ? quantity.toLocaleString() : "0",
+			category: category._id,
+			brand: brand._id,
 		},
 	})
-
-	const [selectedCategory, setSelectedCategory] = useState<string>(category)
-	console.log("Selected category: ", selectedCategory)
+	const [selectedCategory, setSelectedCategory] = useState<string>(category._id)
 	const [descriptionText, setDescriptionText] = useState<string>(description)
 	const [thumbnailImage, setThumbnailImage] = useState<string | File | null>(
 		thumbnail
@@ -77,7 +80,6 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	const [allowVariantsProduct, setAllowVariantsProduct] =
 		useState(allowVariants)
 	const [variantFields, setVariantFields] = useState<any[]>(variants || [])
-	console.log(variants)
 	const [allowPublicProduct, setAllowPublicProduct] = useState(publicProduct)
 
 	const [thumbnailError, setThumbnailError] = useState<string>("")
@@ -168,7 +170,6 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			body: formData,
 		})
 		const responseData = await updateProductResponse.json()
-		console.log(responseData)
 		setLoading(false)
 		// await updateProduct(productResponse.data._id, formData)
 		// 	.then(() => {
@@ -182,7 +183,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	})
 
 	useEffect(() => {
-		if (variantFields.length > 0) {
+		if (allowVariantsProduct && variantFields.length > 0) {
 			const totalQuantityStock = variantFields.reduce((acc, currentStock) => {
 				const numberValue = currentStock.stock
 				const parsedValue = parseInt(
@@ -193,9 +194,9 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			}, 0)
 			setValue("quantity", totalQuantityStock.toLocaleString())
 		} else {
-			setValue("quantity", "0")
+			setValue("quantity", quantity.toLocaleString())
 		}
-	}, [variantFields, allowVariants, setValue])
+	}, [variantFields, allowVariants, setValue, allowVariantsProduct, quantity])
 
 	if (!productResponse.success) {
 		return (
@@ -277,7 +278,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 							register={register}
 							required
 							options={selectedCategoryData.brand}
-							value={brand}
+							value={brand.title}
 							disabled={loading}
 						/>
 					)}

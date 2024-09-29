@@ -1,11 +1,11 @@
 "use client"
 import { FC, memo, useState, useEffect, useMemo, useCallback } from "react"
 import { Button, ProductQuantity } from "@/components"
-import { ProductType, VariantType } from "@/types"
+import { ProductExtraType, ProductType, VariantType } from "@/types"
 
 interface ProductCartProps {
 	variants?: VariantType[]
-	product: ProductType
+	product: ProductExtraType
 	handleProductDetail: (variant: VariantType | null) => void
 	onQuantityChange: (quantity: number) => void
 }

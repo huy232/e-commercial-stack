@@ -48,7 +48,7 @@ const productSchema = new Schema<IProduct>(
 		description: { type: String, trim: true },
 		brand: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "ProductBrand",
+			ref: "Brand",
 			required: true,
 		},
 		price: { type: Number, required: true },

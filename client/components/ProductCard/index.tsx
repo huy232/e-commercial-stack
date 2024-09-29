@@ -1,5 +1,5 @@
 "use client"
-import { ProductType } from "@/types/product"
+import { ProductExtraType, ProductType } from "@/types/product"
 import { FC } from "react"
 import { CustomImage, ProductOptions } from "@/components/"
 import { formatPrice, renderStarFromNumber } from "@/utils/"
@@ -8,7 +8,7 @@ import { NoProductImage } from "@/assets/images"
 import Link from "next/link"
 
 interface ProductProps {
-	product: ProductType
+	product: ProductExtraType
 	markLabel?: string
 	enableOptions?: boolean
 	enableTitle?: boolean

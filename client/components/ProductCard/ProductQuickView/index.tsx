@@ -2,13 +2,18 @@
 
 import { ProductCart, ProductSlider } from "@/components"
 import { handleUserCart } from "@/store/actions"
-import { AppDispatch, ProductType, VariantType } from "@/types"
+import {
+	AppDispatch,
+	ProductExtraType,
+	ProductType,
+	VariantType,
+} from "@/types"
 import { formatPrice, renderStarFromNumber } from "@/utils"
 import { FC, useState } from "react"
 import { useDispatch } from "react-redux"
 
 interface ProductQuickViewProps {
-	product: ProductType
+	product: ProductExtraType
 }
 const ProductQuickView: FC<ProductQuickViewProps> = ({ product }) => {
 	const dispatch = useDispatch<AppDispatch>()

@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { Product } from "../../models"
+import { Brand, Product, ProductCategory } from "../../models"
 import asyncHandler from "express-async-handler"
 import slugify from "slugify"
 import { parseInteger } from "../../utils/parseInteger"
@@ -11,6 +11,7 @@ import { UploadedFile, UploadedFiles } from "../../types/uploadFile"
 import { v4 as uuidv4 } from "uuid"
 import { filterCategory } from "../../data/filterCategory"
 import { getVariantFilters } from "../../utils/getVariantFilters"
+import { ObjectId, Types } from "mongoose"
 
 class ProductController {
 	static cachedDailyDeal: {
@@ -41,6 +42,7 @@ class ProductController {
 			const productImageURLs = images.productImages.map(
 				(image: UploadedFile) => image.path
 			)
+
 			req.body.images = productImageURLs
 			req.body.slug = slugify(productName)
 			req.body.totalRatings = 0
@@ -67,13 +69,16 @@ class ProductController {
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_slug } = req.params
 			try {
-				const product = await Product.findOne({ slug: product_slug }).populate({
-					path: "ratings",
-					populate: {
-						path: "postedBy",
-						select: "firstName lastName avatar",
-					},
-				})
+				const product = await Product.findOne({ slug: product_slug })
+					.populate({
+						path: "ratings",
+						populate: {
+							path: "postedBy",
+							select: "firstName lastName avatar",
+						},
+					})
+					.populate("brand")
+					.populate("category")
 
 				if (product) {
 					res.status(200).json({
@@ -103,6 +108,7 @@ class ProductController {
 			try {
 				const queries = { ...req.query }
 				const excludeFields = ["limit", "sort", "page", "fields"]
+
 				excludeFields.forEach((element) => delete queries[element])
 				let queryString = JSON.stringify(queries)
 				queryString = queryString.replace(
@@ -116,20 +122,16 @@ class ProductController {
 				if (queries.search as string) {
 					delete formattedQueries.search
 					formattedQueries["$or"] = [
-						{ title: { $regex: req.query.search, $options: "i" } },
+						{ title: { $regex: queries.search, $options: "i" } },
 					]
 				}
+
 				// TITLE
 				if (queries.title) {
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
 				}
-				// CATEGORY FILTER
-				if (queries.category) {
-					formattedQueries.category = {
-						$regex: queries.category,
-						$options: "i",
-					}
-				}
+
+				// VARIANT FILTERS
 				const variantFilters = getVariantFilters(filterCategory)
 				const variantQueries: any = {}
 				variantFilters.forEach((field) => {
@@ -159,7 +161,36 @@ class ProductController {
 				if (Object.keys(priceFilter).length > 0) {
 					formattedQueries.price = priceFilter
 				}
+
+				let categoryId: Types.ObjectId | null = null
+				let brandId: Types.ObjectId | null = null
+
+				if (queries.category) {
+					const category = await ProductCategory.findOne({
+						title: { $regex: queries.category, $options: "i" },
+					})
+					categoryId = category ? category._id : null
+				}
+
+				if (queries.brand) {
+					const brand = await Brand.findOne({
+						title: { $regex: queries.brand, $options: "i" },
+					})
+					brandId = brand ? brand._id : null
+				}
+
+				if (categoryId) {
+					formattedQueries.category = categoryId
+				}
+
+				if (brandId) {
+					formattedQueries.brand = brandId
+				}
+
 				let query = Product.find(formattedQueries)
+					.populate("brand")
+					.populate("category")
+
 				// Sorting
 				if (req.query.sort as string) {
 					const sortBy = (req.query.sort as string).split(",").join(" ")
@@ -195,6 +226,7 @@ class ProductController {
 				query.skip(skip).limit(limit)
 
 				const response = await query.exec()
+
 				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
 				const totalPages = Math.ceil(counts / limit) || 1
@@ -203,7 +235,7 @@ class ProductController {
 				res.status(200).json({
 					success: response ? true : false,
 					message: response
-						? "Successfully query all products"
+						? "Successfully queried all products"
 						: "Something went wrong while finding all products",
 					data: response ? response : {},
 					counts,

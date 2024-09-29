@@ -19,26 +19,26 @@ const configureSocket = (server: http.Server) => {
 		},
 	})
 
-	io.on("connection", (data) => {
+	io.on("connection", (socket) => {
 		// Increase active users when someone connects
 		activeUsers++
-		console.log("New client connected:", data.id)
+		console.log("New client connected:", socket.id)
 
 		// Notify all clients about the current active users
 		io!.emit("userCountUpdated", { activeUsers, loggedInUsers }) // Use io! to assert non-null
 
-		data.on("userLoggedIn", () => {
+		socket.on("userLoggedIn", () => {
 			loggedInUsers++
 			io!.emit("userCountUpdated", { activeUsers, loggedInUsers }) // Use io! to assert non-null
 		})
 
-		data.on("disconnect", () => {
+		socket.on("disconnect", () => {
 			activeUsers--
-			console.log("Client disconnected:", data.id)
+			console.log("Client disconnected:", socket.id)
 			io!.emit("userCountUpdated", { activeUsers, loggedInUsers }) // Use io! to assert non-null
 		})
 
-		data.on("userLoggedOut", () => {
+		socket.on("userLoggedOut", () => {
 			loggedInUsers--
 			io!.emit("userCountUpdated", { activeUsers, loggedInUsers }) // Use io! to assert non-null
 		})

@@ -11,6 +11,7 @@ export async function GET(request: NextRequest, context: { params: Params }) {
 
 	const response = await fetch(url, {
 		method: "GET",
+		cache: "no-cache",
 	})
 	const data = await response.json()
 	return NextResponse.json(data)

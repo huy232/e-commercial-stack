@@ -16,7 +16,7 @@ import {
 import { useMounted } from "@/hooks"
 import { handleUserWishlist } from "@/store/actions"
 import { selectAuthUser } from "@/store/slices/authSlice"
-import { AppDispatch, ProductType } from "@/types"
+import { AppDispatch, ProductExtraType, ProductType } from "@/types"
 import { path } from "@/utils"
 import clsx from "clsx"
 import Link from "next/link"
@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from "react-redux"
 
 export interface ProductOptionsProps {
 	productSlug: string
-	product: ProductType
+	product: ProductExtraType
 }
 
 export const productHoverOptions = [

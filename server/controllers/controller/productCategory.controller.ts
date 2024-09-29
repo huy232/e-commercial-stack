@@ -82,9 +82,6 @@ class ProductCategoryController {
 		if (!productCategory_id) {
 			throw new Error("Missing product category ID")
 		}
-		if (!option.length) {
-			throw new Error("Missing option to add to category")
-		}
 		const response = await ProductCategory.findByIdAndUpdate(
 			{ _id: productCategory_id, option },
 			req.body,

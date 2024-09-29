@@ -40,6 +40,7 @@ export default function AdminDashboard() {
 			const response = await fetch(`${API}/order/monthly`, {
 				method: "GET",
 				credentials: "include",
+				cache: "no-cache",
 			})
 			const result = await response.json()
 
@@ -63,6 +64,7 @@ export default function AdminDashboard() {
 			const response = await fetch(`${API}/order/monthly-price`, {
 				method: "GET",
 				credentials: "include",
+				cache: "no-cache",
 			})
 			const result = await response.json()
 
@@ -86,6 +88,7 @@ export default function AdminDashboard() {
 			const response = await fetch(`${API}/product/product-distribution`, {
 				method: "GET",
 				credentials: "include",
+				cache: "no-cache",
 			})
 			const result = await response.json()
 			setProductDistributionData(result) // Assuming the response has the distribution data
@@ -102,6 +105,7 @@ export default function AdminDashboard() {
 			const response = await fetch(`${API}/visit/monthly-visit`, {
 				method: "GET",
 				credentials: "include",
+				cache: "no-cache",
 			})
 			const result = await response.json()
 			setTotalPageVisits(result.visitCount)
@@ -115,6 +119,7 @@ export default function AdminDashboard() {
 			const response = await fetch(`${API}/order/newest-order`, {
 				method: "GET",
 				credentials: "include",
+				cache: "no-cache",
 			})
 			const result = await response.json()
 			setNewestOrders(result.data)

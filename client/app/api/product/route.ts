@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
 		}
 		const response = await fetch(url, {
 			method: "GET",
+			cache: "no-cache",
 		})
 		const data = await response.json()
 		return Response.json(data)

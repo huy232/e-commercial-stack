@@ -10,6 +10,9 @@ type Props = {
 
 export default async function AdminUpdateProduct(props: Props) {
 	const { productSlug } = props.params
+
+	console.log("Product slug: ", productSlug)
+
 	const productResponse = await fetch(URL + `/api/product/` + productSlug, {
 		method: "GET",
 		cache: "no-cache",
@@ -26,6 +29,9 @@ export default async function AdminUpdateProduct(props: Props) {
 	if (success) {
 		categoriesData = data
 	}
+
+	console.log(product)
+
 	return (
 		<main>
 			<h1 className="h-[75px] flex justify-between items-center text-3xl font-bold px-4">

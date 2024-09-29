@@ -1,3 +1,6 @@
+import { Brand } from "./brand"
+import { CategoryType } from "./category"
+
 export type Review = {
 	comment: string
 	postedBy: {
@@ -20,6 +23,27 @@ export type VariantType = {
 export type ProductType = {
 	brand: string
 	category: string
+	createdAt: Date
+	description: string
+	images: string[]
+	price: number
+	quantity: number
+	ratings: Review[]
+	slug: string
+	sold: number
+	title: string
+	totalRatings: number
+	updatedAt: Date
+	_id: string
+	thumbnail: string
+	variants?: VariantType[]
+	publicProduct: boolean
+	allowVariants: boolean
+}
+
+export type ProductExtraType = {
+	brand: Brand
+	category: CategoryType
 	createdAt: Date
 	description: string
 	images: string[]
