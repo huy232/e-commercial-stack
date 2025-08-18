@@ -1,5 +1,7 @@
+export const dynamic = "force-dynamic"
+
 import { API } from "@/constant"
-import dynamic from "next/dynamic"
+import dynamicImport from "next/dynamic"
 
 export const metadata = {
 	title: "Manage Product Categories | Digital World Admin",
@@ -8,7 +10,7 @@ export const metadata = {
 	robots: { index: false, follow: false },
 }
 
-const ManageCategories = dynamic(
+const ManageCategories = dynamicImport(
 	() => import("@/components/ManageCategories"),
 	{
 		ssr: false,
