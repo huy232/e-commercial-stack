@@ -22,7 +22,7 @@ import {
 	Select,
 	VariantOptions,
 } from "@/components"
-import { API, extractImageUrlsFromHTML, URL } from "@/constant"
+import { API, extractImageUrlsFromHTML } from "@/constant"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { processEditorContentWithUpload } from "@/utils"

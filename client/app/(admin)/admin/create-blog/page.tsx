@@ -1,5 +1,5 @@
 import { API } from "@/constant"
-import BlogFormWrapper from "@/components/Forms/BlogFormWrapper" // new wrapper
+import BlogFormWrapper from "@/components/Forms/BlogFormWrapper"
 
 export const metadata = {
 	title: "Create Blog | Digital World Admin",

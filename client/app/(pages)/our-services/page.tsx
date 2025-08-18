@@ -22,6 +22,11 @@ export const metadata: Metadata = {
 }
 const OurServices = dynamic(() => import("@/components/OurServices"), {
 	ssr: false,
+	loading: () => (
+		<div className="flex items-center justify-center h-full">
+			<span className="text-gray-500">Loading...</span>
+		</div>
+	),
 })
 
 export default function OurServicesPage(props: Props) {

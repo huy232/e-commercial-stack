@@ -70,7 +70,6 @@ export default async function Products(props: Props) {
 				{/* <Breadcrumb breadcrumbs={breadcrumbs} allowTitle={false} /> */}
 			</div>
 			<ProductList
-				// fetchProducts={fetchProducts}
 				searchParams={searchParams}
 				products={products.data}
 				categories={categories.data}

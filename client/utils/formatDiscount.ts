@@ -24,7 +24,7 @@ export const formatDiscountDisplay = (couponData: {
 	if (discountType === FormatDiscountEnum.percentage) {
 		return `${discount}%`
 	} else if (discountType === FormatDiscountEnum.fixed) {
-		return formatPrice(discount)
+		return formatPrice(discount) ?? ""
 	} else {
 		throw new Error("Invalid discount type")
 	}

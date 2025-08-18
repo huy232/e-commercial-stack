@@ -18,6 +18,11 @@ export const metadata: Metadata = {
 
 const ContactUs = dynamic(() => import("@/components/ContactUs"), {
 	ssr: false,
+	loading: () => (
+		<div className="flex items-center justify-center h-full">
+			<span className="text-gray-500">Loading...</span>
+		</div>
+	),
 })
 
 export default function ContactUsPage() {

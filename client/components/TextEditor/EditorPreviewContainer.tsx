@@ -11,6 +11,11 @@ import EditorComponent from "./EditorComponent"
 import { arraysAreEqual } from "@/utils"
 const PreviewComponent = dynamic(() => import("./PreviewComponent"), {
 	ssr: false,
+	loading: () => (
+		<div className="flex items-center justify-center h-full">
+			<span className="text-gray-500">Loading...</span>
+		</div>
+	),
 })
 
 interface EditorPreviewProps {
