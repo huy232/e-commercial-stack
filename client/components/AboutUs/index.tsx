@@ -1,35 +1,45 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { FaShoppingCart, FaTags, FaHeadset, FaUsers } from "react-icons/fa"
+import { useIsClient } from "@/hooks"
 
-const values = [
-	{
-		title: "Fast & Secure Shopping",
-		description: "Experience a seamless and safe online shopping journey.",
-		icon: <FaShoppingCart className="text-4xl text-blue-500" />,
-	},
-	{
-		title: "Best Deals & Discounts",
-		description: "Enjoy exclusive offers and unbeatable prices all year round.",
-		icon: <FaTags className="text-4xl text-green-500" />,
-	},
-	{
-		title: "Customer Support",
-		description: "Our dedicated support team is available 24/7 to assist you.",
-		icon: <FaHeadset className="text-4xl text-red-500" />,
-	},
-	{
-		title: "Trusted by Thousands",
-		description: "Join a growing community of happy and satisfied shoppers.",
-		icon: <FaUsers className="text-4xl text-yellow-500" />,
-	},
-]
+// import { motion } from "framer-motion"
+// import { FaShoppingCart, FaTags, FaHeadset, FaUsers } from "react-icons/fa"
 
 const AboutUs = () => {
+	const isClient = useIsClient()
+
+	if (!isClient) {
+		// Render nothing (or a skeleton) on the server
+		return null
+	}
+	// const values = [
+	// 	{
+	// 		title: "Fast & Secure Shopping",
+	// 		description: "Experience a seamless and safe online shopping journey.",
+	// 		icon: <FaShoppingCart className="text-4xl text-blue-500" />,
+	// 	},
+	// 	{
+	// 		title: "Best Deals & Discounts",
+	// 		description:
+	// 			"Enjoy exclusive offers and unbeatable prices all year round.",
+	// 		icon: <FaTags className="text-4xl text-green-500" />,
+	// 	},
+	// 	{
+	// 		title: "Customer Support",
+	// 		description:
+	// 			"Our dedicated support team is available 24/7 to assist you.",
+	// 		icon: <FaHeadset className="text-4xl text-red-500" />,
+	// 	},
+	// 	{
+	// 		title: "Trusted by Thousands",
+	// 		description: "Join a growing community of happy and satisfied shoppers.",
+	// 		icon: <FaUsers className="text-4xl text-yellow-500" />,
+	// 	},
+	// ]
+
 	return (
 		<section className="flex flex-col items-center justify-center px-6 py-12">
-			<motion.h1
+			{/* <motion.h1
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.8, ease: "easeOut" }}
@@ -78,7 +88,7 @@ const AboutUs = () => {
 						</p>
 					</motion.div>
 				))}
-			</motion.div>
+			</motion.div> */}
 		</section>
 	)
 }

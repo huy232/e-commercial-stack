@@ -1,5 +1,12 @@
 import { Metadata } from "next"
-import WishlistComponent from "./_components/WishlistComponent"
+import dynamic from "next/dynamic"
+
+const WishlistComponent = dynamic(
+	() => import("@/components/WishlistComponent"),
+	{
+		ssr: false,
+	}
+)
 
 type Props = {
 	params: {}

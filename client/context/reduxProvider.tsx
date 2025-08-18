@@ -1,15 +1,22 @@
 "use client"
-import { ReactNode } from "react"
+import { ReactNode, useEffect } from "react"
 import { Provider } from "react-redux"
-import { persistStore } from "redux-persist"
 import { store } from "@/store"
+import { persistStore } from "redux-persist"
 
 interface ReduxProviderProps {
 	children: ReactNode
 }
 
-persistStore(store)
+let persistor: any
+
 const ReduxProvider: React.FC<ReduxProviderProps> = ({ children }) => {
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			persistor = persistStore(store)
+		}
+	}, [])
+
 	return <Provider store={store}>{children}</Provider>
 }
 

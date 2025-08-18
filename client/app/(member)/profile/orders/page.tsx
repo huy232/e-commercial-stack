@@ -1,5 +1,9 @@
 import { Metadata } from "next"
-import OrderComponent from "./_components/OrderComponent"
+import dynamic from "next/dynamic"
+
+const OrderComponent = dynamic(() => import("@/components/OrderComponent"), {
+	ssr: false,
+})
 
 type Props = {
 	params: {}

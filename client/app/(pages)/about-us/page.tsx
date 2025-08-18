@@ -1,5 +1,9 @@
-import dynamic from "next/dynamic"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
+
+const AboutUs = dynamic(() => import("@/components/AboutUs"), {
+	ssr: false,
+})
 
 export const metadata: Metadata = {
 	title: "About Us | Digital World",
@@ -14,9 +18,6 @@ export const metadata: Metadata = {
 		"trusted electronics store",
 	],
 }
-
-// Lazy load your client component
-const AboutUs = dynamic(() => import("@/components/AboutUs"), { ssr: false })
 
 export default function AboutPage() {
 	return <AboutUs />

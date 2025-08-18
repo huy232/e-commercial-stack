@@ -1,5 +1,5 @@
-import { ForgotPasswordForm } from "@/components"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 
 export const metadata: Metadata = {
 	title: "Forgot Your Password | Digital World",
@@ -13,6 +13,13 @@ export const metadata: Metadata = {
 		"recover account",
 	],
 }
+
+const ForgotPasswordForm = dynamic(
+	() => import("@/components/Forms/ForgotPasswordForm"),
+	{
+		ssr: false,
+	}
+)
 
 export default function ForgotPassword() {
 	return (

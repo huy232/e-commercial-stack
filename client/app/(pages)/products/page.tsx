@@ -1,6 +1,6 @@
-import { Breadcrumb, ProductList } from "@/components"
 import { API } from "@/constant"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 
 type Props = {
 	params: {}
@@ -22,6 +22,10 @@ export const metadata: Metadata = {
 		"smart home devices",
 	],
 }
+
+const ProductList = dynamic(() => import("@/components/ProductList"), {
+	ssr: false,
+})
 
 export default async function Products(props: Props) {
 	const searchParams = props.searchParams

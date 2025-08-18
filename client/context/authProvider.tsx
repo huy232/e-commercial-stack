@@ -18,8 +18,6 @@ import { API, BASE_SERVER_URL } from "@/constant"
 import { addNewNotification } from "@/store/slices/notifySlice"
 import io, { Socket } from "socket.io-client"
 
-let socket: Socket | null = null
-
 export default function AuthProvider({
 	children,
 }: {
@@ -61,7 +59,11 @@ export default function AuthProvider({
 	}, [isAuthenticated, dispatch])
 
 	useEffect(() => {
-		if (!socket && isAuthenticated && user?._id) {
+		if (!isAuthenticated || !user?._id) return
+
+		let socket: Socket | null = null
+
+		import("socket.io-client").then(({ io }) => {
 			socket = io(BASE_SERVER_URL, { withCredentials: true })
 
 			socket.on("connect", () => {
@@ -72,7 +74,7 @@ export default function AuthProvider({
 			socket.on("newNotification", async (notification) => {
 				await dispatch(addNewNotification(notification))
 			})
-		}
+		})
 
 		return () => {
 			if (socket) {

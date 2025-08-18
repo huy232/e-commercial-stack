@@ -1,4 +1,4 @@
-import { AdminChatRoomList } from "@/components"
+import dynamic from "next/dynamic"
 
 export const metadata = {
 	title: "Manage Chat Room | Digital World Admin",
@@ -6,6 +6,13 @@ export const metadata = {
 		"Monitor and manage live chat rooms between customers and support staff.",
 	robots: { index: false, follow: false },
 }
+
+const AdminChatRoomList = dynamic(
+	() => import("@/components/AdminChatRoomList"),
+	{
+		ssr: false,
+	}
+)
 
 export default async function AdminManageChat() {
 	return (

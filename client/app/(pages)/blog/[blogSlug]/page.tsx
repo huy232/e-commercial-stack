@@ -1,12 +1,12 @@
 import { API } from "@/constant"
-import BlogCategory from "../_components/BlogCategory"
 import { CustomImage } from "@/components"
 import InnerHTML from "dangerously-set-html-content"
 import { FaBoltLightning, FaReadme, GrTechnology } from "@/assets/icons"
 import Link from "next/link"
-import SingleBlog from "./_components/SingleBlog"
 import { cookies } from "next/headers"
 import { Metadata } from "next"
+import SingleBlog from "@/components/SinglePost"
+import BlogCategory from "@/components/BlogComponent/BlogCategory"
 
 type Props = {
 	params: { blogSlug: string }

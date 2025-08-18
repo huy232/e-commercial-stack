@@ -1,6 +1,6 @@
-import { GoogleAuth, LoginForm } from "@/components"
 import { path } from "@/utils"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 
 export const metadata: Metadata = {
@@ -16,6 +16,14 @@ export const metadata: Metadata = {
 		"manage account",
 	],
 }
+
+const GoogleAuth = dynamic(() => import("@/components/GoogleAuth"), {
+	ssr: false,
+})
+
+const LoginForm = dynamic(() => import("@/components/Forms/LoginForm"), {
+	ssr: false,
+})
 
 export default async function Login() {
 	return (

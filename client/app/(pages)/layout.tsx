@@ -1,10 +1,23 @@
-import type { Metadata } from "next"
-import { ChatBox, Footer, Header, Navbar, Toast } from "@/components"
+import dynamic from "next/dynamic"
 import clsx from "clsx"
 import { anton, bebasNeue, inter, poppins } from "@/utils"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 import { AuthProvider, ReduxProvider } from "@/context"
+import { Toast } from "@/components"
 import "../globals.css"
+
+const ChatBox = dynamic(() => import("@/components/Chatbox"), {
+	ssr: false,
+})
+const Footer = dynamic(() => import("@/components/Footer"), {
+	ssr: false,
+})
+const Header = dynamic(() => import("@/components/Header"), {
+	ssr: false,
+})
+const Navbar = dynamic(() => import("@/components/Navbar"), {
+	ssr: false,
+})
 
 const bodyClassName = clsx(
 	"w-full flex flex-col items-center min-h-screen",
@@ -13,7 +26,6 @@ const bodyClassName = clsx(
 	inter.variable,
 	bebasNeue.variable
 )
-
 export default function RootLayout({
 	children,
 }: {

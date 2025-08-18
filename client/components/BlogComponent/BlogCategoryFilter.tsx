@@ -10,7 +10,7 @@ const categories = [
 	{ label: "Technology", value: "technology" },
 ]
 
-export function BlogCategoryFilter() {
+const BlogCategoryFilter = () => {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const currentCategory = searchParams.get("category") || ""
@@ -48,3 +48,5 @@ export function BlogCategoryFilter() {
 		</div>
 	)
 }
+
+export default BlogCategoryFilter

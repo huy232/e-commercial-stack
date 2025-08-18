@@ -1,4 +1,4 @@
-import { ManageProducts } from "@/components"
+import dynamic from "next/dynamic"
 import { Suspense } from "react"
 
 export const metadata = {
@@ -6,6 +6,10 @@ export const metadata = {
 	description: "Edit, update, and manage the products available in your store.",
 	robots: { index: false, follow: false },
 }
+
+const ManageProducts = dynamic(() => import("@/components/ManageProducts"), {
+	ssr: false,
+})
 
 export default async function AdminManageProducts() {
 	return (

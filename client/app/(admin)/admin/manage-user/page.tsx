@@ -1,4 +1,4 @@
-import { ManageUserList } from "@/components"
+import dynamic from "next/dynamic"
 import { Suspense } from "react"
 
 type Props = {
@@ -11,6 +11,10 @@ export const metadata = {
 	description: "View, edit, and manage registered users of Digital World.",
 	robots: { index: false, follow: false },
 }
+
+const ManageUserList = dynamic(() => import("@/components/ManageUserList"), {
+	ssr: false,
+})
 
 export default async function AdminManageUser(props: Props) {
 	return (

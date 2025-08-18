@@ -1,5 +1,5 @@
-import { ManageCategories } from "@/components"
 import { API } from "@/constant"
+import dynamic from "next/dynamic"
 
 export const metadata = {
 	title: "Manage Product Categories | Digital World Admin",
@@ -7,6 +7,13 @@ export const metadata = {
 		"Add, edit, and remove product categories to keep your store organized.",
 	robots: { index: false, follow: false },
 }
+
+const ManageCategories = dynamic(
+	() => import("@/components/ManageCategories"),
+	{
+		ssr: false,
+	}
+)
 
 export default async function AdminManageCategories() {
 	const brandResponse = await fetch(API + "/brand", {

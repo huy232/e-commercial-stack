@@ -1,4 +1,4 @@
-import { ManageBlogCategories, ManageBlogs } from "@/components"
+import dynamic from "next/dynamic"
 
 export const metadata = {
 	title: "Manage Blog Categories | Digital World Admin",
@@ -6,6 +6,13 @@ export const metadata = {
 		"Organize, edit, and create blog categories for the Digital World website.",
 	robots: { index: false, follow: false },
 }
+
+const ManageBlogCategories = dynamic(
+	() => import("@/components/ManageBlogCategories"),
+	{
+		ssr: false,
+	}
+)
 
 export default async function AdminManageBlogCategories() {
 	return (

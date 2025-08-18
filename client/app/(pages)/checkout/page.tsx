@@ -1,6 +1,6 @@
-import { Checkout } from "@/components"
 import { API } from "@/constant"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 
 type Props = {
 	params: {}
@@ -19,6 +19,10 @@ export const metadata: Metadata = {
 		"payment options",
 	],
 }
+
+const Checkout = dynamic(() => import("@/components/Checkout"), {
+	ssr: false,
+})
 
 export default async function Cart(props: Props) {
 	const searchParams = props.searchParams

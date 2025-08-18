@@ -1,11 +1,6 @@
-import { API, WEB_URL } from "@/constant"
+import { API } from "@/constant"
 import { Metadata } from "next"
 import Link from "next/link"
-
-type Props = {
-	params: {}
-	searchParams: { [key: string]: string | string[] | undefined }
-}
 
 export const metadata: Metadata = {
 	title: "Complete Registration | Digital World",
@@ -18,6 +13,11 @@ export const metadata: Metadata = {
 		"exclusive deals",
 		"track orders",
 	],
+}
+
+type Props = {
+	params: {}
+	searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default async function CompleteRegistration(props: Props) {

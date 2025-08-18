@@ -1,10 +1,7 @@
 import { API } from "@/constant"
-import NewsBlog from "./_components/NewsBlog"
-import MostViewedBlog from "./_components/MostViewedBlog"
-import BlogCategory from "./_components/BlogCategory"
 import { FaBoltLightning, FaReadme, GrTechnology } from "@/assets/icons"
-import { BlogCategoryFilter } from "./_components/BlogCategoryFilter"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 
 type Props = {
 	params: {}
@@ -26,6 +23,31 @@ export const metadata: Metadata = {
 		"how-to guides",
 	],
 }
+
+const NewsBlog = dynamic(() => import("@/components/BlogComponent/NewsBlog"), {
+	ssr: false,
+})
+
+const MostViewedBlog = dynamic(
+	() => import("@/components/BlogComponent/MostViewedBlog"),
+	{
+		ssr: false,
+	}
+)
+
+const BlogCategory = dynamic(
+	() => import("@/components/BlogComponent/BlogCategory"),
+	{
+		ssr: false,
+	}
+)
+
+const BlogCategoryFilter = dynamic(
+	() => import("@/components/BlogComponent/BlogCategoryFilter"),
+	{
+		ssr: false,
+	}
+)
 
 export default async function Blogs(props: Props) {
 	const searchParams = props.searchParams
@@ -78,9 +100,7 @@ export default async function Blogs(props: Props) {
 				News / blog
 			</h1>
 
-			{/* Main + Sidebar layout */}
 			<div className="grid grid-cols-12 gap-1 p-1 mt-4">
-				{/* Left: Main Blog Section (9 columns) */}
 				<div className="col-span-12 lg:col-span-8">
 					<section>
 						<h2 className="font-bebasNeue text-2xl font-bold mb-2">
@@ -95,7 +115,6 @@ export default async function Blogs(props: Props) {
 					</section>
 				</div>
 
-				{/* Right: Category Blog Sidebar (3 columns) */}
 				<div className="col-span-12 lg:col-span-4 space-y-6">
 					<section className="">
 						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#03304b] rounded relative">
