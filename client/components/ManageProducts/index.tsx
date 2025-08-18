@@ -5,7 +5,7 @@ import { Pagination } from "@/components"
 import { useSearchParams } from "next/navigation"
 import SearchProduct from "./SearchProduct"
 import ProductTableRow from "./ProductTableRow"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
 
 const ManageProducts: FC = () => {
 	const [productList, setProductList] = useState<ProductExtraType[]>([])

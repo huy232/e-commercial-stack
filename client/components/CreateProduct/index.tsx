@@ -16,7 +16,7 @@ import {
 import { FC, useEffect, useRef, useState } from "react"
 import { CategoryType, ProductCategoryType } from "@/types"
 import { useMounted } from "@/hooks"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
 import { processEditorContentWithUpload } from "@/utils"
 
 interface CreateProductProps {

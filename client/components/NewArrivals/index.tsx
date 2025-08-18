@@ -4,7 +4,7 @@ import { ProductExtraType, ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
 import { ApiProductResponse } from "@/types"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
 
 interface NewArrivalsProps {
 	initialProducts: ProductExtraType[] | []

@@ -5,7 +5,7 @@ import { useState, useCallback } from "react"
 import { passwordHashingClient, path } from "@/utils"
 import { Button, InputField } from "@/components"
 import Link from "next/link"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
 
 type ErrorMessage = {
 	location: string

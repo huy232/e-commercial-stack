@@ -3,7 +3,7 @@ import { Users } from "@/types"
 import { FC, useEffect, useState } from "react"
 import { Pagination, SearchUser, UserTableRow } from "@/components"
 import { useSearchParams } from "next/navigation"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
 
 const ManageUserList: FC = () => {
 	const [userList, setUserList] = useState<Users[]>([])
