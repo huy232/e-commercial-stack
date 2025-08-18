@@ -1,14 +1,21 @@
 "use client"
 import { FC } from "react"
 import parse from "html-react-parser"
-import { Review } from "@/types"
 import { CustomImage } from ".."
 import { DefaultAvatar } from "@/assets/images"
 import moment from "moment"
 import { renderStarFromNumber } from "@/utils"
 
 interface ReviewComment {
-	reviews: Review[]
+	reviews: {
+		postedBy: {
+			avatar?: string
+			firstName?: string
+		}
+		star: number
+		comment: string
+		updatedAt: string
+	}[]
 }
 
 const ReviewComment: FC<ReviewComment> = ({ reviews }) => {
