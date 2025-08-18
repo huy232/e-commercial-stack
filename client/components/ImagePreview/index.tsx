@@ -23,37 +23,36 @@ const ImagePreview: FC<ImagePreviewProps> = ({
 	)
 
 	const renderImage = (image: string | File, index: number) => {
+		const src = typeof image === "string" ? image : URL.createObjectURL(image)
 		return (
 			<div
 				key={index}
-				className="relative inline-block group w-[160px] h-[160px]"
+				className="relative group w-[160px] h-[160px] shrink-0 mx-2 border border-gray-200 rounded overflow-hidden"
 			>
 				<CustomImage
-					src={
-						typeof image === "string"
-							? image
-							: URL.createObjectURL(image as File)
-					}
+					src={src}
 					alt={`Product Image ${index + 1}`}
 					fill
+					className="object-cover"
 				/>
-				<button
-					className={imageClass}
-					onClick={() => handleDeleteImage(index)}
-					disabled={disabled}
-				>
-					<MdDelete size={20} color="#FF0000" />
-				</button>
+				{!disabled && (
+					<button
+						type="button"
+						className={imageClass}
+						onClick={() => handleDeleteImage(index)}
+					>
+						<MdDelete size={20} color="#FF0000" />
+					</button>
+				)}
 			</div>
 		)
 	}
 
 	return (
-		<>
-			{Array.isArray(images)
-				? images.map((image, index) => renderImage(image, index))
-				: renderImage(images, 0)}
-		</>
+		<div className="flex flex-wrap">
+			{Array.isArray(images) &&
+				images.map((image, index) => renderImage(image, index))}
+		</div>
 	)
 }
 

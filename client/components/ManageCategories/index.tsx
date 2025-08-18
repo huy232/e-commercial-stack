@@ -5,6 +5,7 @@ import CategoryForm from "./CategoryForm"
 import CategoryList from "./CategoryList"
 import EditCategoryModal from "./EditCategoryModal"
 import VariantForm from "./VariantForm"
+import { useMounted } from "@/hooks"
 
 interface ManageCategoryProps {
 	brands: Brand[]
@@ -12,6 +13,7 @@ interface ManageCategoryProps {
 }
 
 const ManageCategories: FC<ManageCategoryProps> = ({ brands, categories }) => {
+	const mounted = useMounted()
 	const [showEditModal, setShowEditModal] = useState(false)
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
 		null
@@ -30,9 +32,11 @@ const ManageCategories: FC<ManageCategoryProps> = ({ brands, categories }) => {
 	}
 
 	return (
-		<div>
-			<CategoryForm />
-			<VariantForm categories={categories} />
+		<>
+			<div className="grid grid-cols-1 lg:grid-cols-2">
+				<CategoryForm />
+				{mounted && <VariantForm categories={categories} />}
+			</div>
 			<CategoryList brands={brands} handleEditCategory={handleEditCategory} />
 			<EditCategoryModal
 				showEditModal={showEditModal}
@@ -43,7 +47,7 @@ const ManageCategories: FC<ManageCategoryProps> = ({ brands, categories }) => {
 				setSelectedBrands={setSelectedBrands}
 				brands={brands}
 			/>
-		</div>
+		</>
 	)
 }
 

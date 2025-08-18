@@ -1,4 +1,6 @@
-export enum adminDashboardStatus {
-	SINGLE = 1,
-	PARENT = 2,
-}
+export const adminDashboardStatus = {
+	SINGLE: "SINGLE",
+	PARENT: "PARENT",
+} as const
+
+export type AdminDashboardStatus = keyof typeof adminDashboardStatus

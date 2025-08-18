@@ -1,154 +1,132 @@
-// "use client"
-// import { usePathname, useRouter, useSearchParams } from "next/navigation"
-// import { useState, FC, useEffect } from "react"
-// import ReactPaginate from "react-paginate"
-
-// interface PaginationProps {
-// 	totalPages: number
-// }
-
-// const Pagination: FC<PaginationProps> = ({ totalPages }) => {
-// 	const searchParams = useSearchParams()
-// 	const pathname = usePathname()
-// 	const { replace } = useRouter()
-// 	const initialSelected = searchParams.has("page")
-// 		? Number(searchParams.get("page"))
-// 		: 1
-// 	const [currentPage, setCurrentPage] = useState(
-// 		Number(initialSelected) > totalPages ? totalPages : Number(initialSelected)
-// 	)
-// 	// const [currentPage, setCurrentPage] = useState(initialSelected)
-// 	const [prevSearchParams, setPrevSearchParams] =
-// 		useState<URLSearchParams | null>(null)
-
-// 	useEffect(() => {
-// 		if (prevSearchParams) {
-// 			const pageParams = searchParams.getAll("page")
-// 			const otherParams = Array.from(searchParams.entries()).filter(
-// 				([key, value]) => {
-// 					return key !== "page" && value !== prevSearchParams.get(key)
-// 				}
-// 			)
-// 			if (pageParams.length > 0 && otherParams.length > 0) {
-// 				const newSearchParams = new URLSearchParams(searchParams.toString())
-// 				newSearchParams.set("page", "1")
-// 				replace(`${pathname}?${newSearchParams.toString()}`)
-// 				setCurrentPage(1)
-// 			}
-// 		}
-// 		setPrevSearchParams(searchParams)
-// 	}, [
-// 		searchParams,
-// 		pathname,
-// 		replace,
-// 		prevSearchParams,
-// 		totalPages,
-// 		currentPage,
-// 	])
-
-// 	const handlePageChange = ({ selected }: { selected: number }) => {
-// 		const pageNumber = selected + 1
-// 		const params = new URLSearchParams(searchParams)
-// 		params.set("page", pageNumber.toString())
-// 		replace(`${pathname}?${params.toString()}`)
-// 		setCurrentPage(pageNumber)
-// 	}
-// 	console.log(totalPages)
-// 	return (
-// 		<div className="flex items-center justify-center my-2">
-// 			<ReactPaginate
-// 				breakLabel="..."
-// 				nextLabel="Next >"
-// 				onPageChange={handlePageChange}
-// 				pageRangeDisplayed={5}
-// 				pageCount={totalPages}
-// 				previousLabel="< Previous"
-// 				marginPagesDisplayed={1}
-// 				forcePage={currentPage - 1}
-// 				containerClassName={"flex justify-center items-center gap-2"}
-// 				activeClassName={"bg-red-500 p-1 rounded"}
-// 				pageLinkClassName={"hover-effect hover:bg-red-500 p-1 rounded"}
-// 				previousLinkClassName={"hover-effect hover:bg-red-500 rounded p-1"}
-// 				nextLinkClassName={"hover-effect hover:bg-red-500 rounded p-1"}
-// 				disabledClassName={"disabled bg-gray-500 cursor-not-allowed"}
-// 				disableInitialCallback={true}
-// 				renderOnZeroPageCount={null}
-// 			/>
-// 		</div>
-// 	)
-// }
-
-// export default
-
 "use client"
+import { FaChevronLeft, FaChevronRight } from "@/assets/icons"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useState, FC, useEffect } from "react"
+import { useState, FC, useEffect, useCallback } from "react"
 import ReactPaginate from "react-paginate"
 
 interface PaginationProps {
 	totalPages: number
+	showPageInput?: boolean // Optional feature
 }
 
-const Pagination: FC<PaginationProps> = ({ totalPages }) => {
+const Pagination: FC<PaginationProps> = ({
+	totalPages,
+	showPageInput = false,
+}) => {
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const { replace } = useRouter()
 
-	// Get the initial page number from the URL, default to 1 if not set
 	const initialSelected = searchParams.has("page")
 		? Number(searchParams.get("page"))
 		: 1
 
-	// Set current page based on the URL param, but cap it at the totalPages value
 	const [currentPage, setCurrentPage] = useState(
 		Number(initialSelected) > totalPages ? totalPages : Number(initialSelected)
 	)
 
-	// Check if user enters an invalid page and redirect if necessary
-	useEffect(() => {
-		// If the current page exceeds totalPages, or is less than 1, adjust it
-		if (currentPage > totalPages) {
-			setCurrentPage(totalPages)
-			const params = new URLSearchParams(searchParams)
-			params.set("page", totalPages.toString())
-			replace(`${pathname}?${params.toString()}`)
-		} else if (currentPage < 1) {
-			setCurrentPage(1)
-			const params = new URLSearchParams(searchParams)
-			params.set("page", "1")
-			replace(`${pathname}?${params.toString()}`)
-		}
-	}, [currentPage, totalPages, pathname, replace, searchParams])
+	const [pageInput, setPageInput] = useState(currentPage.toString())
 
-	// Handle page change events (when user interacts with the pagination component)
+	const updateURLPage = useCallback(
+		(page: number) => {
+			const params = new URLSearchParams(searchParams)
+			params.set("page", page.toString())
+			replace(`${pathname}?${params.toString()}`)
+		},
+		[searchParams, pathname, replace]
+	)
+
 	const handlePageChange = ({ selected }: { selected: number }) => {
-		const pageNumber = selected + 1 // ReactPaginate uses 0-based index
-		const params = new URLSearchParams(searchParams)
-		params.set("page", pageNumber.toString())
-		replace(`${pathname}?${params.toString()}`)
+		const pageNumber = selected + 1
 		setCurrentPage(pageNumber)
+		setPageInput(pageNumber.toString())
+		updateURLPage(pageNumber)
 	}
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setPageInput(e.target.value)
+	}
+
+	const handleInputSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		const num = Number(pageInput)
+		if (!isNaN(num)) {
+			const clamped = Math.max(1, Math.min(totalPages, num))
+			setCurrentPage(clamped)
+			setPageInput(clamped.toString())
+			updateURLPage(clamped)
+		}
+	}
+
+	useEffect(() => {
+		if (currentPage > totalPages) {
+			setCurrentPage(totalPages)
+			updateURLPage(totalPages)
+		} else if (currentPage < 1) {
+			setCurrentPage(1)
+			updateURLPage(1)
+		}
+	}, [currentPage, totalPages, updateURLPage])
+
 	return (
-		<div className="flex items-center justify-center my-2">
+		<div className="flex flex-col items-center gap-2 my-4">
 			<ReactPaginate
 				breakLabel="..."
-				nextLabel="Next >"
+				nextLabel={
+					<>
+						<span>Next</span> <FaChevronRight className="mt-[2px]" />
+					</>
+				}
 				onPageChange={handlePageChange}
-				pageRangeDisplayed={5}
+				pageRangeDisplayed={3}
 				pageCount={totalPages}
-				previousLabel="< Previous"
+				previousLabel={
+					<>
+						<FaChevronLeft className="mt-[2px]" />
+						<span>Previous</span>
+					</>
+				}
 				marginPagesDisplayed={1}
 				forcePage={currentPage - 1}
-				containerClassName={"flex justify-center items-center gap-2"}
-				activeClassName={"bg-red-500 p-1 rounded"}
-				pageLinkClassName={"hover-effect hover:bg-red-500 p-1 rounded"}
-				previousLinkClassName={"hover-effect hover:bg-red-500 rounded p-1"}
-				nextLinkClassName={"hover-effect hover:bg-red-500 rounded p-1"}
-				disabledClassName={"disabled bg-gray-500 cursor-not-allowed"}
-				disableInitialCallback={true}
+				containerClassName="flex items-center gap-3 text-sm"
+				pageLinkClassName="px-3 py-1 rounded-md border hover:bg-red-500 hover:text-white transition-all"
+				activeClassName="bg-red-500 text-white py-1 rounded-md"
+				previousLinkClassName={`gap-1 px-2 py-1 flex items-center rounded-lg border transition-all ${
+					currentPage === 1
+						? "cursor-not-allowed opacity-50"
+						: "hover:bg-red-500 hover:text-white"
+				}`}
+				nextLinkClassName={`gap-1 px-2 py-1 flex items-center rounded-lg border transition-all ${
+					currentPage === totalPages
+						? "cursor-not-allowed opacity-50"
+						: "hover:bg-red-500 hover:text-white"
+				}`}
 				renderOnZeroPageCount={null}
 			/>
+
+			{showPageInput && (
+				<form
+					onSubmit={handleInputSubmit}
+					className="text-sm mt-2 flex items-center gap-2"
+				>
+					<span>Page</span>
+					<input
+						type="number"
+						value={pageInput}
+						onChange={handleInputChange}
+						className="w-16 px-2 py-1 border rounded-md text-center"
+						min={1}
+						max={totalPages}
+					/>
+					<span>of {totalPages}</span>
+					<button
+						type="submit"
+						className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+					>
+						Go
+					</button>
+				</form>
+			)}
 		</div>
 	)
 }

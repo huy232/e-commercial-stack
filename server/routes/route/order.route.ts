@@ -53,6 +53,19 @@ router.get(
 	[verifyAccessToken, isAdmin],
 	OrderController.getNewestOrders
 )
+
+router.get(
+	"/orders-category",
+	[verifyAccessToken, isAdmin],
+	OrderController.getSalesByCategory
+)
+
+router.get(
+	"/all-year-orders",
+	[verifyAccessToken, isAdmin],
+	OrderController.getAllYearSaleOrder
+)
+
 // router.post("/webhook", OrderController.handleWebhook)
 
 export { router as orderRouter }

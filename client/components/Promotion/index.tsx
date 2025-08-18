@@ -8,7 +8,7 @@ import {
 
 const Promotion = () => {
 	return (
-		<div className="w-full h-full">
+		<div className="w-full lg:w-2/3">
 			<video
 				width="1280"
 				height="720"
@@ -16,6 +16,7 @@ const Promotion = () => {
 				muted={true}
 				loop={true}
 				preload="none"
+				className="rounded"
 			>
 				<source src="/media/promotion.mp4" type="video/mp4" />
 				Your browser does not support the video tag.

@@ -32,7 +32,24 @@ interface IProduct extends Document {
 	variants: IVariant[] | null
 	publicProduct: boolean
 	deleted: boolean
+	discount: {
+		type: "percentage" | "fixed"
+		value: number
+		expirationDate: string
+	} | null
+	enableDiscount: boolean
+	relatedBlogs: mongoose.Types.ObjectId[]
 }
+
+const dynamicVariantSchema = new Schema(
+	{
+		stock: { type: Number, required: true },
+		price: { type: Number },
+		// Other dynamic properties can be added directly when creating a variant
+		variant: [],
+	},
+	{ _id: true, strict: false } // `_id` generation enabled, `strict: false` allows dynamic fields
+)
 
 const productSchema = new Schema<IProduct>(
 	{
@@ -70,9 +87,25 @@ const productSchema = new Schema<IProduct>(
 		],
 		totalRatings: { type: Number, default: 0 },
 		allowVariants: { type: Boolean, required: true },
-		variants: { type: [Schema.Types.Mixed], _id: true, default: [] },
+		// variants: { type: [Schema.Types.Mixed], default: [] },
+		variants: { type: [dynamicVariantSchema], default: [] },
 		publicProduct: { type: Boolean, required: true, default: false },
 		deleted: { type: Boolean, default: false },
+		discount: {
+			type: {
+				type: String,
+				enum: ["percentage", "fixed"],
+			},
+			value: { type: Number },
+			expirationDate: { type: Date },
+			productPrice: { type: Number },
+		},
+		enableDiscount: { type: Boolean, default: false },
+		relatedBlogs: {
+			type: [mongoose.Schema.Types.ObjectId],
+			ref: "Blog",
+			default: [],
+		},
 	},
 	{ timestamps: true }
 )

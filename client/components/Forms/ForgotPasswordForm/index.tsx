@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
 import { InputField } from "@/components"
-import { URL } from "@/constant"
+import { WEB_URL } from "@/constant"
 
 const ForgotPasswordForm = () => {
 	const {
@@ -18,7 +18,7 @@ const ForgotPasswordForm = () => {
 	const handleForgotPassword = useCallback(async (data: any) => {
 		try {
 			const { email } = data
-			const response = await fetch(URL + `/api/user/forgot-password`, {
+			const response = await fetch(WEB_URL + `/api/user/forgot-password`, {
 				method: "POST",
 				body: JSON.stringify({ email }),
 				headers: { "Content-Type": "application/json" },

@@ -24,12 +24,12 @@ const VoteBar: FC<VoteBarProps> = ({
 				<span>{ratingNumber}</span>
 				<AiFillStar color="orange" />
 			</div>
-			<div className="w-[70%]">
+			<div className="w-[60%] lg:w-[70%]">
 				<div className="relative w-full h-[6px] bg-gray-600 rounded-l-full rounded-r-full">
 					<div className="absolute inset-y-0 bg-red-500" style={reviewBar} />
 				</div>
 			</div>
-			<div className="w-[20%] flex justify-end text-xs text-400">{`${
+			<div className="w-[30%] lg:w-[20%] flex justify-end text-xs text-400">{`${
 				ratingCount || 0
 			} reviews`}</div>
 		</div>

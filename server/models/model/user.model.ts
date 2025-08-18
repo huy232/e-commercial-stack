@@ -2,18 +2,7 @@ import mongoose, { Document, Types, Schema } from "mongoose"
 import crypto from "crypto"
 import * as bcrypt from "bcrypt"
 import { IProduct, IVariant } from "./product.model"
-
-interface ICartItem {
-	product_id: mongoose.Types.ObjectId | string
-	variant_id?: mongoose.Types.ObjectId | string
-	quantity: number
-}
-
-interface ICartItemPopulate {
-	product: IProduct
-	variant?: IVariant
-	quantity: number
-}
+import { ICartItem } from "./cart.model"
 
 interface IUser extends Document {
 	firstName: string
@@ -23,9 +12,7 @@ interface IUser extends Document {
 	avatar: string
 	password: string
 	role: string[]
-	cart: ICartItem[]
 	address: string[]
-	wishlist: Types.ObjectId[]
 	isBlocked: boolean
 	refreshToken?: string
 	passwordChangedAt?: string
@@ -34,6 +21,8 @@ interface IUser extends Document {
 	createdAt: Date
 	updatedAt: Date
 	registerToken: string
+	socialProvider: string
+	googleId: string
 
 	createPasswordChangedToken(): string
 	isCorrectPassword(password: string): Promise<boolean>
@@ -46,17 +35,21 @@ const userSchema = new mongoose.Schema<IUser>(
 		email: { type: String, required: true, unique: true, trim: true },
 		avatar: { type: String },
 		mobile: { type: String, trim: true },
-		password: { type: String, required: true, trim: true },
-		role: { type: [String], default: ["user"] },
-		cart: [
-			{
-				product_id: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-				variant_id: { type: mongoose.Schema.Types.ObjectId },
-				quantity: { type: Number },
+		password: {
+			type: String,
+			trim: true,
+			required: function () {
+				return this.socialProvider === "normal"
 			},
-		],
+		}, // Required only if normal login
+		socialProvider: {
+			type: String,
+			enum: ["normal", "google"],
+			default: "normal",
+		},
+		googleId: { type: String, unique: true, sparse: true }, // Unique Google ID for social logins
+		role: { type: [String], default: ["user"] },
 		address: { type: [], default: [] },
-		wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 		isBlocked: { type: Boolean, default: false },
 		refreshToken: { type: String },
 		passwordChangedAt: { type: String },
@@ -66,7 +59,6 @@ const userSchema = new mongoose.Schema<IUser>(
 	},
 	{ timestamps: true }
 )
-
 userSchema.pre("save", async function (next) {
 	if (!this.isModified("password")) {
 		return next()
@@ -92,4 +84,4 @@ userSchema.methods = {
 
 const UserModel = mongoose.model<IUser>("User", userSchema)
 
-export { UserModel as User, IUser, ICartItem, ICartItemPopulate }
+export { UserModel as User, IUser, ICartItem }

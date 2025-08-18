@@ -90,31 +90,52 @@ const ManageBrand: FC<ManageBrandProps> = () => {
 	}, [])
 
 	return (
-		<div>
-			<form onSubmit={handleSubmitBrand} className="w-full flex flex-col">
-				<h2>Create brand</h2>
-				<InputField
-					name="brand"
-					register={register}
-					label="Brand name"
-					required="Brand name is required"
-					errorMessage={
-						errors.brand &&
-						(errors.brand.message?.toString() ||
-							"Please enter a valid brand name.")
-					}
-				/>
-				<Button type="submit">Submit</Button>
+		<>
+			<form
+				onSubmit={handleSubmitBrand}
+				// className="w-full lg:w-[480px] flex flex-col space-y-4 mb-2 mx-4 lg:mx-6"
+				className="lg:w-[480px] mx-4"
+			>
+				<h2 className="text-xl font-bold font-bebasNeue">Create brand</h2>
+				<div className="flex flex-row items-center justify-between">
+					<InputField
+						name="brand"
+						register={register}
+						required="Brand name is required"
+						errorMessage={
+							errors.brand &&
+							(errors.brand.message?.toString() ||
+								"Please enter a valid brand name.")
+						}
+						placeholder={"Brand name"}
+					/>
+					<Button
+						type="submit"
+						className="bg-rose-500 p-1 rounded hover:brightness-125 hover:opacity-90 duration-300 ease-in-out text-white hover:bg-transparent hover:border-rose-500 border-transparent border-[2px] hover:text-black w-[120px]"
+					>
+						Submit
+					</Button>
+				</div>
 			</form>
-			<div>
-				<h2>Manage brand list</h2>
+
+			<h2 className="text-2xl font-bold mb-4 font-bebasNeue text-center">
+				Available brand list
+			</h2>
+			<div className="flex flex-wrap flex-row gap-3 items-center flex-inline mx-4">
 				{!loading && brandList ? (
-					brandList.map((brand) => <div key={brand._id}>{brand.title}</div>)
+					brandList.map((brand) => (
+						<div
+							className="bg-black/40 rounded p-1 text-base font-inter w-fit"
+							key={brand._id}
+						>
+							{brand.title}
+						</div>
+					))
 				) : (
 					<div>Loading</div>
 				)}
 			</div>
-		</div>
+		</>
 	)
 }
 

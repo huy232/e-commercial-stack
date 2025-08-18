@@ -14,6 +14,7 @@ import {
 	ArcElement, // For Pie chart
 	BarElement, // For Bar chart
 } from "chart.js"
+import clsx from "clsx"
 
 ChartJS.register(
 	CategoryScale,
@@ -44,6 +45,7 @@ interface OrdersChartProps {
 	labels?: string[] // For pie charts, pass category labels separately
 	chartTitle: string
 	chartType?: "line" | "pie" | "bar" // Allow different chart types
+	className?: string
 }
 
 const OrdersChart: React.FC<OrdersChartProps> = ({
@@ -51,9 +53,9 @@ const OrdersChart: React.FC<OrdersChartProps> = ({
 	labels, // Optional for pie charts
 	chartTitle,
 	chartType = "line",
+	className,
 }) => {
 	const [chartData, setChartData] = useState<any>(null)
-
 	useEffect(() => {
 		// If it's a pie chart, the data structure is different
 		if (chartType === "pie" && labels) {
@@ -107,19 +109,36 @@ const OrdersChart: React.FC<OrdersChartProps> = ({
 	// Render the appropriate chart type
 	const renderChart = () => {
 		if (!chartData) return null
-
 		switch (chartType) {
 			case "pie":
-				return <Pie data={chartData} options={chartOptions} />
+				return (
+					<Pie
+						data={chartData}
+						options={chartOptions}
+						className={clsx(className)}
+					/>
+				)
 			case "bar":
-				return <Bar data={chartData} options={chartOptions} />
+				return (
+					<Bar
+						data={chartData}
+						options={chartOptions}
+						className={clsx(className)}
+					/>
+				)
 			case "line":
 			default:
-				return <Line data={chartData} options={chartOptions} />
+				return (
+					<Line
+						data={chartData}
+						options={chartOptions}
+						className={clsx(className)}
+					/>
+				)
 		}
 	}
 
-	return <div>{renderChart()}</div>
+	return renderChart()
 }
 
 export default OrdersChart

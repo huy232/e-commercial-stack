@@ -60,3 +60,23 @@ export interface ApiProductCategoryResponse<T> {
 	totalPages: number
 	currentPage: number
 }
+
+export interface ApiResponse<T> {
+	success: boolean
+	data: T
+	error?: string
+	message?: string
+	pagination: {
+		currentPage: number
+		totalPages: number
+		totalItems: number
+		limit: number
+	}
+}
+
+export type DiscountedProductsData = {
+	percentageDiscountProducts: ProductType[]
+	fixedDiscountProducts: ProductType[]
+}
+
+export type DiscountedProductsResponse = ApiResponse<DiscountedProductsData>

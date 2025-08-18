@@ -6,12 +6,12 @@ import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js"
 import { Button } from "@/components"
 import { CheckoutFormValues } from "../index"
 import { loadStripe } from "@stripe/stripe-js"
-import { ICoupon, UserCart } from "@/types"
+import { Cart, ICoupon } from "@/types"
 import { API } from "@/constant"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 interface IPayment {
-	userCart: UserCart[]
+	userCart: Cart[] | null
 	coupon: {
 		message: string
 		data: ICoupon
@@ -30,39 +30,43 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 	const pathname = usePathname()
 	const backUrl = `${pathname}?${searchParams.toString()}`
 	const makePayment = async () => {
-		const stripe = await loadStripe(
-			process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-		)
-		const body = {
-			products: userCart,
-			couponCode: coupon ? coupon.data.code : "",
-			backUrl,
+		try {
+			setIsProcessing(true)
+			const stripe = await loadStripe(
+				process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
+			)
+			const body = {
+				products: userCart,
+				couponCode: coupon ? coupon.data.code : "",
+				backUrl,
+			}
+			const headers = {
+				"Content-Type": "application/json",
+			}
+
+			const response = await fetch(API + "/order/create-checkout-session", {
+				method: "POST",
+				headers,
+				body: JSON.stringify(body),
+				credentials: "include",
+			})
+
+			const session = await response.json()
+			const result = stripe?.redirectToCheckout({
+				sessionId: session.id,
+			})
+		} catch (error) {
+			setMessage("Something went wrong while doing checkout process.")
+			console.log(error)
+		} finally {
+			setIsProcessing(false)
 		}
-		const headers = {
-			"Content-Type": "application/json",
-		}
-
-		console.log(body)
-
-		const response = await fetch(API + "/order/create-checkout-session", {
-			method: "POST",
-			headers,
-			body: JSON.stringify(body),
-			credentials: "include",
-		})
-
-		const session = await response.json()
-		const result = stripe?.redirectToCheckout({
-			sessionId: session.id,
-		})
-
-		console.log(result)
 	}
 
 	return (
-		<div>
+		<div className="text-center">
 			<Button
-				className="p-2 px-6 rounded-md hover-effect border-2 border-red-500 hover:bg-red-500 hover:text-white inline-block"
+				className="py-2 px-6 rounded-md hover-effect border-2 bg-rose-500 hover:text-white inline-block"
 				type="submit"
 				disabled={isProcessing || !stripe || !elements}
 				loading={isProcessing}
@@ -70,7 +74,7 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 			>
 				Submit
 			</Button>
-			{message && <div>{message}</div>}
+			{message && <div className="text-red-500 italic">{message}</div>}
 		</div>
 	)
 }

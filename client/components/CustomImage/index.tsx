@@ -48,6 +48,10 @@ const CustomImage: FC<CustomImageProps> = ({
 			{...(fill ? {} : { width, height })}
 			{...(fill ? { fill: true } : {})}
 			{...rest}
+			placeholder="blur"
+			quality={80}
+			priority={false}
+			blurDataURL={typeof src === "string" ? src : undefined}
 		/>
 	)
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ProductCategory } from "../../models"
+import { Product, ProductCategory } from "../../models"
 import asyncHandler from "express-async-handler"
 import { parseInteger } from "../../utils/parseInteger"
 import slugify from "slugify"
@@ -13,7 +13,11 @@ class ProductCategoryController {
 				lower: true,
 			})
 
-			const response = await ProductCategory.create({ title, slug })
+			const response = await ProductCategory.create({
+				title,
+				slug,
+				image: req.body.image,
+			})
 			const io = req.app.get("io")
 			io.emit("categoryUpdate")
 			res.json({
@@ -39,6 +43,7 @@ class ProductCategoryController {
 				.skip((page - 1) * limit)
 				.limit(limit)
 			const response = await query.exec()
+
 			res.json({
 				success: response ? true : false,
 				message: response
@@ -102,15 +107,36 @@ class ProductCategoryController {
 		async (req: Request, res: Response): Promise<void> => {
 			const { productCategory_id } = req.params
 
+			// Step 1: Remove the category from all related products
+			await Product.updateMany(
+				{ category: productCategory_id },
+				{ $unset: { category: "" } } // or { $set: { category: null } }
+			)
+
+			// Step 2: Delete the category itself
 			const response = await ProductCategory.findByIdAndDelete(
 				productCategory_id
 			)
+
+			const hasProducts = await Product.exists({ category: productCategory_id })
+
+			if (hasProducts) {
+				res.status(400).json({
+					success: false,
+					message:
+						"Cannot delete category because it is assigned to one or more products.",
+				})
+			}
+
+			const io = req.app.get("io")
+			io.emit("categoryUpdate")
+
 			res.json({
-				success: response ? true : false,
+				success: !!response,
 				message: response
-					? "Success delete a category"
-					: "Something went wrong while delete category",
-				data: response ? response : {},
+					? "Successfully deleted the category and cleared it from products."
+					: "Something went wrong while deleting the category.",
+				data: response || {},
 			})
 		}
 	)

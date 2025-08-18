@@ -14,11 +14,21 @@ const ManageProducts: FC = () => {
 	const [ordersListChanged, setOrdersListChanged] = useState(false)
 	const params = useSearchParams() as URLSearchParams
 
-	const fetchOrders = useCallback(async (params: any) => {
+	const fetchOrders = useCallback(async () => {
 		setLoading(true)
 		try {
+			const queryParams: Record<string, string> = {}
+			params.forEach((value, key) => {
+				queryParams[key] = value
+			})
+			// Ensure default pagination limit is set if not provided
+			if (!queryParams.limit) {
+				queryParams.limit = "10"
+			}
+
+			const queryString = new URLSearchParams(queryParams).toString()
 			const fetchOrdersResponse = await fetch(
-				API + "/order/get-orders?" + new URLSearchParams(params),
+				API + `/order/get-orders?${queryString}`,
 				{ method: "GET", credentials: "include" }
 			)
 			const data = await fetchOrdersResponse.json()
@@ -31,18 +41,11 @@ const ManageProducts: FC = () => {
 		} finally {
 			setLoading(false)
 		}
-	}, [])
+	}, [params])
 
 	useEffect(() => {
-		const page = params.has("page") ? Number(params.get("page")) : 1
-		const search = params.has("search") ? params.get("search") ?? "" : ""
-		const type = params.has("type") ? params.get("type") : ""
-		if (search !== "") {
-			fetchOrders({ page, search, limit: 10, type })
-		} else {
-			fetchOrders({ page, limit: 10, type })
-		}
-	}, [params, ordersListChanged, fetchOrders])
+		fetchOrders()
+	}, [fetchOrders, params, ordersListChanged])
 
 	const handleOrdersListChange = () => {
 		setOrdersListChanged((prevState) => !prevState)

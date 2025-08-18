@@ -2,27 +2,30 @@
 
 import {
 	ApiResponse,
-	Brand,
+	CategoryType,
 	ProductCategoryType,
 	ProductExtraType,
-	ProductType,
 } from "@/types"
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import {
 	BrandSelect,
 	Button,
 	Checkbox,
+	EditorPreviewContainer,
 	ImagePreview,
 	ImageUpload,
 	InputField,
 	LoadingSpinner,
 	Modal,
+	Radio,
 	Select,
-	TextEditor,
 	VariantOptions,
 } from "@/components"
-import { URL } from "@/constant"
+import { API, extractImageUrlsFromHTML, URL } from "@/constant"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
+import { processEditorContentWithUpload } from "@/utils"
 
 interface UpdateProductProps {
 	productResponse: ApiResponse<ProductExtraType>
@@ -48,17 +51,19 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		description,
 		images,
 		price,
-		publicProduct,
 		quantity,
 		thumbnail,
 		variants,
 		title,
+		enableDiscount,
 	} = productResponse.data
+
 	const {
 		register,
 		handleSubmit,
 		setValue,
 		getValues,
+		watch,
 		formState: { errors },
 	} = useForm<ProductFormData>({
 		defaultValues: {
@@ -67,24 +72,48 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 			quantity: quantity ? quantity.toLocaleString() : "0",
 			category: category._id,
 			brand: brand._id,
+			discountType: productResponse.data?.discount
+				? productResponse.data?.discount.type
+				: "",
+			discountValue: productResponse.data?.discount
+				? productResponse.data?.discount.value
+				: "0",
+			enableDiscount: enableDiscount,
+			publicProduct: productResponse.data.publicProduct,
+			allowVariants: productResponse.data.allowVariants,
 		},
 	})
+
+	const enableDiscountCheck = watch("enableDiscount")
+	const allowVariantsCheck = watch("allowVariants")
+	const discountTypeCheck = watch("discountType")
+	const publicProductCheck = watch("publicProduct")
 	const [selectedCategory, setSelectedCategory] = useState<string>(category._id)
-	const [descriptionText, setDescriptionText] = useState<string>(description)
+	const editorPreviewRef = useRef<{
+		clear: () => void
+		getContent: () => string
+		getLocalImages: () => string[]
+	} | null>(null)
+	const descriptionRef = useRef<string>(description)
+
+	const [descriptionImages, setDescriptionImages] = useState<string[]>(
+		productResponse?.data?.description
+			? extractImageUrlsFromHTML(productResponse.data.description)
+			: []
+	)
 	const [thumbnailImage, setThumbnailImage] = useState<string | File | null>(
 		thumbnail
 	)
+
 	const [productImages, setProductImages] =
 		useState<Array<string | File>>(images)
-	const [totalStock, setTotalStock] = useState(quantity)
-	const [allowVariantsProduct, setAllowVariantsProduct] =
-		useState(allowVariants)
+	const [expirationDate, setExpirationDate] = useState<Date | null>(
+		productResponse.data?.discount?.expirationDate
+			? new Date(productResponse.data.discount.expirationDate)
+			: null
+	)
 	const [variantFields, setVariantFields] = useState<any[]>(variants || [])
-	const [allowPublicProduct, setAllowPublicProduct] = useState(publicProduct)
-
-	const [thumbnailError, setThumbnailError] = useState<string>("")
-	const [productImagesError, setProductImagesError] = useState<string>("")
-	const [descriptionError, setDescriptionError] = useState<string>("")
+	const [errorMessages, setErrorMessages] = useState<string[]>([])
 	const [loading, setLoading] = useState<boolean>(false)
 
 	const selectValueGetter = (option: ProductCategoryType) => option._id
@@ -94,17 +123,29 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 	}
 	const selectedCategoryData = categories.find(
 		(category) => category._id === selectedCategory
-	)
-
+	) as CategoryType
+	const addError = (message: string) => {
+		if (!errorMessages.includes(message)) {
+			setErrorMessages((prevErrors) => [...prevErrors, message])
+		}
+	}
+	const clearErrors = () => {
+		setErrorMessages([])
+	}
+	const removeError = (message: string) => {
+		setErrorMessages((prevErrors) =>
+			prevErrors.filter((error) => error !== message)
+		)
+	}
 	const handleThumbnailUpload = (files: File[]) => {
 		if (files.length > 0) {
 			setThumbnailImage(files[0])
-			setThumbnailError("")
+			removeError("Thumbnail is required.")
 		}
 	}
 	const handleProductImagesUpload = (files: File[]) => {
 		setProductImages([...productImages, ...files])
-		setProductImagesError("")
+		removeError("Please choose a picture for the product.")
 	}
 	const handleDeleteThumbnail = () => {
 		setThumbnailImage(null)
@@ -114,76 +155,150 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		updatedImages.splice(index, 1)
 		setProductImages(updatedImages)
 	}
-	const handleAllowVariantsChange = (
-		e: React.ChangeEvent<HTMLInputElement>
-	) => {
-		setAllowVariantsProduct(e.target.checked)
-		if (!e.target.checked) {
-			setTotalStock(0)
-		}
-	}
-	const handlePublicProduct = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setAllowPublicProduct(e.target.checked)
+	const handleDateChange = (date: Date | null) => {
+		setExpirationDate(date)
+		setValue("discountExpirationDate", date?.toISOString() || "")
 	}
 
 	const handleSubmitProduct = handleSubmit(async (data) => {
+		setLoading(true)
 		let hasError = false
 		const formData = new FormData()
+		clearErrors()
+
 		for (let [key, value] of Object.entries(data)) {
-			if (key === "price" || key === "quantity") {
-				value = value = value.replace(/[^0-9]/g, "")
-				console.log("Key: ", key, "Value: ", value)
-				formData.append(key, value)
+			if (key === "price" || key === "quantity" || key === "discountValue") {
+				value = Number(String(value).replace(/[^0-9]/g, ""))
+			}
+			formData.append(key, value)
+		}
+		const { description, error, removedImages, currentCloudImages } =
+			await processEditorContentWithUpload(
+				editorPreviewRef,
+				descriptionImages // ← existing cloud URLs
+			)
+
+		// if (currentCloudImages) {
+		// 	setDescriptionImages(currentCloudImages)
+		// }
+
+		if (error) {
+			addError(error)
+			hasError = true
+		} else {
+			formData.append("description", description)
+		}
+
+		// Optionally delete removed images
+		if (removedImages?.length) {
+			await fetch(`${API}/upload-image`, {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ imageUrls: removedImages }),
+				credentials: "include",
+			})
+		}
+
+		// ----- Handle thumbnail -----
+		if (thumbnailImage) {
+			if (thumbnailImage instanceof File) {
+				formData.append("thumbnail", thumbnailImage)
+
+				// delete old thumbnail if new one is uploaded
+				if (
+					typeof productResponse.data.thumbnail === "string" &&
+					productResponse.data.thumbnail.startsWith(
+						"https://res.cloudinary.com/"
+					)
+				) {
+					await fetch(`${API}/upload-image/delete`, {
+						method: "DELETE",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							imageUrls: [productResponse.data.thumbnail],
+						}),
+						credentials: "include",
+					})
+				}
 			} else {
-				formData.append(key, value)
-			}
-		}
-		formData.append("allowVariants", JSON.stringify(allowVariants))
-		if (descriptionText) {
-			formData.append("description", descriptionText)
-		} else {
-			setDescriptionError("Please enter description for the product")
-			hasError = true
-		}
-		if (thumbnail) {
-			formData.append("thumbnail", thumbnail)
-		} else {
-			setThumbnailError("Thumbnail is required")
-			hasError = true
-		}
-		if (productImages) {
-			for (let image of productImages) {
-				formData.append("productImages", image)
+				formData.append("thumbnail", thumbnailImage)
 			}
 		} else {
-			setProductImagesError("Please choose a picture for product")
+			addError("Thumbnail is required.")
 			hasError = true
 		}
-		formData.append("publicProduct", JSON.stringify(allowPublicProduct))
+
+		// ----- Handle product images -----
+		if (productImages.length > 0) {
+			const existingImageUrls = productImages.filter(
+				(img) => typeof img === "string"
+			) as string[]
+
+			const newImageFiles = productImages.filter(
+				(img) => img instanceof File
+			) as File[]
+
+			// Append new images
+			newImageFiles.forEach((file) => {
+				formData.append("productImages", file)
+			})
+
+			// Append kept Cloudinary URLs
+			formData.append(
+				"existingProductImages",
+				JSON.stringify(existingImageUrls)
+			)
+
+			// 🔥 Delete removed Cloudinary images
+			const originalUrls = productResponse.data.images.filter((img) =>
+				img.startsWith("https://res.cloudinary.com/")
+			)
+
+			const removedProductImages = originalUrls.filter(
+				(original) => !existingImageUrls.includes(original)
+			)
+
+			if (removedProductImages.length > 0) {
+				await fetch(`${API}/upload-image/`, {
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ imageUrls: removedProductImages }),
+					credentials: "include",
+				})
+			}
+		} else {
+			addError("Please choose a picture for the product.")
+			hasError = true
+		}
+
 		formData.append("variants", JSON.stringify(variantFields))
-		if (hasError) {
-			return
+
+		if (hasError) return
+
+		try {
+			const updateProductResponse = await fetch(
+				`${API}/product/update-product/${productResponse.data._id}`,
+				{
+					method: "PUT",
+					body: formData,
+					credentials: "include",
+				}
+			)
+
+			const responseData = await updateProductResponse.json()
+
+			if (responseData.success) {
+				clearErrors()
+			}
+		} catch (error) {
+			addError("An error occurred during the update process.")
+		} finally {
+			setLoading(false)
 		}
-		setLoading(true)
-		const updateProductResponse = await fetch(URL + "/api/product/", {
-			method: "PUT",
-			body: formData,
-		})
-		const responseData = await updateProductResponse.json()
-		setLoading(false)
-		// await updateProduct(productResponse.data._id, formData)
-		// 	.then(() => {
-		// 		setDescriptionError("")
-		// 		setThumbnailError("")
-		// 		setProductImagesError("")
-		// 	})
-		// 	.finally(() => {
-		// 		setLoading(false)
-		// 	})
 	})
 
 	useEffect(() => {
-		if (allowVariantsProduct && variantFields.length > 0) {
+		if (allowVariantsCheck && variantFields.length > 0) {
 			const totalQuantityStock = variantFields.reduce((acc, currentStock) => {
 				const numberValue = currentStock.stock
 				const parsedValue = parseInt(
@@ -196,7 +311,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 		} else {
 			setValue("quantity", quantity.toLocaleString())
 		}
-	}, [variantFields, allowVariants, setValue, allowVariantsProduct, quantity])
+	}, [variantFields, allowVariants, setValue, quantity, allowVariantsCheck])
 
 	if (!productResponse.success) {
 		return (
@@ -215,82 +330,91 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 					</div>
 				</Modal>
 			)}
-			<form onSubmit={handleSubmitProduct} className="w-full flex flex-col">
-				<div>
-					<InputField
-						label="Product name"
-						name="productName"
-						register={register}
-						required
-						errorMessage={
-							errors.productName &&
-							(errors.productName.message?.toString() ||
-								"Please enter a valid product name.")
-						}
-						disabled={loading}
-					/>
-				</div>
-				<div className="flex gap-4">
-					<InputField
-						label="Price"
-						name="price"
-						register={register}
-						required="Price is required"
-						validateType={"onlyNumbers"}
-						errorMessage={
-							errors.price &&
-							(errors.price.message?.toString() ||
-								"Please enter a valid price.")
-						}
-						disabled={loading}
-					/>
-					<InputField
-						label="Quantity"
-						name="quantity"
-						register={register}
-						required="Quantity is required"
-						validateType={"onlyNumbers"}
-						errorMessage={
-							errors.quantity &&
-							(errors.quantity.message?.toString() ||
-								"Please enter a valid quantity.")
-						}
-						disabled={loading || variantFields.length > 0}
-					/>
-				</div>
-				<div className="flex gap-4">
-					<Select
-						name="category"
-						label="Category"
-						register={register}
-						required
-						options={categories}
-						getValue={selectValueGetter}
-						getLabel={selectLabelGetter}
-						value={selectedCategory}
-						disabled={loading}
-						onChange={handleCategoryChange}
-					/>
-					{selectedCategoryData && (
-						<BrandSelect
-							name="brand"
-							label="Brand"
+			<form
+				onSubmit={handleSubmitProduct}
+				className="w-full grid grid-cols-2 gap-4"
+			>
+				<div className="bg-neutral-400 bg-opacity-50 rounded py-1 px-3 mt-2 mb-6 inline-block h-fit">
+					<div className="flex gap-2 mb-2">
+						<InputField
+							label="Name"
+							name="productName"
 							register={register}
 							required
-							options={selectedCategoryData.brand}
-							value={brand.title}
+							errorMessage={
+								errors.productName &&
+								(errors.productName.message?.toString() ||
+									"Please enter a valid product name.")
+							}
+							disabled={loading}
+							inputAdditionalClass="w-full"
+						/>
+					</div>
+					<div className="flex gap-2 mb-2">
+						<InputField
+							label="Price"
+							name="price"
+							register={register}
+							required="Price is required"
+							validateType={"onlyNumbers"}
+							errorMessage={
+								errors.price &&
+								(errors.price.message?.toString() ||
+									"Please enter a valid price.")
+							}
 							disabled={loading}
 						/>
+						<InputField
+							label="Quantity"
+							name="quantity"
+							register={register}
+							required="Quantity is required"
+							validateType={"onlyNumbers"}
+							errorMessage={
+								errors.quantity &&
+								(errors.quantity.message?.toString() ||
+									"Please enter a valid quantity.")
+							}
+							disabled={loading || allowVariants}
+						/>
+					</div>
+					<div className="flex gap-2 mb-2">
+						<Select
+							name="category"
+							label="Category"
+							register={register}
+							required
+							options={categories}
+							getValue={selectValueGetter}
+							getLabel={selectLabelGetter}
+							value={selectedCategory}
+							disabled={loading}
+							onChange={handleCategoryChange}
+						/>
+						{selectedCategoryData && (
+							<BrandSelect
+								name="brand"
+								label="Brand"
+								register={register}
+								required
+								options={selectedCategoryData.brand}
+								value={brand.title}
+								disabled={loading}
+							/>
+						)}
+					</div>
+					{selectedCategoryData.option &&
+					selectedCategoryData.option.length > 0 ? (
+						<Checkbox
+							label="Allow variants"
+							name="allowVariants"
+							checked={allowVariantsCheck} // Use the watched value
+							onChange={(e) => setValue("allowVariants", e.target.checked)}
+						/>
+					) : (
+						<div>Currently supported no variant</div>
 					)}
-				</div>
-				<div>
-					<Checkbox
-						label="Allow Variants"
-						name="allowVariants"
-						checked={allowVariantsProduct}
-						onChange={handleAllowVariantsChange}
-					/>
-					{allowVariantsProduct && selectedCategory && (
+					{allowVariantsCheck && selectedCategory && (
 						<VariantOptions
 							category={selectedCategory}
 							variantFields={variantFields}
@@ -298,15 +422,103 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 							categories={categories}
 						/>
 					)}
-				</div>
-				<TextEditor value={descriptionText} onChange={setDescriptionText} />
+					<div className="flex gap-2 flex-col">
+						<div className="flex items-center">
+							{/* <label htmlFor="enableDiscount">Discount?</label> */}
+							<Checkbox
+								label="Enable discount"
+								type="checkbox"
+								name="enableDiscount"
+								// {...register("enableDiscount")}
+								checked={enableDiscountCheck} // Use the watched value
+								// className="mr-2"
+								onChange={(e) => setValue("enableDiscount", e.target.checked)}
+							/>
+						</div>
+						{enableDiscountCheck && (
+							<div className="flex flex-col mx-4">
+								<div className="flex gap-2 mb-2">
+									<Radio
+										label="Percentage"
+										name="discountType"
+										value="percentage"
+										checked={discountTypeCheck === "percentage"}
+										onChange={() => setValue("discountType", "percentage")}
+									/>
 
-				<div className="w-full h-full">
+									<Radio
+										label="Fixed"
+										name="discountType"
+										value="fixed"
+										checked={discountTypeCheck === "fixed"}
+										onChange={() => setValue("discountType", "fixed")}
+									/>
+								</div>
+								<div className="flex gap-2 mb-2">
+									<InputField
+										label="Discount value"
+										name="discountValue"
+										register={register}
+										required="Discount is required"
+										validateType={"onlyNumbers"}
+										errorMessage={
+											errors.discountValue &&
+											(errors.discountValue?.message?.toString() ||
+												"Please enter a valid discount value.")
+										}
+										validate={(value) => {
+											const discountType = getValues("discountType")
+											if (value) {
+												const numericValue = Number(
+													String(value).replace(/[^0-9]/g, "")
+												)
+												if (discountType === "percentage") {
+													if (numericValue < 1 || numericValue > 100) {
+														return "Percentage must be between 1-100%"
+													}
+												}
+												if (discountType === "fixed") {
+													if (numericValue > price) {
+														return "Fixed discount cannot exceed the original price"
+													}
+												}
+											}
+											return true
+										}}
+										disabled={loading}
+									/>
+								</div>
+								<div className="flex gap-2">
+									<label htmlFor="discountExpirationDate">
+										Expiration date
+									</label>
+									<DatePicker
+										selected={expirationDate}
+										onChange={handleDateChange}
+										dateFormat="yyyy-MM-dd"
+										minDate={new Date()}
+										className="input-field"
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+					<div className="w-full px-2 my-4">
+						<EditorPreviewContainer
+							ref={editorPreviewRef}
+							initialContent={description}
+							onContentChange={(content) => (descriptionRef.current = content)}
+							images={descriptionImages}
+							onImageChange={setDescriptionImages}
+						/>
+					</div>
+				</div>
+				<div className="px-4">
 					<h3 className="font-semibold">Thumbnail preview</h3>
 					<div className="flex items-center">
 						{thumbnailImage && (
 							<ImagePreview
-								images={thumbnailImage}
+								images={[thumbnailImage]}
 								onDelete={handleDeleteThumbnail}
 								disabled={loading}
 							/>
@@ -314,8 +526,8 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 					</div>
 					<ImageUpload onUpload={handleThumbnailUpload} />
 
-					<h3 className="font-semibold">Product images</h3>
-					<div className="flex items-center">
+					<h3 className="font-semibold mt-4">Product images</h3>
+					<div className="lg:w-full overflow-y-auto flex flex-wrap max-h-[320px]">
 						{productImages.length > 0 && (
 							<ImagePreview
 								images={productImages}
@@ -326,24 +538,32 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 					</div>
 					<ImageUpload multiple onUpload={handleProductImagesUpload} />
 				</div>
-				<Checkbox
-					label="Public right away?"
-					name="public"
-					checked={publicProduct}
-					onChange={handlePublicProduct}
-				/>
-				{thumbnailError && (
-					<span className="text-red-500">{thumbnailError}</span>
-				)}
-				{productImagesError && (
-					<span className="text-red-500">{productImagesError}</span>
-				)}
-				{descriptionError && (
-					<span className="text-red-500">{descriptionError}</span>
-				)}
-				<Button disabled={loading} type="submit">
-					Update product
-				</Button>
+				<div className="flex flex-col items-end gap-2">
+					{/* <label htmlFor="publicProduct">Public right away?</label>
+					<input type="checkbox" {...register("publicProduct")} /> */}
+
+					<Checkbox
+						label="Public right away?"
+						name="publicProduct"
+						checked={publicProductCheck}
+						// onChange={handlePublicProduct}
+						onChange={(e) => setValue("publicProduct", e.target.checked)}
+					/>
+					<Button
+						disabled={loading}
+						type="submit"
+						className="w-fit bg-green-500 disabled:bg-rose-500 p-1 hover:bg-opacity-70 hover:brightness-125 duration-300 ease-in-out rounded"
+					>
+						Update product
+					</Button>
+					{errorMessages.length > 0 && (
+						<ul className="text-red-500">
+							{errorMessages.map((error, index) => (
+								<li key={index}>{error}</li>
+							))}
+						</ul>
+					)}
+				</div>
 			</form>
 		</>
 	)

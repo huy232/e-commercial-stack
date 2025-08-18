@@ -1,5 +1,12 @@
 import { CreateProduct } from "@/components"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
+
+export const metadata = {
+	title: "Create Product | Digital World Admin",
+	description:
+		"Add new products to the Digital World store with images, prices, and details.",
+	robots: { index: false, follow: false },
+}
 
 export default async function AdminCreateProducts() {
 	const categoryResponse = (
@@ -7,11 +14,11 @@ export default async function AdminCreateProducts() {
 	).json()
 	const { data } = await categoryResponse
 	return (
-		<div>
-			<h1 className="h-[75px] flex justify-between items-center text-3xl font-bold px-4">
+		<main className="w-full">
+			<h1 className="text-center text-3xl font-bold font-bebasNeue mt-8">
 				Create products
 			</h1>
 			<CreateProduct categories={data} />
-		</div>
+		</main>
 	)
 }

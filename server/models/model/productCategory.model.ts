@@ -32,6 +32,7 @@ const productCategorySchema = new Schema<IProductCategory>(
 		],
 		image: {
 			type: String,
+			default: "",
 		},
 		option: [
 			{

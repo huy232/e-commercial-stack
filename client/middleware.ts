@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { path } from "./utils"
-import { API, URL } from "./constant"
+import { API, WEB_URL } from "./constant"
 
 export async function authorizeMiddleware(request: NextRequest) {
 	let refreshTokenCookie = request.cookies.get("refreshToken")
@@ -18,10 +18,10 @@ export async function authorizeMiddleware(request: NextRequest) {
 		})
 		const response = await checkUserResponse.json()
 		if (!response.success) {
-			return NextResponse.redirect(`${URL}${path.LOGIN}`)
+			return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
 		}
 	} else {
-		return NextResponse.redirect(`${URL}${path.LOGIN}`)
+		return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
 	}
 
 	const response = NextResponse.next()
@@ -45,9 +45,9 @@ export async function loginMiddleware(request: NextRequest) {
 		const response = await checkUserResponse.json()
 
 		if (response.success) {
-			return NextResponse.redirect(`${URL}/`)
+			return NextResponse.redirect(`${WEB_URL}/`)
 		} else {
-			return NextResponse.redirect(`${URL}${path.LOGIN}`)
+			return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
 		}
 	}
 
@@ -73,10 +73,10 @@ export async function adminMiddleware(request: NextRequest) {
 		// 	return NextResponse.redirect(`${URL}${path.LOGIN}`)
 		// }
 		if (!adminResponse.success) {
-			return NextResponse.redirect(`${URL}${path.LOGIN}`)
+			return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
 		}
 	} else {
-		return NextResponse.redirect(`${URL}${path.LOGIN}`)
+		return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
 	}
 }
 

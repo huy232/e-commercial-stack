@@ -1,11 +1,16 @@
-import mongoose from "mongoose"
+import mongoose, { Document } from "mongoose"
+import slugify from "slugify"
+import { Blog } from "./blog.model"
 
 interface IBlogCategory extends Document {
 	title: string
+	slug: string
 	createdAt: Date
 	updatedAt: Date
+	description: string
 }
-var blogCategorySchema = new mongoose.Schema<IBlogCategory>(
+
+const blogCategorySchema = new mongoose.Schema<IBlogCategory>(
 	{
 		title: {
 			type: String,
@@ -13,11 +18,34 @@ var blogCategorySchema = new mongoose.Schema<IBlogCategory>(
 			unique: true,
 			index: true,
 		},
+		slug: {
+			type: String,
+			unique: true,
+			index: true,
+			default: function (this: { title: string }) {
+				return slugify(this.title, { lower: true, strict: true })
+			},
+		},
+		description: {
+			type: String,
+			default: "",
+		},
 	},
 	{ timestamps: true }
 )
 
-//Export the model
+blogCategorySchema.pre("findOneAndDelete", async function (next) {
+	const category = await this.model.findOne(this.getFilter())
+	if (!category) return next()
+
+	await Blog.updateMany(
+		{ relatedBlogCategory: category._id },
+		{ $set: { relatedBlogCategory: null } }
+	)
+
+	next()
+})
+
 const BlogCategoryModel = mongoose.model<IBlogCategory>(
 	"BlogCategory",
 	blogCategorySchema

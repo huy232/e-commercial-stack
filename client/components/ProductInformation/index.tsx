@@ -1,15 +1,15 @@
 "use client"
 import { FC, useCallback, useState } from "react"
-import { URL, productInformationTabs } from "@/constant"
 import clsx from "clsx"
 import { memo } from "react"
 import { Review, ReviewComment } from "@/components"
-import { ProductType } from "@/types"
+import { ProductExtraType, ProductType } from "@/types"
 import { useMounted } from "@/hooks"
+import { WEB_URL } from "@/constant"
 
 interface ProductInformationProps {
-	product: ProductType
-	updateReviews: () => Promise<ProductType>
+	product: ProductExtraType
+	updateReviews: () => Promise<ProductExtraType>
 }
 
 const ProductInformation: FC<ProductInformationProps> = ({
@@ -47,7 +47,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 			}
 			try {
 				const updatedAt = Date.now()
-				const ratingResponse = await fetch(URL + "/api/product/rating", {
+				const ratingResponse = await fetch(WEB_URL + "/api/product/rating", {
 					method: "PUT",
 					cache: "no-cache",
 					credentials: "include",
@@ -62,9 +62,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 					}),
 				})
 				const rating = await ratingResponse.json()
-				console.log(rating)
 				const productResponse = await updateReviews()
-				console.log(productResponse)
 				setBaseProduct(productResponse)
 				setReviews(rating.data.ratings)
 				closeVoteModal()
@@ -77,7 +75,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 
 	return (
 		<div>
-			<div className="flex items-center gap-2">
+			{/* <div className="flex items-center gap-2">
 				{productInformationTabs.map((tab) => (
 					<span
 						className={tabClass(tab.id)}
@@ -87,7 +85,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 						{tab.name}
 					</span>
 				))}
-			</div>
+			</div> */}
 			{mounted ? (
 				<Review
 					totalRatings={baseProduct.totalRatings}

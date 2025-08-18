@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
 		const cookieString = cookieArray
 			.map((cookie) => `${cookie.name}=${cookie.value}`)
 			.join("; ")
-		console.log("Cookie: ", cookieString)
 		const response = await fetch(`${API}/product/create-product`, {
 			method: "POST",
 			cache: "no-cache",

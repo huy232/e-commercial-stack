@@ -1,7 +1,7 @@
 import { Brand } from "./brand"
 import { CategoryType } from "./category"
 
-export type Review = {
+export type ReviewType = {
 	comment: string
 	postedBy: {
 		firstName: string
@@ -14,7 +14,10 @@ export type Review = {
 }
 
 export type VariantType = {
-	[key: string]: any
+	variant: {
+		type: string
+		value: string
+	}[]
 	price: number
 	stock: number
 	_id: string
@@ -60,6 +63,13 @@ export type ProductExtraType = {
 	variants?: VariantType[]
 	publicProduct: boolean
 	allowVariants: boolean
+	discount: {
+		type: "percentage" | "fixed"
+		value: number
+		expirationDate: Date
+		productPrice: number
+	}
+	enableDiscount: boolean
 }
 
 export interface DailyDealType extends ProductType {

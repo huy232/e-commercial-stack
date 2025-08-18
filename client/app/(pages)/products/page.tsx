@@ -1,9 +1,26 @@
 import { Breadcrumb, ProductList } from "@/components"
-import { API, URL } from "@/constant"
+import { API } from "@/constant"
+import { Metadata } from "next"
 
 type Props = {
 	params: {}
 	searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export const metadata: Metadata = {
+	title: "Products | Digital World",
+	description:
+		"Explore our wide range of cutting-edge electronics at Digital World. From smartphones and laptops to gaming gear and smart home devices, find the latest technology to suit your needs.",
+	keywords: [
+		"Digital World products",
+		"electronics store",
+		"buy gadgets online",
+		"latest tech products",
+		"smartphones",
+		"laptops",
+		"gaming accessories",
+		"smart home devices",
+	],
 }
 
 export default async function Products(props: Props) {
@@ -45,37 +62,19 @@ export default async function Products(props: Props) {
 	})
 	const products = await productsResponse.json()
 	const categories = await categoriesResponse.json()
-	// const fetchProducts = async (params: {}) => {
-	// 	"use server"
-	// 	try {
-	// 		const response = await fetch(
-	// 			URL + "/api/product/all-product?" + new URLSearchParams(params),
-	// 			{ method: "GET" }
-	// 		)
-	// 		const data = await response.json()
-	// 		return data
-	// 	} catch (error) {
-	// 		console.error("Error fetching products:", error)
-	// 		return {
-	// 			success: false,
-	// 			data: [],
-	// 			counts: 0,
-	// 			totalPages: 0,
-	// 			currentPage: 0,
-	// 		}
-	// 	}
-	// }
+
 	return (
 		<main className="w-full">
 			<div className="w-main justify-center items-center mx-auto">
 				<h2 className="uppercase font-semibold">{category}</h2>
-				<Breadcrumb breadcrumbs={breadcrumbs} allowTitle={false} />
+				{/* <Breadcrumb breadcrumbs={breadcrumbs} allowTitle={false} /> */}
 			</div>
 			<ProductList
 				// fetchProducts={fetchProducts}
 				searchParams={searchParams}
 				products={products.data}
 				categories={categories.data}
+				totalPages={products.totalPages}
 			/>
 		</main>
 	)

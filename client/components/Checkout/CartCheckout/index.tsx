@@ -1,41 +1,27 @@
 import { CustomImage } from "@/components"
-import { ProfileUser, UserCart, VariantProperties } from "@/types"
-import { formatPrice } from "@/utils"
+import { Cart, ProfileUser, VariantProperties, VariantType } from "@/types"
+import { formatPrice, handleCalculatePrice } from "@/utils"
 
 interface ICartCheckout {
 	mounted: boolean
-	user: ProfileUser
+	cart: Cart[] | null
 }
 
-const CartCheckout = ({ mounted, user }: ICartCheckout) => {
+const CartCheckout = ({ mounted, cart }: ICartCheckout) => {
 	if (!mounted) {
 		return null
 	}
-	if (!user) {
+	if (!cart) {
 		return <div>No product in your cart.</div>
 	}
-	const { cart } = user
 
-	const handleCalculatePrice = (item: UserCart) => {
-		let total = 0
-		if (item.variant) {
-			total = (item.product.price + item.variant.price) * item.quantity
-		} else {
-			total = item.product.price * item.quantity
-		}
-		return total
-	}
-
-	const renderVariantDetails = (variant: VariantProperties) => {
-		const variantKeys = Object.keys(variant).filter(
-			(key) => !["_id", "price", "stock"].includes(key)
-		)
+	const renderVariantDetails = (variant: VariantType) => {
 		return (
 			<div>
-				{variantKeys.map((key) => (
-					<div key={key}>
-						<span className="capitalize text-xs font-medium">{key}: </span>
-						<span className="text-xs text-gray-500">{variant[key]}</span>
+				{variant.variant.map((key, index) => (
+					<div key={index}>
+						<span className="capitalize text-xs font-medium">{key.type}: </span>
+						<span className="text-xs text-gray-500">{key.value}</span>
 					</div>
 				))}
 			</div>
@@ -43,21 +29,21 @@ const CartCheckout = ({ mounted, user }: ICartCheckout) => {
 	}
 
 	return (
-		<div>
-			{cart.map((cartItem: UserCart) => (
-				<div className="flex flex-row">
-					<div className="relative">
+		<>
+			{cart.map((cartItem, index) => (
+				<div className="flex flex-row items-center mt-2" key={index}>
+					<div className="relative my-auto">
 						<CustomImage
 							src={cartItem.product.thumbnail}
-							width={120}
-							height={120}
 							alt={cartItem.product.title}
+							fill
+							className="w-[120px] h-[120px]"
 						/>
 						<span className="text-xs absolute top-0 left-0 p-2 bg-black text-white rounded-full w-[30px] h-[30px] flex justify-center items-center">
 							{cartItem.quantity}
 						</span>
 					</div>
-					<div className="">
+					<div>
 						<span className="font-semibold line-clamp-2">
 							{cartItem.product.title}
 						</span>
@@ -70,7 +56,7 @@ const CartCheckout = ({ mounted, user }: ICartCheckout) => {
 					</div>
 				</div>
 			))}
-		</div>
+		</>
 	)
 }
 export default CartCheckout

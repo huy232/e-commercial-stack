@@ -1,12 +1,14 @@
 import { Request, Response } from "express"
 import {
 	Blog,
+	Cart,
 	Coupon,
 	ICartItem,
 	ICoupon,
 	IProduct,
 	Order,
 	Product,
+	ProductCategory,
 	User,
 } from "../../models"
 import asyncHandler from "express-async-handler"
@@ -19,21 +21,16 @@ import { transformCartItems } from "../../utils/cartUtils"
 import { parseInteger } from "../../utils/parseInteger"
 import { CheckoutItem } from "../../types/checkoutItem"
 import { sendMail } from "../../utils/sendMail"
+import { userCartPopulate } from "../../constant"
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 class OrderController {
 	createCheckoutSession = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response) => {
 			const { products, couponCode, backUrl } = req.body
-			console.log("Create checkout session")
-			const placeholderOrder = await Order.create({
-				products,
-				total: 0,
-				orderBy: req.user._id,
-			})
-			const orderId = placeholderOrder._id.toString()
 			let discountObject: ICoupon | null = null
 			let coupon_id: string | null = null
+			let productPrice
 			if (couponCode) {
 				const couponDoc = await Coupon.findOne({ code: couponCode })
 				if (couponDoc) {
@@ -53,10 +50,27 @@ class OrderController {
 					name: product.product.title,
 					images: [product.product.thumbnail],
 				}
-
+				if (product.variant && product.variant.variant.length > 0) {
+					const variantDescription = product.variant.variant
+						.map(
+							(v: { type: string; value: string }) =>
+								`${v.type.charAt(0).toUpperCase() + v.type.slice(1)}: ${
+									v.value
+								}`
+						)
+						.join("; ")
+					productData.description = variantDescription
+				}
+				if (
+					product.product.enableDiscount &&
+					new Date(product.product.discount.expirationDate) > new Date()
+				) {
+					productPrice = product.product.discount.productPrice
+				} else {
+					productPrice = product.product.price
+				}
 				// Calculate unit_amount
-				const unitAmount =
-					product.product.price + (product?.variant?.price || 0)
+				const unitAmount = productPrice + (product?.variant?.price || 0)
 
 				let discountedUnitAmount = unitAmount
 
@@ -88,22 +102,27 @@ class OrderController {
 					quantity: product.quantity,
 				}
 			})
-
-			// Create the Stripe checkout session
+			// const placeholderOrder = await Order.create({
+			// 	products,
+			// 	total: 0,
+			// 	orderBy: req.user._id,
+			// })
+			// const orderId = placeholderOrder._id.toString()
 			const session = await stripe.checkout.sessions.create(
 				{
 					payment_method_types: ["card"],
 					line_items: items,
 					mode: "payment",
-					success_url: `${
-						process.env.URL_CLIENT as string
-					}/order-success?orderId=${orderId}`,
+					// success_url: `${
+					// 	process.env.URL_CLIENT as string
+					// }/order-success?orderId=${orderId}`,
+					success_url: `${process.env.URL_CLIENT as string}`,
 					cancel_url: `${process.env.URL_CLIENT as string}/${backUrl}`,
 					metadata: {
 						userId: req.user._id,
 						couponCode,
 						couponId: coupon_id,
-						orderId,
+						// orderId,
 					},
 				},
 				{ apiKey: process.env.STRIPE_SECRET_KEY }
@@ -157,8 +176,6 @@ class OrderController {
 				payment_method_id,
 				cart,
 			} = req.body
-
-			console.log(req.body)
 
 			try {
 				const customer = await stripe.customers.create(
@@ -308,18 +325,20 @@ class OrderController {
 	)
 
 	getOrders = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-		const { search, type } = req.query
+		const { search, type, sort, order } = req.query
 		const { _id } = req.user
+
 		if (!_id) {
 			res.json({
 				success: false,
 				data: [],
 				message: "No user found to get orders",
 			})
-			return
 		}
+
 		const page = parseInteger(req.query.page, 1)
 		const limit = parseInteger(req.query.limit, 10)
+
 		let searchQuery = {}
 		if (search && type) {
 			if (type === "order_id") {
@@ -329,40 +348,34 @@ class OrderController {
 			}
 		}
 
-		const totalOrders = await Order.countDocuments()
+		const allowedSortFields: Record<string, string> = {
+			status: "status",
+			total: "total",
+			firstName: "orderBy.firstName", // Since we populate, we can sort this directly
+		}
+
+		const sortField = allowedSortFields[sort as string] || "createdAt"
+		const sortOrder = order === "asc" ? 1 : -1
+
+		// Get total count before applying pagination
+		const totalOrders = await Order.countDocuments(searchQuery)
 		const totalPages = Math.ceil(totalOrders / limit)
 		const hasNextPage = page < totalPages
 
-		if (page < 1) {
-			res.status(400).json({
-				success: false,
-				message:
-					"Invalid value for page parameter. Must be a positive integer.",
+		// Fetch orders with populated user data
+		const response = await Order.find(searchQuery)
+			.populate("coupon")
+			.populate({
+				path: "orderBy",
+				select: "firstName", // Only fetch `firstName` to optimize performance
 			})
-			return
-		}
-
-		if (limit < 1) {
-			res.status(400).json({
-				success: false,
-				message:
-					"Invalid value for limit parameter. Must be a positive integer.",
-			})
-			return
-		}
-
-		const query = Order.find(searchQuery)
-			.sort({ createdAt: -1 })
+			.sort({ [sortField]: sortOrder })
 			.skip((page - 1) * limit)
 			.limit(limit)
-			.populate("coupon")
-			.populate("orderBy")
-
-		const response = await query.exec()
 
 		res.json({
-			success: response ? true : false,
-			data: response ? response : [],
+			success: true,
+			data: response,
 			currentPage: page,
 			totalPages: totalPages,
 			totalItems: totalOrders,
@@ -402,17 +415,34 @@ class OrderController {
 				case "payment_intent.created":
 					break
 				case "checkout.session.completed":
+				case "charge.succeeded":
 					const checkoutSucceeded = event.data.object
 					const userId = checkoutSucceeded.metadata?.userId
 					const couponId = checkoutSucceeded.metadata?.couponId
-					const orderId = checkoutSucceeded.metadata?.orderId
-					if (userId && orderId) {
-						const populatedUserCart = await User.findById(userId)
-							.populate({
-								path: "cart.product_id",
-								select: "title thumbnail price allowVariants variants quantity",
+
+					// const orderId = checkoutSucceeded.metadata?.orderId
+					// if (userId && orderId)
+					if (userId) {
+						const user = await User.findById(userId)
+
+						if (!user) {
+							res.status(404).json({
+								success: false,
+								message: "User not found.",
 							})
-							.exec()
+							return
+						}
+
+						const populatedUserCart = await Cart.findOne({ user_id: userId })
+							.populate({
+								path: "items.product_id",
+								model: "Product",
+								select:
+									"title thumbnail price allowVariants variants quantity enableDiscount discount category",
+							})
+							.select("items.variant_id items.product_id items.quantity")
+							.lean()
+
 						if (!populatedUserCart) {
 							res.status(500).json({
 								success: false,
@@ -421,16 +451,14 @@ class OrderController {
 							return
 						}
 
-						// Map the populated cart to the expected ICartItemPopulate type
-						if (!populatedUserCart || !populatedUserCart.cart) {
-							console.error("User or cart not found")
-							res.status(404).send("User or cart not found")
-						}
-						const populatedCart = transformCartItems(populatedUserCart.cart)
+						const populatedCart = transformCartItems(populatedUserCart.items)
+
 						const filterVariantStock = (cartItems: any[]) => {
 							return cartItems.map((item) => {
-								let newItem = { ...item }
+								// Perform a deep copy of item to remove Mongoose properties
+								let newItem = JSON.parse(JSON.stringify(item))
 
+								// Proceed with filtering as usual
 								if (newItem.variant) {
 									const { stock, ...filteredVariant } = newItem.variant
 									newItem = { ...newItem, variant: filteredVariant }
@@ -444,103 +472,148 @@ class OrderController {
 								return newItem
 							})
 						}
+
 						const filteredCart = filterVariantStock(populatedCart)
+
 						if (populatedUserCart) {
 							const orderData = {
+								// products: filteredCart,
 								products: filteredCart,
 								status: "Processing",
 								total: checkoutSucceeded.amount_total,
 								coupon: couponId ? couponId : null,
-								orderBy: populatedUserCart._id,
+								orderBy: userId,
 							}
-
 							try {
-								await Order.findByIdAndUpdate(
-									orderId,
-									{ ...orderData, visible: true },
-									{ new: true }
-								)
+								const order = await Order.create({
+									...orderData,
+									visible: true,
+								})
+								let coupon
+								try {
+									const couponData = await Coupon.findById(couponId)
+									coupon = couponData
+								} catch (error) {
+									coupon = null
+								}
+
+								const emailHtml = `
+								  <div style="font-family: Arial, sans-serif; max-width: 1024px; margin: 0 auto; padding: 6px; border: 1px solid #ddd; border-radius: 8px;">
+								    <h2 style="color: #333; text-align: center;">Order Confirmation</h2>
+								    <p style="text-align: center; color: #555;">Order ID: <strong>${
+											order._id
+										}</strong></p>
+								    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+								      <thead>
+								        <tr>
+								          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: left;">Product</th>
+								          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: center;">Quantity</th>
+								          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: left;">Variant</th>
+								          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: right;">Price</th>
+								        </tr>
+								      </thead>
+								      <tbody>
+								        ${filteredCart
+													.map(
+														(item) => `
+								          <tr>
+														<td style="padding: 4px 0; border-bottom: 1px solid #eee; width: 160px">
+														<table role="presentation" cellspacing="0" cellpadding="0" style="width: 100%;">
+															<tr>
+																<td style="padding-right: 4px; width: 60px;">
+																	<img src="${item.product.thumbnail}" alt="${item.product.title}"
+																			style="width: 60px; height: 60px; object-fit: contain; border-radius: 5px; display: block;">
+																</td>
+																<td style="max-width: 100px; text-align: center;">
+																	<span style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+																							font-size: 14px; color: #333; margin-top: 5px; line-height: 1.2;">
+																		${item.product.title}
+																	</span>
+																</td>
+															</tr>
+														</table>
+													</td>
+								            <td style="padding: 4px 0; border-bottom: 1px solid #eee; text-align: center">${
+															item.quantity
+														}</td>
+
+								            <td style="padding: 4px 0; border-bottom: 1px solid #eee; text-align: left">
+															${
+																item.variant
+																	? item.variant.variant
+																			.map(
+																				(variantObject: {
+																					type: string
+																					value: string
+																				}) => `
+								                <span style="display: block; font-size: 12px; color: #555; text-transform: uppercase">${variantObject.type}: ${variantObject.value}</span>
+								              `
+																			)
+																			.join("")
+																	: "<span style='display: block; font-size: 12px; color: #555; '>None</span>"
+															}
+
+								            </td>
+								            <td style="padding: 4px 0; border-bottom: 1px solid #eee; text-align: right;">${item.product.price.toLocaleString(
+															"it-IT",
+															{
+																style: "currency",
+																currency: "VND",
+															}
+														)}</td>
+								          </tr>
+								        `
+													)
+													.join("")}
+								      </tbody>
+								    </table>
+
+								    <div style="margin-top: 20px;">
+								      <p style="color: #555;">Coupon Applied: <strong>${
+												coupon ? coupon.name : "None"
+											}</strong></p>
+								      <p style="color: #333; font-size: 18px; font-weight: bold;">Total: ${checkoutSucceeded.amount_total.toLocaleString(
+												"it-IT",
+												{
+													style: "currency",
+													currency: "VND",
+												}
+											)}</p>
+								    </div>
+
+								    <p style="text-align: center; color: #999; margin-top: 20px">Thank you for your purchase!</p>
+
+										<table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="text-align: center; margin-top: 20px;">
+												<tr>
+												 <td align="center">
+														<a href="${process.env.URL_CLIENT}/order-success?orderId=${order._id}"
+														style="background-color: #F43F5E; padding: 10px 20px; color: 	#ffffff; border-radius: 8px;
+								  					text-decoration: none; font-size: 16px; font-weight: 700; display: 	inline-block;">
+															Check out your billing information here.
+														</a>
+													</td>
+												</tr>
+										</table>
+								  </div>
+								`
+
+								const response = await sendMail({
+									email: user.email,
+									html: emailHtml,
+									subject: "User billing information",
+								})
+
+								const io = req.app.get("io") // Access io instance from app
+								io.emit("orderUpdated", {
+									message: "Order updated",
+									orderId: order._id,
+								})
+								io.emit("newestOrdersUpdated", {
+									message: "Newest orders updated",
+								})
 							} catch (error) {
 								console.log("Error while update order in checkout session")
 							}
-							const emailHtml = `
-							  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-							    <h2 style="color: #333; text-align: center;">Order Confirmation</h2>
-							    <p style="text-align: center; color: #555;">Order ID: <strong>${orderId}</strong></p>
-
-							    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-							      <thead>
-							        <tr>
-							          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: left;">Product</th>
-							          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: left;">Quantity</th>
-							          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: left;">Variant</th>
-							          <th style="border-bottom: 2px solid #ddd; padding-bottom: 10px; text-align: right;">Price</th>
-							        </tr>
-							      </thead>
-							      <tbody>
-							        ${filteredCart
-												.map(
-													(item) => `
-							          <tr>
-							            <td style="padding: 10px 0; border-bottom: 1px solid #eee;">
-							              <div style="display: flex; align-items: center;">
-							                <img src="${item.product.thumbnail}" alt="${
-														item.product.title
-													}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; border-radius: 5px;" />
-							                <span>${item.product.title}</span>
-							              </div>
-							            </td>
-							            <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${
-														item.quantity
-													}</td>
-							            <td style="padding: 10px 0; border-bottom: 1px solid #eee;">
-							              ${
-															item.variant
-																? Object.entries(item.variant)
-																		.map(
-																			([key, value]) => `
-							                <span style="display: block; font-size: 12px; color: #555;">${key}: ${value}</span>
-							              `
-																		)
-																		.join("")
-																: "None"
-														}
-							            </td>
-							            <td style="padding: 10px 0; border-bottom: 1px solid #eee; text-align: right;">${
-														item.product.price
-													} VND</td>
-							          </tr>
-							        `
-												)
-												.join("")}
-							      </tbody>
-							    </table>
-
-							    <div style="margin-top: 20px;">
-							      <p style="color: #555;">Coupon Applied: <strong>${
-											couponId ? couponId : "None"
-										}</strong></p>
-							      <p style="color: #333; font-size: 18px; font-weight: bold;">Total: ${
-											checkoutSucceeded.amount_total
-										} VND</p>
-							    </div>
-
-							    <p style="text-align: center; color: #999; margin-top: 20px;">Thank you for your purchase!</p>
-							  </div>
-							`
-
-							await sendMail({
-								email: populatedUserCart.email,
-								html: emailHtml,
-								subject: "User billing information",
-							})
-							// After successfully updating the order, emit a socket event
-
-							const io = req.app.get("io") // Access io instance from app
-							io.emit("orderUpdated", { message: "Order updated", orderId })
-							io.emit("newestOrdersUpdated", {
-								message: "Newest orders updated",
-							})
 						}
 						await this.updateProductAndVariantQuantities(populatedCart)
 						await this.clearCartForUser(userId)
@@ -558,8 +631,9 @@ class OrderController {
 	}
 
 	clearCartForUser = async (userId: string) => {
-		await User.findByIdAndUpdate(userId, { cart: [] })
+		await Cart.deleteOne({ user_id: userId })
 	}
+
 	updateProductAndVariantQuantities = async (cartItems: any[]) => {
 		for (const item of cartItems) {
 			const product = await Product.findById(item.product._id)
@@ -594,8 +668,6 @@ class OrderController {
 				return res.status(400).json({ message: "Invalid request body" })
 			}
 
-			console.log(modifiedOrders)
-
 			// Cast Object.entries to ensure TypeScript knows that status is a string
 			const modifiedOrdersArray = Object.entries(modifiedOrders).map(
 				([_id, status]) => ({ _id, status: status as string })
@@ -611,8 +683,6 @@ class OrderController {
 					}
 				}
 			)
-
-			console.log(bulkOps)
 
 			await Order.bulkWrite(bulkOps)
 
@@ -723,7 +793,7 @@ class OrderController {
 			const newestOrders = await Order.find({ visible: true })
 				.sort({ createdAt: -1 }) // Sort by createdAt in descending order
 				.limit(5) // Limit to 5 orders
-				.populate("orderBy", "_id firstName lastName email avatar")
+				.populate("orderBy")
 				.populate("coupon")
 
 			res.json({
@@ -734,6 +804,185 @@ class OrderController {
 			res.status(500).json({
 				success: false,
 				message: "Error fetching newest orders",
+				data: [],
+			})
+		}
+	})
+
+	// getSalesByCategory = asyncHandler(async (req, res) => {
+	// 	try {
+	// 		const salesByCategory = await Order.aggregate([
+	// 			// Filter only visible orders
+	// 			{ $match: { visible: true } },
+
+	// 			// Deconstruct the products array
+	// 			{ $unwind: "$products" },
+
+	// 			// Extract relevant product details and category
+	// 			{
+	// 				$project: {
+	// 					category: "$products.product.category",
+	// 					quantity: "$products.quantity",
+	// 				},
+	// 			},
+
+	// 			// Group by category and sum up the quantities
+	// 			{
+	// 				$group: {
+	// 					_id: "$category",
+	// 					totalSold: { $sum: "$quantity" },
+	// 				},
+	// 			},
+
+	// 			// Optionally, lookup category details if needed
+	// 			{
+	// 				$lookup: {
+	// 					from: "categories", // Replace with your category collection name
+	// 					localField: "_id",
+	// 					foreignField: "_id",
+	// 					as: "categoryDetails",
+	// 				},
+	// 			},
+
+	// 			// Simplify the output
+	// 			{
+	// 				$project: {
+	// 					categoryId: "$_id",
+	// 					totalSold: 1,
+	// 					categoryDetails: { $arrayElemAt: ["$categoryDetails", 0] },
+	// 				},
+	// 			},
+	// 		])
+
+	// 		res.status(200).json({
+	// 			success: true,
+	// 			data: salesByCategory,
+	// 		})
+	// 	} catch (error) {
+	// 		console.error("Error fetching sales by category:", error)
+	// 		res.status(500).json({
+	// 			success: false,
+	// 			message: "Error fetching sales by category",
+	// 			data: [],
+	// 		})
+	// 	}
+	// })
+
+	getSalesByCategory = asyncHandler(async (req, res) => {
+		try {
+			const salesByCategory = await ProductCategory.aggregate([
+				// Lookup orders and match their categories
+				{
+					$lookup: {
+						from: "orders", // Order collection name
+						let: { categoryId: "$_id" },
+						pipeline: [
+							{ $match: { visible: true } }, // Match only visible orders
+							{ $unwind: "$products" }, // Flatten products array
+							{
+								$addFields: {
+									"products.product.category": {
+										$convert: {
+											input: "$products.product.category",
+											to: "objectId",
+											onError: "$products.product.category",
+											onNull: null,
+										},
+									},
+								},
+							},
+							{
+								$match: {
+									$expr: {
+										$eq: ["$products.product.category", "$$categoryId"],
+									},
+								},
+							},
+							{
+								$group: {
+									_id: "$products.product.category",
+									totalSold: { $sum: "$products.quantity" },
+								},
+							},
+						],
+						as: "orders",
+					},
+				},
+
+				// Add totalSold field, default to 0 if no orders found
+				{
+					$addFields: {
+						totalSold: {
+							$ifNull: [{ $arrayElemAt: ["$orders.totalSold", 0] }, 0],
+						},
+					},
+				},
+
+				// Clean up the output
+				{
+					$project: {
+						_id: 1,
+						title: 1,
+						totalSold: 1,
+					},
+				},
+			])
+
+			res.status(200).json({
+				success: true,
+				data: salesByCategory,
+			})
+		} catch (error) {
+			console.error("Error fetching sales by category: ", error)
+			res.status(500).json({
+				success: false,
+				message: "Error fetching sales by category",
+				data: [],
+			})
+		}
+	})
+
+	getAllYearSaleOrder = asyncHandler(async (req, res) => {
+		try {
+			// Get current year
+			const currentYear = new Date().getFullYear()
+
+			// Start and end dates of the current year
+			const startOfYear = new Date(`${currentYear}-01-01T00:00:00Z`)
+			const endOfYear = new Date(`${currentYear}-12-31T23:59:59Z`)
+
+			// Aggregate pipeline
+			const yearlySales = await Order.aggregate([
+				// Match orders created in the current year
+				{
+					$match: {
+						createdAt: {
+							$gte: startOfYear,
+							$lte: endOfYear,
+						},
+					},
+				},
+				// Group and sum the total field
+				{
+					$group: {
+						_id: null, // No grouping key needed; we only want the sum
+						totalSales: { $sum: "$total" },
+					},
+				},
+			])
+
+			// Extract totalSales or default to 0 if no orders
+			const totalSales = yearlySales.length > 0 ? yearlySales[0].totalSales : 0
+
+			res.status(200).json({
+				success: true,
+				data: { totalSales },
+			})
+		} catch (error) {
+			console.error("Error fetching all year sale orders:", error)
+			res.status(500).json({
+				success: false,
+				message: "Error fetching all year sale orders",
 				data: [],
 			})
 		}

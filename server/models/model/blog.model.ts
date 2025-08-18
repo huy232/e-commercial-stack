@@ -8,14 +8,16 @@ interface IUserBlog {
 interface IBlog extends Document {
 	title: string
 	description: string
-	category: string
 	numberViews: number
 	likes: Types.ObjectId[] | IUserBlog[]
 	dislikes: Types.ObjectId[] | IUserBlog[]
 	image: string
-	author: string
+	author: Types.ObjectId | IUserBlog
+	relatedProducts?: mongoose.Types.ObjectId[]
 	createdAt: Date
 	updatedAt: Date
+	slug: string
+	relatedBlogCategory: mongoose.Types.ObjectId[] | null
 }
 
 var blogSchema = new mongoose.Schema<IBlog>(
@@ -25,10 +27,6 @@ var blogSchema = new mongoose.Schema<IBlog>(
 			required: true,
 		},
 		description: {
-			type: String,
-			required: true,
-		},
-		category: {
 			type: String,
 			required: true,
 		},
@@ -50,12 +48,30 @@ var blogSchema = new mongoose.Schema<IBlog>(
 		],
 		image: {
 			type: String,
-			default:
-				"https://oymwwlqfxvnemaewrjza.supabase.co/storage/v1/object/public/Images/bg-wallpaper.jpg?t=2023-12-05T10%3A12%3A42.593Z",
+			default: "",
 		},
 		author: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+		relatedProducts: {
+			type: [mongoose.Schema.Types.ObjectId],
+			ref: "Product",
+			default: [],
+		},
+		relatedBlogCategory: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "BlogCategory",
+			default: null,
+		},
+		slug: {
 			type: String,
-			default: "Admin",
+			unique: true,
+			required: true,
+			trim: true,
+			lowercase: true,
+			set: (v: string) => v.replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
 		},
 	},
 	{

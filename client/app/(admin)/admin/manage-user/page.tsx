@@ -6,10 +6,16 @@ type Props = {
 	searchParams: { [key: string]: string | string[] | undefined }
 }
 
+export const metadata = {
+	title: "Manage Users | Digital World Admin",
+	description: "View, edit, and manage registered users of Digital World.",
+	robots: { index: false, follow: false },
+}
+
 export default async function AdminManageUser(props: Props) {
 	return (
-		<main>
-			<h1 className="h-[75px] flex justify-between items-center text-3xl font-bold px-4">
+		<main className="w-full">
+			<h1 className="text-center text-3xl font-bold font-bebasNeue mt-8">
 				Manage users
 			</h1>
 			<Suspense fallback={<div>Loading...</div>}>

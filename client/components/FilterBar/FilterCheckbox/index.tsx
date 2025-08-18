@@ -1,6 +1,7 @@
 "use client"
+import { FaCheckSquare, FaSquare } from "@/assets/icons"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { FC, useState } from "react"
+import { FC, useState, useEffect, useCallback } from "react"
 
 interface FilterCheckboxProps {
 	options: {
@@ -11,20 +12,26 @@ interface FilterCheckboxProps {
 }
 
 const FilterCheckbox: FC<FilterCheckboxProps> = ({ options, onChange }) => {
-	// Get URL search params and handle initial values from the URL
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const router = useRouter()
 
-	const getInitialValues = (paramName: string): string[] => {
-		const valuesString = searchParams.get(paramName)
-		return valuesString ? valuesString.split(",") : []
-	}
+	const getInitialValues = useCallback(
+		(paramName: string): string[] => {
+			const valuesString = searchParams.get(paramName)
+			return valuesString ? valuesString.split(",") : []
+		},
+		[searchParams]
+	)
 
-	// Get initial selected values from the URL
-	const initialSelected = getInitialValues(options.paramName)
-	const [selectedValues, setSelectedValues] =
-		useState<string[]>(initialSelected)
+	// State to manage selected values
+	const [selectedValues, setSelectedValues] = useState<string[]>([])
+
+	// Sync state with query parameters
+	useEffect(() => {
+		const initialSelected = getInitialValues(options.paramName)
+		setSelectedValues(initialSelected)
+	}, [searchParams, options.paramName, getInitialValues])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value
@@ -45,21 +52,49 @@ const FilterCheckbox: FC<FilterCheckboxProps> = ({ options, onChange }) => {
 		router.replace(`${pathname}?${params.toString()}`)
 	}
 
+	const resetFilter = () => {
+		const params = new URLSearchParams(searchParams)
+		params.delete(options.paramName)
+		router.replace(`${pathname}?${params.toString()}`)
+		setSelectedValues([])
+	}
+
 	return (
-		<div>
-			{options.values.map((value) => (
-				<label key={value}>
-					<input
-						type="checkbox"
-						name={options.paramName}
-						value={value}
-						checked={selectedValues.includes(value)}
-						onChange={handleCheckboxChange}
-					/>
-					{value}
-				</label>
-			))}
-		</div>
+		<>
+			<div className="flex flex-wrap gap-2">
+				{options.values.map((value) => (
+					<label key={value} className="w-fit">
+						<input
+							type="checkbox"
+							name={options.paramName}
+							value={value}
+							checked={selectedValues.includes(value)}
+							onChange={handleCheckboxChange}
+							className="peer hidden"
+						/>
+						<div className="hover:bg-gray-50 flex items-center justify-between px-1 py-1 rounded cursor-pointer text-sm group peer-checked:border-blue-500 peer-checked:bg-white text-white peer-checked:text-black hover-effect hover:text-black gap-1">
+							<FaCheckSquare
+								size={16}
+								className="text-blue-600 hidden group-[.peer:checked+&]:block"
+							/>
+							<FaSquare
+								size={16}
+								className="block group-[.peer:checked+&]:hidden"
+							/>
+							<span>{value}</span>
+						</div>
+					</label>
+				))}
+			</div>
+			<button
+				className="mt-2 text-xs text-red-500 hover:underline"
+				onClick={() => {
+					resetFilter()
+				}}
+			>
+				Clear Selection
+			</button>
+		</>
 	)
 }
 

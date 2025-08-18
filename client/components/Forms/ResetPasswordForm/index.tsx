@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import Link from "next/link"
 import { passwordHashingClient, path } from "@/utils"
 import { Button, InputField } from "@/components"
-import { URL } from "@/constant"
+import { WEB_URL } from "@/constant"
 
 type ResetPasswordFormData = {
 	password: string
@@ -40,7 +40,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 			}
 			const hashPassword = await passwordHashingClient(confirmPassword)
 			// const response = await resetPassword(hashPassword, token)
-			const response = await fetch(URL + "/api/user/reset-password", {
+			const response = await fetch(WEB_URL + "/api/user/reset-password", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

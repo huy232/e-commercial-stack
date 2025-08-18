@@ -22,7 +22,6 @@ const FilterBar: FC<FilterBarProps> = ({
 	options,
 	maxPrice,
 	onChange,
-	selectedValue,
 }) => {
 	const dropdownRef = useRef<HTMLDivElement>(null)
 	const [open, setOpen] = useState(false)
@@ -35,10 +34,6 @@ const FilterBar: FC<FilterBarProps> = ({
 		setOpen(!open)
 	}
 
-	const handleDropdownClick = (event: MouseEvent) => {
-		event.stopPropagation() // Prevent click from closing the dropdown
-	}
-
 	const handleFilterChange = (selectedValues: string | string[]) => {
 		if (onChange) {
 			onChange(selectedValues)
@@ -46,33 +41,33 @@ const FilterBar: FC<FilterBarProps> = ({
 	}
 
 	return (
-		<div onClick={toggleFilterBar} className="relative" ref={dropdownRef}>
-			<div className="p-4 text-xs gap-6 border border-gray-800 flex items-center justify-center text-gray-500 cursor-pointer">
-				<span className="uppercase">{name}</span>
-				<AiOutlineDown />
+		<div onClick={toggleFilterBar} className="" ref={dropdownRef}>
+			<div className="p-1 text-xs flex items-center">
+				<span className="inline-block font-bold text-base text-white">
+					{name}
+				</span>
+				{/* <AiOutlineDown /> */}
 			</div>
-			{open && (
-				<div
-					className="z-10 absolute top-[calc(100%-1px)] left-0 w-fit p-4 border bg-white min-w-[150px]"
-					onClick={handleDropdownClick} // Prevent click from closing the dropdown
-				>
-					{type === "checkbox" && options && (
-						<FilterCheckbox
-							options={options}
-							onChange={(values: string[]) => handleFilterChange(values)} // Pass string[]
-							selectedValues={(selectedValue as string[]) || []} // Ensure it's an array
-						/>
-					)}
-					{type === "radio" && options && (
-						<FilterRadio
-							options={options}
-							onChange={(value: string) => handleFilterChange(value)} // Pass single string
-							selectedValue={(selectedValue as string) || ""} // Ensure it's a string
-						/>
-					)}
-					{type === "input" && maxPrice && <FilterInput maxPrice={maxPrice} />}
-				</div>
-			)}
+			{/* {open && ( */}
+			<div
+				className="w-full px-2 mt-1 text-white/70"
+				// onClick={handleDropdownClick} // Prevent click from closing the dropdown
+			>
+				{type === "checkbox" && options && (
+					<FilterCheckbox
+						options={options}
+						onChange={(values: string[]) => handleFilterChange(values)} // Pass string[]
+					/>
+				)}
+				{type === "radio" && options && (
+					<FilterRadio
+						options={options}
+						onChange={(value: string) => handleFilterChange(value)} // Pass single string
+					/>
+				)}
+				{type === "input" && maxPrice && <FilterInput maxPrice={maxPrice} />}
+			</div>
+			{/* )} */}
 		</div>
 	)
 }

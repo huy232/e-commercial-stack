@@ -11,6 +11,12 @@ import {
 	productRouter,
 	userRouter,
 	visitRouter,
+	cartRouter,
+	wishlistRouter,
+	notifyRouter,
+	socialAuthRouter,
+	uploadImage,
+	chatRouter,
 } from "./route"
 
 const initRoutes = (app: Express): void => {
@@ -23,7 +29,14 @@ const initRoutes = (app: Express): void => {
 	app.use("/api/coupon", couponRouter)
 	app.use("/api/order", orderRouter)
 	app.use("/api/insert-data", insertDataRoute)
-	app.use("/api/visit", visitRouter)
+	app.use("/api/cart", cartRouter)
+	app.use("/api/wishlist", wishlistRouter)
+	app.use("/api/auth", socialAuthRouter)
+	app.use("/api/upload-image", uploadImage)
+	app.use("/api/chat", chatRouter)
+	// app.use("/api/visit", visitRouter)
+
+	app.use("/api/notification", notifyRouter)
 
 	// Error handling middleware
 	app.use(notFound)

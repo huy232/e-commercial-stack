@@ -1,9 +1,23 @@
 import { UserCart } from "@/components"
 import { API } from "@/constant"
+import { Metadata } from "next"
 
 type Props = {
 	params: {}
 	searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export const metadata: Metadata = {
+	title: "Your Cart | Digital World",
+	description:
+		"View and manage the products in your Digital World cart. Update quantities, remove items, and proceed to secure checkout.",
+	keywords: [
+		"Digital World cart",
+		"shopping cart",
+		"view cart",
+		"manage cart",
+		"checkout",
+	],
 }
 
 export default async function Cart(props: Props) {
@@ -20,10 +34,12 @@ export default async function Cart(props: Props) {
 		const couponData = await couponResponse.json()
 		coupon = couponData
 	}
-	console.log(coupon)
 	return (
-		<main className="w-main">
-			<h1 className="font-bold">User cart</h1>
+		<main className="w-full lg:w-main">
+			<h1 className="font-bold text-right font-bebasNeue text-2xl mx-2">
+				<span className="mr-1 text-main">User</span>
+				<span className="">cart</span>
+			</h1>
 			<UserCart discount={discount} coupon={coupon} />
 		</main>
 	)

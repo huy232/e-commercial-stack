@@ -1,3 +1,5 @@
+import { ProductExtraType } from "./product"
+
 export interface User {
 	id: string
 	username: string
@@ -56,20 +58,9 @@ export interface UpdateUserProfile {
 	avatar?: string
 }
 
-export interface UserCart {
-	product: {
-		_id: string
-		title: string
-		thumbnail: string
-		quantity: number
-		price: number
-		allowVariants: boolean
-	}
-	variant: {
-		price: number
-		stock: number
-		[key: string]: any
-		_id: string
-	}
-	quantity: number
+export interface VariantType {
+	variant: { type: string; value: string }[]
+	price: number
+	stock: number
+	_id: string
 }

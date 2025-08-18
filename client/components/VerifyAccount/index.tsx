@@ -2,7 +2,7 @@
 import { FC, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { URL } from "@/constant"
+import { WEB_URL } from "@/constant"
 
 const VerifyAccount: FC = () => {
 	const [errorMessage, setErrorMessage] = useState("")
@@ -15,7 +15,7 @@ const VerifyAccount: FC = () => {
 			const handleVerifyAccount = async () => {
 				const tokenValue = Array.isArray(token) ? token[0] : token
 				try {
-					const response = await fetch(URL + "/api/user/verify", {
+					const response = await fetch(WEB_URL + "/api/user/verify", {
 						method: "POST",
 						body: tokenValue,
 					})

@@ -14,20 +14,19 @@ const InputSelect: FC<InputSelectProps> = ({ options }) => {
 	const initialSelected = searchParams.get("sort") ?? options[0].value
 	const [selectedSort, setSelectedSort] = useState<string>(initialSelected)
 
-	useEffect(() => {
-		const sortParamExists = searchParams.has("sort")
-		if (!sortParamExists) {
-			setSelectedSort(options[0].value)
-			return
-		}
-		const currentSort = searchParams.get("sort") ?? ""
-		if (selectedSort !== currentSort) {
-			setSelectedSort(currentSort)
-		}
-	}, [selectedSort, searchParams, pathname, replace, options])
+	// useEffect(() => {
+	// 	const sortParamExists = searchParams.has("sort")
+	// 	if (!sortParamExists) {
+	// 		setSelectedSort(options[0].value)
+	// 		return
+	// 	}
+	// 	const currentSort = searchParams.get("sort") ?? ""
+	// 	if (selectedSort !== currentSort) {
+	// 		setSelectedSort(currentSort)
+	// 	}
+	// }, [selectedSort, searchParams, pathname, replace, options])
 
-	const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const newSortValue = e.target.value
+	const handleSortChange = (newSortValue: string) => {
 		setSelectedSort(newSortValue)
 		const params = new URLSearchParams(searchParams)
 		params.set("sort", newSortValue)
@@ -35,17 +34,24 @@ const InputSelect: FC<InputSelectProps> = ({ options }) => {
 	}
 
 	return (
-		<select
-			className="form-select"
-			value={selectedSort}
-			onChange={handleSortChange}
-		>
+		<div className="flex flex-col gap-2 text-white w-full px-2 pb-4">
 			{options.map((option) => (
-				<option key={option.id} value={option.value}>
-					{option.text}
-				</option>
+				<label
+					key={option.id}
+					className="flex items-center gap-2 cursor-pointer"
+				>
+					<input
+						type="radio"
+						name="sort"
+						value={option.value}
+						checked={selectedSort === option.value}
+						onChange={(e) => handleSortChange(e.target.value)}
+						className="form-radio"
+					/>
+					<span>{option.text}</span>
+				</label>
 			))}
-		</select>
+		</div>
 	)
 }
 export default memo(InputSelect)

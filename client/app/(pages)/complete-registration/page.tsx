@@ -1,4 +1,5 @@
-import { API, URL } from "@/constant"
+import { API, WEB_URL } from "@/constant"
+import { Metadata } from "next"
 import Link from "next/link"
 
 type Props = {
@@ -6,10 +7,22 @@ type Props = {
 	searchParams: { [key: string]: string | string[] | undefined }
 }
 
+export const metadata: Metadata = {
+	title: "Complete Registration | Digital World",
+	description:
+		"Finish setting up your Digital World account to unlock exclusive deals, track orders, and enjoy a fully personalized shopping experience.",
+	keywords: [
+		"Digital World complete registration",
+		"account setup",
+		"finish sign up",
+		"exclusive deals",
+		"track orders",
+	],
+}
+
 export default async function CompleteRegistration(props: Props) {
 	const token = props.searchParams.token as string | undefined
 	if (!token) {
-		console.error("Token is undefined")
 		return (
 			<div className="w-main">
 				<div className="flex flex-col gap-2 items-center">
@@ -38,7 +51,6 @@ export default async function CompleteRegistration(props: Props) {
 		}
 	)
 	const verifyResponse = await response.json()
-	console.log(verifyResponse)
 	if (!verifyResponse.success) {
 		return (
 			<div className="w-main">

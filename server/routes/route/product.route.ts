@@ -19,6 +19,7 @@ router.post(
 )
 router.get("/get-product/:product_slug", ProductController.getProduct)
 router.get("/get-all-product", ProductController.getAllProducts)
+router.get("/products-on-sale", ProductController.getProductsOnSale)
 router.put(
 	"/update-product/:product_id",
 	[verifyAccessToken, isAdmin],
@@ -66,5 +67,7 @@ router.get(
 	verifyAccessToken,
 	ProductController.getProductCategoryCounts
 )
+router.get("/normalize-product", ProductController.normalizeProduct)
+router.get("/product-brand", ProductController.productBrand)
 
 export { router as productRouter }

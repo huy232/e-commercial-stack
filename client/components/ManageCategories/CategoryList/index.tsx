@@ -1,10 +1,12 @@
 "use client"
 import { FC, useCallback, useEffect, useState } from "react"
 import { Brand, CategoryType } from "@/types"
-import { Button, Pagination } from "@/components"
+import { Button, Checkbox, Modal, Pagination, showToast } from "@/components"
 import { useSearchParams } from "next/navigation"
 import { API, BASE_SERVER_URL } from "@/constant"
 import io, { Socket } from "socket.io-client"
+import { FaTrashAlt, IoMdCloseCircle, IoMdSettings } from "@/assets/icons"
+import clsx from "clsx"
 
 interface CategoryListProps {
 	brands: Brand[]
@@ -24,6 +26,10 @@ const CategoryList: FC<CategoryListProps> = ({
 	const [totalPages, setTotalPages] = useState(1)
 	const [currentPage, setCurrentPage] = useState(1)
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+	const [showModal, setShowModal] = useState(false)
+	const [categoryToDelete, setCategoryToDelete] = useState<CategoryType | null>(
+		null
+	)
 
 	const fetchCategoryList = useCallback(async () => {
 		setLoading(true)
@@ -83,6 +89,52 @@ const CategoryList: FC<CategoryListProps> = ({
 
 	const startIndex = (currentPage - 1) * itemsPerPage + 1
 
+	const handleOpenDeleteModal = (category: CategoryType) => {
+		setCategoryToDelete(category)
+		setShowModal(true)
+	}
+
+	const handleConfirmDelete = async () => {
+		if (!categoryToDelete) return
+
+		try {
+			if (categoryToDelete.image) {
+				await fetch(API + "/upload-image/delete", {
+					method: "POST",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						imageUrls: [categoryToDelete.image],
+					}),
+				})
+			}
+
+			const response = await fetch(
+				API + `/product-category/${categoryToDelete._id}`,
+				{
+					method: "DELETE",
+					credentials: "include",
+				}
+			)
+			const result = await response.json()
+
+			if (result.success) {
+				showToast("Category deleted successfully.", "success")
+				await fetchCategoryList()
+			} else {
+				showToast(result.message || "Failed to delete category.", "error")
+			}
+		} catch (err) {
+			console.error(err)
+			showToast("Something went wrong while deleting.", "error")
+		} finally {
+			setShowModal(false)
+			setCategoryToDelete(null)
+		}
+	}
+
 	useEffect(() => {
 		fetchCategoryList()
 
@@ -111,68 +163,131 @@ const CategoryList: FC<CategoryListProps> = ({
 		return <div>There are currently no product categories.</div>
 
 	return (
-		<div>
-			<h2 className="text-xl font-bold mb-4">Manage categories list</h2>
-			<div>
-				<table className="min-w-full table-auto">
-					<thead>
-						<tr>
-							<th className="px-4 py-2">Select</th>
-							<th className="px-4 py-2">#</th>
-							<th className="px-4 py-2">Name</th>
-							<th className="px-4 py-2">Brand(s)</th>
-							<th className="px-4 py-2">Action(s)</th>
-						</tr>
-					</thead>
-					<tbody>
-						{productCategories.map((category, index) => (
-							<tr key={category._id} className="border-b">
-								<td className="px-4 py-2">
-									<input
-										type="checkbox"
-										checked={selectedCategories.includes(category._id)}
-										onChange={() => handleSelectCategory(category._id)}
+		<>
+			<h2 className="text-2xl font-bold mb-4 font-bebasNeue text-center mt-4">
+				Categories list
+			</h2>
+			<Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+				<div className="max-w-xs text-center">
+					<h2 className="text-lg font-semibold mb-2">Delete Category</h2>
+					<p className="text-sm mb-4">
+						<div className="flex flex-col items-center">
+							<span className="">Are you sure you want to delete</span>
+							<strong>{categoryToDelete?.title}</strong>?<br />
+						</div>
+						<span className="text-red-500 font-semibold">
+							This action cannot be undone.
+						</span>
+					</p>
+					<div className="flex justify-end gap-2">
+						<Button
+							onClick={() => setShowModal(false)}
+							className="bg-gray-300 text-black px-4 py-2 rounded hover:opacity-80"
+						>
+							Cancel
+						</Button>
+						<Button
+							onClick={handleConfirmDelete}
+							className="bg-red-500 text-white px-4 py-2 rounded hover:opacity-80"
+						>
+							Delete
+						</Button>
+					</div>
+				</div>
+			</Modal>
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+				{productCategories.map((category, index) => (
+					<div
+						key={category._id}
+						className={clsx(
+							"w-full md:w-[320px] lg:w-[320px] opacity-80 rounded p-2 lg:m-2 h-fit mx-2 lg:mx-auto mt-2 relative",
+							selectedCategories.includes(category._id)
+								? "bg-green-400/80"
+								: "bg-black/30"
+						)}
+					>
+						<div className="mx-2 flex items-center gap-1 justify-between">
+							<div className="bg-black/30 rounded p-1 justify-center items-center flex-inline hover:opacity-80 hover:brightness-125 duration-300 ease-in-out mx-1 flex">
+								<Checkbox
+									checked={selectedCategories.includes(category._id)}
+									onChange={() => handleSelectCategory(category._id)}
+									name={`product-category-${category._id}`}
+									size={4}
+								/>
+								<label
+									htmlFor={`product-category-${category._id}`}
+									className="ml-1 cursor-pointer font-inter text-base font-semibold select-none"
+								>
+									{category.title}
+								</label>
+							</div>
+							<div className="flex flex-col items-center justify-end">
+								<Button
+									onClick={() => handleEditCategory(category)}
+									className="mx-2 group duration-300 transition-all hover:opacity-80 hover:brightness-110 bg-black/30 rounded p-1 flex flex-row items-center ease-in-out"
+								>
+									<span className="mr-0.5">Edit</span>{" "}
+									<IoMdSettings
+										size={20}
+										className="group-hover:animate-spin"
 									/>
-								</td>
-								<td className="px-4 py-2">{startIndex + index}</td>
-								<td className="px-4 py-2">{category.title}</td>
-								<td className="px-4 py-2">
-									{category.brand && (
-										<div className="overflow-y-auto whitespace-nowrap h-[90px] w-full">
-											{category.brand.map((brand) => (
-												<span key={brand._id} className="block">
-													{brand.title}
-												</span>
-											))}
-										</div>
-									)}
-								</td>
-								<td className="px-4 py-2">
-									<Button onClick={() => handleEditCategory(category)}>
-										Edit
-									</Button>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-				<div className="flex space-x-4 mt-4">
+								</Button>
+								<Button
+									onClick={() => handleOpenDeleteModal(category)}
+									className="bg-red-500 text-white p-1 rounded hover:opacity-80 hover:brightness-110 duration-300 ease-in-out absolute top-[-14px] right-[-8px] flex items-center justify-center"
+									title="Delete category"
+									aria-label="Delete category"
+									disabled={selectedCategories.includes(category._id)}
+									aria-disabled={selectedCategories.includes(category._id)}
+								>
+									<FaTrashAlt />
+								</Button>
+							</div>
+						</div>
+						<span className="font-medium mx-3 text-sm mt-2">
+							Brand available
+						</span>
+						{category.brand ? (
+							<ul className="whitespace-nowrap mx-2 px-2 py-1 flex flex-wrap gap-2 mt-1">
+								{category.brand.map((brand) => (
+									<li
+										key={brand._id}
+										className="text-xs block w-fit bg-zinc-800 text-gray-300 p-1 rounded select-none font-light"
+									>
+										{brand.title}
+									</li>
+								))}
+							</ul>
+						) : (
+							<span className="italic text-red-500/80 font-semibold">
+								No brand available
+							</span>
+						)}
+					</div>
+				))}
+			</div>
+			{selectedCategories.length > 0 && (
+				<div className="flex mt-4 items-center justify-end mx-2 gap-2">
 					<Button
 						onClick={handleDeleteSelected}
 						disabled={selectedCategories.length === 0}
+						className={clsx(
+							"bg-green-500/80 rounded p-1 hover:opacity-80 hover:brightness-125 duration-300 ease-in-out border-2 border-transparent hover:bg-transparent hover:border-green-bg-green-500/80"
+						)}
 					>
 						Delete Selected
 					</Button>
 					<Button
 						onClick={handleCancelSelection}
 						disabled={selectedCategories.length === 0}
+						className="bg-rose-500 rounded p-1 hover:opacity-80 hover:brightness-125 duration-300 ease-in-out border-2 border-transparent hover:bg-transparent hover:border-rose-500"
 					>
 						Cancel
 					</Button>
 				</div>
-				<Pagination totalPages={totalPages} />
-			</div>
-		</div>
+			)}
+			<Pagination totalPages={totalPages} />
+		</>
 	)
 }
 

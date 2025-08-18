@@ -27,16 +27,25 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 	})
 
 	const imageUploadClass = clsx(
-		`border border-gray-300 p-4 text-center cursor-pointer h-fit`,
+		`border border-gray-300 p-4 text-center cursor-pointer h-fit w-fit mt-2`,
 		isDragActive && "bg-gray-100"
 	)
 
 	return (
 		<div {...getRootProps()} className={imageUploadClass}>
 			<input {...getInputProps()} disabled={disabled} />
-			<p>Drag and drop your {multiple ? "images" : "image"} here</p>
-			<p>or</p>
-			<label htmlFor="file-upload" className="cursor-pointer">
+			<p className="text-base font-medium">
+				<span>Drag and drop your</span>
+				<span className="italic text-gray-500 mx-1">
+					{multiple ? "image(s)" : "image"}
+				</span>
+				<span>here</span>
+			</p>
+			<p className="italic text-xs uppercase font-semibold">or</p>
+			<label
+				htmlFor="file-upload"
+				className="font-medium text-base cursor-pointer"
+			>
 				Browse
 			</label>
 		</div>

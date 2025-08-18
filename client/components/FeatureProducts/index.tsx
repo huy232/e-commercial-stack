@@ -1,4 +1,4 @@
-import { ProductType } from "@/types"
+import { ProductExtraType, ProductType } from "@/types"
 import { FC } from "react"
 import { ProductCard } from "@/components"
 
@@ -8,13 +8,14 @@ interface FeatureProductsProps {
 
 const FeatureProducts: FC<FeatureProductsProps> = ({ featureProducts }) => {
 	return (
-		<div className="w-full">
-			<h3 className="uppercase text-lg font-semibold py-[15px] border-b-2 border-main">
-				Feature products
+		<div className="w-full grid">
+			<h3 className="uppercase text-2xl font-semibold py-[15px] border-b-2 border-main lg:skew-x-12 font-bebasNeue lg:text-right text-center">
+				<span className="lg:text-4xl mr-1 text-red-500">Feature</span>
+				products
 			</h3>
-			<div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-14">
+			<div className="my-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4 lg:gap-8 xl:gap-12 place-self-center">
 				{featureProducts ? (
-					featureProducts.map((product: ProductType) => (
+					featureProducts.map((product: ProductExtraType) => (
 						<ProductCard
 							key={product._id}
 							product={product}

@@ -11,7 +11,8 @@ import { UploadedFile, UploadedFiles } from "../../types/uploadFile"
 import { v4 as uuidv4 } from "uuid"
 import { filterCategory } from "../../data/filterCategory"
 import { getVariantFilters } from "../../utils/getVariantFilters"
-import { ObjectId, Types } from "mongoose"
+import mongoose, { ObjectId, Types } from "mongoose"
+import { NotifyService } from "../../services"
 
 class ProductController {
 	static cachedDailyDeal: {
@@ -106,19 +107,32 @@ class ProductController {
 	getAllProducts = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			try {
-				const queries = { ...req.query }
-				const excludeFields = ["limit", "sort", "page", "fields"]
+				// Convert query keys to lowercase to match optionKey
+				const queries: Record<string, any> = {}
+				Object.keys(req.query).forEach((key) => {
+					queries[key.toLowerCase()] = req.query[key]
+				})
 
+				const excludeFields = [
+					"limit",
+					"sort",
+					"page",
+					"fields",
+					"type",
+					"order",
+				]
 				excludeFields.forEach((element) => delete queries[element])
+
 				let queryString = JSON.stringify(queries)
+
+				console.log(queryString)
 				queryString = queryString.replace(
 					/\b(gte|gt|lt|lte)\b/g,
 					(matchedElement) => `$${matchedElement}`
 				)
 				const formattedQueries = JSON.parse(queryString)
 				const priceFilter: any = {}
-
-				// Filtering
+				// Handle search
 				if (queries.search as string) {
 					delete formattedQueries.search
 					formattedQueries["$or"] = [
@@ -126,30 +140,71 @@ class ProductController {
 					]
 				}
 
-				// TITLE
+				// Handle title
 				if (queries.title) {
 					formattedQueries.title = { $regex: queries.title, $options: "i" }
 				}
 
-				// VARIANT FILTERS
-				const variantFilters = getVariantFilters(filterCategory)
-				const variantQueries: any = {}
-				variantFilters.forEach((field) => {
-					const queryField = field.toLowerCase()
-					if (queries[queryField]) {
-						const values = (queries[queryField] as string).split(",")
-						variantQueries[`${queryField}`] = {
-							$in: values.map((value) => new RegExp(value, "i")),
+				// Handle category filtering
+				let categoryId: Types.ObjectId | null = null
+				if (queries.category) {
+					const category = await ProductCategory.findOne({
+						title: { $regex: queries.category, $options: "i" },
+					})
+					if (category) {
+						categoryId = category._id
+						formattedQueries.category = categoryId
+						// Dynamic variant filtering
+						// Dynamic variant filtering
+						const categoryOptions = category.option || []
+						const variantQueries = []
+
+						for (const option of categoryOptions) {
+							const optionKey = option.type.toLowerCase() // Use exact type (e.g., 'color', 'storage')
+
+							if (queries[optionKey.toLowerCase()]) {
+								// Query params are in lowercase
+								const values = (
+									queries[optionKey.toLowerCase()] as string
+								).split(",")
+
+								// Push a condition for each option type and values to match
+								variantQueries.push({
+									variants: {
+										$elemMatch: {
+											"variant.type": new RegExp(option.type, "i"), // Match `type` in a case-insensitive way
+											"variant.value": {
+												$in: values.map((value) => new RegExp(value, "i")),
+											}, // Match values case-insensitively
+										},
+									},
+								})
+
+								// Remove the option from main queries to avoid conflict
+								delete formattedQueries[optionKey.toLowerCase()]
+							}
 						}
-						// Remove from main queries to avoid conflict
-						delete formattedQueries[queryField]
+
+						// If there are dynamic option filters, apply them using $and
+						if (variantQueries.length > 0) {
+							formattedQueries.$and = variantQueries
+						}
 					}
-				})
-				if (Object.keys(variantQueries).length > 0) {
-					formattedQueries.variants = { $elemMatch: variantQueries }
 				}
 
-				// PRICE
+				// Handle brand filtering
+				let brandId: Types.ObjectId | null = null
+				if (queries.brand) {
+					const brand = await Brand.findOne({
+						title: { $regex: queries.brand, $options: "i" },
+					})
+					brandId = brand ? brand._id : null
+					if (brandId) {
+						formattedQueries.brand = brandId
+					}
+				}
+
+				// Handle price filtering
 				if (queries.from) {
 					priceFilter.$gte = parseInt(queries.from as string)
 					delete formattedQueries.from
@@ -162,72 +217,38 @@ class ProductController {
 					formattedQueries.price = priceFilter
 				}
 
-				let categoryId: Types.ObjectId | null = null
-				let brandId: Types.ObjectId | null = null
-
-				if (queries.category) {
-					const category = await ProductCategory.findOne({
-						title: { $regex: queries.category, $options: "i" },
-					})
-					categoryId = category ? category._id : null
-				}
-
-				if (queries.brand) {
-					const brand = await Brand.findOne({
-						title: { $regex: queries.brand, $options: "i" },
-					})
-					brandId = brand ? brand._id : null
-				}
-
-				if (categoryId) {
-					formattedQueries.category = categoryId
-				}
-
-				if (brandId) {
-					formattedQueries.brand = brandId
-				}
-
+				// Build the query
 				let query = Product.find(formattedQueries)
 					.populate("brand")
 					.populate("category")
 
-				// Sorting
+				// Handle sorting
 				if (req.query.sort as string) {
 					const sortBy = (req.query.sort as string).split(",").join(" ")
 					query = query.sort(sortBy)
 				}
 
-				// Fields limiting
+				// Handle field limiting
 				if (req.query.fields as string) {
 					const fields = (req.query.fields as string).split(",").join(" ")
 					query = query.select(fields)
 				}
 
-				const page = parseInteger(req.query.page, 1)
-				const limit = parseInteger(req.query.limit, 10)
-				if (page < 1) {
-					res.status(400).json({
-						success: false,
-						message:
-							"Invalid value for page parameter. Must be a positive integer.",
-					})
-					return
+				if (req.query.sort) {
+					delete formattedQueries.type
+					delete formattedQueries.order
+					const sortField = req.query.sort as string
+					const sortOrder = req.query.order === "desc" ? -1 : 1 // Default to "asc"
+					query = query.sort({ [sortField]: sortOrder })
 				}
 
-				if (limit < 1) {
-					res.status(400).json({
-						success: false,
-						message:
-							"Invalid value for limit parameter. Must be a positive integer.",
-					})
-					return
-				}
+				// Handle pagination
+				const page = parseInteger(req.query.page, 1)
+				const limit = parseInteger(req.query.limit, 9)
 				const skip = (page - 1) * limit
 				query.skip(skip).limit(limit)
 
 				const response = await query.exec()
-
-				// Count the documents
 				const counts = await Product.countDocuments(formattedQueries)
 				const totalPages = Math.ceil(counts / limit) || 1
 				const currentPage = page
@@ -252,43 +273,143 @@ class ProductController {
 		}
 	)
 
+	getProductsOnSale = asyncHandler(async (req: Request, res: Response) => {
+		const now = new Date()
+
+		const [percentageDiscountProducts, fixedDiscountProducts] =
+			await Promise.all([
+				Product.find({
+					enableDiscount: true,
+					"discount.type": "percentage",
+					"discount.expirationDate": { $gt: now },
+					publicProduct: true,
+					deleted: false,
+				})
+					.populate("brand")
+					.populate("category"),
+
+				Product.find({
+					enableDiscount: true,
+					"discount.type": "fixed",
+					"discount.expirationDate": { $gt: now },
+					publicProduct: true,
+					deleted: false,
+				})
+					.populate("brand")
+					.populate("category"),
+			])
+
+		res.status(200).json({
+			success: true,
+			message: "Successfully fetched discounted products",
+			data: {
+				percentageDiscountProducts,
+				fixedDiscountProducts,
+			},
+		})
+	})
+
 	updateProduct = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { product_id } = req.params
 			const images = req.files as UploadedFiles
+
 			if (req.body && req.body.title) {
 				req.body.slug = slugify(req.body.title)
 			}
-			if (req.body.category) {
-				let categoriesSet = new Set(["Home"])
-				if (Array.isArray(req.body.category)) {
-					req.body.category.forEach((category: string) =>
-						categoriesSet.add(category)
-					)
-				} else {
-					categoriesSet.add(req.body.category as string)
-				}
-				req.body.category = Array.from(categoriesSet)
-			}
+
 			if (images.thumbnail) {
 				req.body.thumbnail = images.thumbnail[0].path
 			}
+
+			let uploadedImageURLs: string[] = []
 			if (images.productImages) {
-				const productImageURLs = images.productImages.map(
+				uploadedImageURLs = images.productImages.map(
 					(image: UploadedFile) => image.path
 				)
-				let existingProductImages = req.body.productImages || []
-				if (!Array.isArray(existingProductImages)) {
-					existingProductImages = [existingProductImages]
+			}
+
+			let existingProductImages: string[] = []
+			if (req.body.existingProductImages) {
+				try {
+					existingProductImages = JSON.parse(req.body.existingProductImages)
+				} catch (err) {
+					console.error("Failed to parse existingProductImages:", err)
+					existingProductImages = []
 				}
-				const productImages = [...existingProductImages, ...productImageURLs]
-				req.body.images = productImages
+			}
+
+			// ✅ Always update images, whether or not new ones were uploaded
+			req.body.images = [...existingProductImages, ...uploadedImageURLs]
+
+			if (req.body.variants) {
+				req.body.variants = JSON.parse(req.body.variants)
+			}
+
+			const existingProduct = await Product.findById(product_id)
+			if (!existingProduct) {
+				res.status(404).json({ success: false, message: "Product not found" })
+				return
+			}
+
+			if (
+				req.body.enableDiscount === "true" ||
+				req.body.enableDiscount === true
+			) {
+				req.body.enableDiscount = true
+				let productOriginalPrice
+				if (req.body.price) {
+					productOriginalPrice = req.body.price
+				} else {
+					const product = await Product.findById({ product_id })
+					productOriginalPrice = product?.price
+				}
+				let discountType = req.body.discountType
+				let productPrice
+				if (discountType === "percentage") {
+					productPrice =
+						productOriginalPrice -
+						(productOriginalPrice * req.body.discountValue) / 100
+				}
+				if (discountType === "fixed") {
+					productPrice = productOriginalPrice - req.body.discountValue
+				}
+				req.body.discount = {
+					type: req.body.discountType,
+					value: req.body.discountValue,
+					expirationDate: req.body.discountExpirationDate
+						? new Date(req.body.discountExpirationDate)
+						: null,
+					productPrice: productPrice,
+				}
+
+				// Remove individual discount fields from req.body
+				delete req.body.discountType
+				delete req.body.discountValue
+				delete req.body.discountExpirationDate
+			} else {
+				req.body.enableDiscount = false
+				req.body.discount = null // Clear discount if enableDiscount is false
 			}
 			const updatedProduct = await Product.findByIdAndUpdate(
 				product_id,
 				req.body,
 				{ new: true }
 			)
+
+			const validDiscount =
+				updatedProduct?.enableDiscount &&
+				updatedProduct.discount?.expirationDate &&
+				new Date(updatedProduct.discount.expirationDate) > new Date() && // Check if discount is still valid
+				updatedProduct.discount.value < existingProduct.price // Ensure it's actually discounted
+
+			if (validDiscount) {
+				await NotifyService.notifyWishlistUsers(
+					product_id,
+					req.app.get("io") // Pass Socket.IO instance
+				)
+			}
+
 			res.status(200).json({
 				success: updatedProduct ? true : false,
 				message: updatedProduct
@@ -414,18 +535,18 @@ class ProductController {
 		res: Response
 	): Promise<void> => {
 		try {
-			let cachedDeal = ProductController.cachedDailyDeal
+			// let cachedDeal = ProductController.cachedDailyDeal
 			res.setHeader("Cache-Control", "no-store")
 			// Check if the cached deal exists and is not expired
-			if (cachedDeal && moment().isBefore(moment(cachedDeal.expirationTime))) {
-				res.json({
-					success: true,
-					message: "Fetch daily deal from cache",
-					data: cachedDeal.product,
-					expirationTime: cachedDeal.expirationTime,
-				})
-				return
-			}
+			// if (cachedDeal && moment().isBefore(moment(cachedDeal.expirationTime))) {
+			// 	res.json({
+			// 		success: true,
+			// 		message: "Fetch daily deal from cache",
+			// 		data: cachedDeal.product,
+			// 		expirationTime: cachedDeal.expirationTime,
+			// 	})
+			// 	return
+			// }
 
 			// Fetch a new random product
 			const randomProduct = await Product.aggregate([
@@ -436,10 +557,10 @@ class ProductController {
 			// Update the MongoDB and cache with the new deal
 			if (randomProduct && randomProduct.length > 0) {
 				const expirationTime = moment().endOf("day").toISOString()
-				await ProductController.updateCachedDailyDeal(
-					randomProduct[0],
-					expirationTime
-				)
+				// await ProductController.updateCachedDailyDeal(
+				// 	randomProduct[0],
+				// 	expirationTime
+				// )
 
 				res.json({
 					success: true,
@@ -566,28 +687,163 @@ class ProductController {
 	getProductCategoryCounts = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			try {
-				// Aggregation pipeline to filter, unwind, group, and count
+				// Aggregation pipeline to filter, lookup, group, and count
 				const categoryCounts = await Product.aggregate([
-					// Match documents where the category array exists and is not empty
-					{ $match: { category: { $exists: true, $not: { $size: 0 } } } },
-					// Unwind the category array to process each category individually
-					{ $unwind: "$category" },
-					// Match again to exclude "Home" after unwind
-					{ $match: { category: { $ne: "Home" } } },
-					// Group by category and count the number of products in each category
-					{ $group: { _id: "$category", count: { $sum: 1 } } },
+					// Match documents where the category field exists
+					{ $match: { category: { $exists: true, $ne: null } } },
+					// Lookup to join with the ProductCategory collection and get category info
+					{
+						$lookup: {
+							from: "productcategories", // Name of the ProductCategory collection in MongoDB
+							localField: "category", // The field in the Product collection that references ProductCategory
+							foreignField: "_id", // The field in the ProductCategory collection to match with
+							as: "categoryInfo", // Name the output field to hold the populated category info
+						},
+					},
+					// Unwind categoryInfo array to handle each category individually
+					{ $unwind: "$categoryInfo" },
+					// Match again to exclude any unwanted categories (like "Home" by title)
+					{ $match: { "categoryInfo.title": { $ne: "Home" } } },
+					// Group by category title and count the number of products in each category
+					{
+						$group: {
+							_id: "$categoryInfo.title", // Group by category title
+							count: { $sum: 1 }, // Count the number of products in each category
+						},
+					},
 					// Sort the categories by count in descending order
 					{ $sort: { count: -1 } },
 				])
 
 				res.status(200).json(categoryCounts)
 			} catch (error) {
-				res
-					.status(500)
-					.json({ message: "Error retrieving product category counts", error })
+				res.status(500).json({
+					message: "Error retrieving product category counts",
+					error,
+				})
 			}
 		}
 	)
+
+	// normalizeProduct = asyncHandler(async (req: Request, res: Response) => {
+	// 	const products = await Product.find({})
+
+	// 	// Loop through each product
+	// 	for (const product of products) {
+	// 		if (product.variants) {
+	// 			const updatedVariants = product.variants.map((variant: any) => {
+	// 				const normalizedVariant: any = {}
+
+	// 				// Normalize all keys to lowercase
+	// 				Object.keys(variant).forEach((key) => {
+	// 					normalizedVariant[key.toLowerCase()] = variant[key]
+	// 				})
+
+	// 				return normalizedVariant
+	// 			})
+
+	// 			// Update the product with the new normalized variants
+	// 			product.variants = updatedVariants
+	// 			await product.save()
+	// 		}
+	// 	}
+	// 	res.status(200).json({ message: "Success" })
+	// })
+
+	normalizeProduct = asyncHandler(async (req: Request, res: Response) => {
+		const products = await Product.find({})
+		for (const product of products) {
+			if (product.variants && product.variants.length > 0) {
+				const updatedVariants = product.variants.map((variant: any) => {
+					// Destructure fixed fields
+					const rawVariant = variant.toObject()
+					const { stock, price, _id, ...dynamicFields } = rawVariant
+					const formattedVariantArray = Object.keys(dynamicFields).map(
+						(key) => ({
+							type: key,
+							value: dynamicFields[key],
+						})
+					)
+					return {
+						stock,
+						price,
+						_id,
+						variant: formattedVariantArray,
+					}
+				})
+
+				// Update the product's variants array with the modified format
+				product.variants = updatedVariants
+				product.markModified("variants") // Mark the variants field as modified
+				await product.save() // Save changes
+			}
+		}
+
+		res.status(200).json({ message: "Success" })
+	})
+
+	productBrand = asyncHandler(async (req: Request, res: Response) => {
+		try {
+			// Step 1: Aggregate brands that have at least 5 associated products, then randomly pick 5
+			const brandsWithProducts = await Product.aggregate([
+				{ $group: { _id: "$brand", count: { $sum: 1 } } }, // Group products by brand and count them
+				{ $match: { count: { $gte: 3 } } }, // Filter to include only brands with at least # products
+				{ $sample: { size: 5 } }, // Randomly select 5 brands
+			])
+
+			// Get the brand IDs from the aggregation result
+			const brandIds = brandsWithProducts.map((b) => b._id)
+
+			// Step 2: Find the details of the selected brands
+			const randomBrands = await Brand.find({ _id: { $in: brandIds } })
+
+			// Step 3: Find products for each brand, limited to 5 products per brand
+			const productPromises = brandIds.map(async (brandId) => {
+				const products = await Product.find({ brand: brandId })
+					.limit(5) // Limit to 5 products per brand
+					.populate("brand") // Populate brand info
+					.populate("category") // Populate category info
+				return { brandId, products }
+			})
+
+			// Step 4: Wait for all promises to resolve
+			const productsByBrand = await Promise.all(productPromises)
+
+			// Step 5: Structure and send the response
+			const result = productsByBrand.map(({ brandId, products }) => {
+				const brand = randomBrands.find((b) => b._id.equals(brandId))
+
+				// Check if brand exists to avoid undefined error
+				if (brand) {
+					return {
+						brand: {
+							_id: brand._id,
+							title: brand.title,
+						},
+						products,
+					}
+				} else {
+					return {
+						brand: null, // Handle the case where brand is not found
+						products,
+					}
+				}
+			})
+
+			res.status(200).json({
+				success: true,
+				message:
+					"Successfully fetched products for random brands with at least 5 products",
+				data: result,
+			})
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Error fetching products by brand",
+				error,
+			})
+		}
+	})
 }
 
 export default new ProductController()

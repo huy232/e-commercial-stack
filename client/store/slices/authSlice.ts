@@ -1,30 +1,33 @@
-import { ProfileUser, RootState, UserCart } from "@/types"
+import { ProfileUser, RootState } from "@/types"
 import { createSlice } from "@reduxjs/toolkit"
 import {
 	checkAuthentication,
 	checkIsAdmin,
 	handleApplyCoupon,
-	handleUserBulkCart,
-	handleUserCart,
 	handleUserWishlist,
+	handleUserLogin,
+	getUserWishlist,
+	getInformUserWishlist,
 } from "../actions"
 
 export interface AuthState {
 	isAuthenticated: boolean
 	user: ProfileUser | null
-	originalCart: UserCart[] | null
 	isAdmin: boolean
 	isLoading: boolean
 	error: string
+	isWishlistLoading: boolean
+	wishlist: []
 }
 
 const initialState: AuthState = {
 	isAuthenticated: false,
 	user: null,
-	originalCart: null,
 	isAdmin: false,
-	isLoading: false,
+	isLoading: true,
 	error: "",
+	isWishlistLoading: true,
+	wishlist: [],
 }
 
 const authSlice = createSlice({
@@ -34,29 +37,49 @@ const authSlice = createSlice({
 		loginSuccess: (state, action) => {
 			state.isAuthenticated = true
 			state.user = action.payload
-			state.originalCart = action.payload.cart
 			state.isAdmin = action.payload.role.includes("admin")
+			state.isLoading = false
 		},
 		logout: (state) => {
 			state.isAuthenticated = false
 			state.user = null
-			state.originalCart = null
 			state.isAdmin = false
+			state.isLoading = false
+			state.wishlist = []
 		},
 		updateUserCart: (state, action) => {
 			if (state.user) {
 				state.user.cart = action.payload
 			}
 		},
-		updateOriginalCart: (state, action) => {
-			state.originalCart = action.payload
+		updateOriginalCart: (state, action) => {},
+		setWishlistLoading: (state, action) => {
+			state.isWishlistLoading = action.payload
 		},
 	},
 	extraReducers: (builder) => {
+		// Login
+		builder.addCase(handleUserLogin.fulfilled, (state, action) => {
+			state.isAuthenticated = true
+			state.user = action.payload.userData
+			state.isAdmin = action.payload.userData.role.includes("admin")
+			state.isLoading = false
+		})
+		builder.addCase(handleUserLogin.pending, (state, action) => {
+			state.isLoading = true
+		})
+		builder.addCase(handleUserLogin.rejected, (state, action) => {
+			state.isAuthenticated = false
+			state.user = null
+			state.isAdmin = false
+			state.isLoading = false
+		})
+
 		// Check authentication
 		builder.addCase(checkAuthentication.fulfilled, (state, action) => {
 			state.isAuthenticated = action.payload
 			state.isLoading = false
+			state.isWishlistLoading = false
 		})
 		builder.addCase(checkAuthentication.pending, (state) => {
 			state.isLoading = true
@@ -64,9 +87,9 @@ const authSlice = createSlice({
 		builder.addCase(checkAuthentication.rejected, (state) => {
 			state.isAuthenticated = false
 			state.user = null
-			state.originalCart = null
 			state.isAdmin = false
 			state.isLoading = false
+			state.isWishlistLoading = false
 		})
 		// Check admin role
 		builder.addCase(checkIsAdmin.fulfilled, (state, action) => {
@@ -80,39 +103,10 @@ const authSlice = createSlice({
 			state.isAdmin = false
 			state.isLoading = false
 		})
-		// Handle user cart
-		builder.addCase(handleUserCart.fulfilled, (state, action) => {
-			if (state.user) {
-				state.user.cart = action.payload
-				state.originalCart = action.payload
-			}
-			state.isLoading = false
-		})
-		builder.addCase(handleUserCart.pending, (state) => {
-			state.isLoading = true
-		})
-		builder.addCase(handleUserCart.rejected, (state) => {
-			state.isLoading = false
-		})
-		// Handle user bulk cart
-		builder.addCase(handleUserBulkCart.fulfilled, (state, action) => {
-			if (state.user) {
-				state.user.cart = action.payload
-				state.originalCart = action.payload
-			}
-			state.isLoading = false
-		})
-		builder.addCase(handleUserBulkCart.pending, (state) => {
-			state.isLoading = true
-		})
-		builder.addCase(handleUserBulkCart.rejected, (state) => {
-			state.isLoading = false
-		})
 		// Handle handleApplyCoupon actions
 		builder.addCase(handleApplyCoupon.fulfilled, (state, action) => {
 			if (state.user) {
 				state.user.cart = action.payload
-				state.originalCart = action.payload
 			}
 			state.isLoading = false
 		})
@@ -123,28 +117,51 @@ const authSlice = createSlice({
 			state.isLoading = false
 			state.error = action.error.message || ""
 		})
-		// Handle user wishlist
+		// Handle add/remove user wishlist
 		builder.addCase(handleUserWishlist.pending, (state, action) => {
-			state.isLoading = true
+			state.isWishlistLoading = true
 		})
 		builder.addCase(handleUserWishlist.rejected, (state, action) => {
-			state.isLoading = false
+			state.isWishlistLoading = false
 		})
 		builder.addCase(handleUserWishlist.fulfilled, (state, action) => {
-			if (state.user) {
-				state.user.wishlist = action.payload
-			}
-			state.isLoading = false
+			state.wishlist = action.payload.data || []
+			state.isWishlistLoading = false
+		})
+		// Handle get user wishlist
+		builder.addCase(getUserWishlist.pending, (state, action) => {
+			state.isWishlistLoading = true
+		})
+		builder.addCase(getUserWishlist.rejected, (state, action) => {
+			state.isWishlistLoading = false
+		})
+		builder.addCase(getUserWishlist.fulfilled, (state, action) => {
+			state.wishlist = action.payload.data || []
+			state.isWishlistLoading = false
+		})
+
+		// Handle get inform user wishlist
+		builder.addCase(getInformUserWishlist.pending, (state, action) => {
+			state.isWishlistLoading = true
+		})
+		builder.addCase(getInformUserWishlist.rejected, (state, action) => {
+			state.isWishlistLoading = false
+		})
+		builder.addCase(getInformUserWishlist.fulfilled, (state, action) => {
+			state.wishlist = action.payload.data || []
+			state.isWishlistLoading = false
 		})
 	},
 })
 
 export const selectAuthUser = (state: RootState) => state.auth.user
+export const selectWishlist = (state: RootState) => state.auth.wishlist
 export const selectIsAuthenticated = (state: RootState) =>
 	state.auth.isAuthenticated
 export const selectIsAdmin = (state: RootState) => state.auth.isAdmin
 export const selectOriginalCart = (state: RootState) => state.auth.originalCart
-export const selectIsLoading = (state: RootState) => state.auth.isLoading
-export const { loginSuccess, logout, updateUserCart, updateOriginalCart } =
-	authSlice.actions
+export const selectIsUserLoading = (state: RootState) => state.auth.isLoading
+export const selectIsWishlistLoading = (state: RootState) =>
+	state.auth.isWishlistLoading
+export const { loginSuccess, logout, setWishlistLoading } = authSlice.actions
 export default authSlice.reducer

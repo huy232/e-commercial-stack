@@ -4,8 +4,10 @@ export const path = {
 	REGISTER: "/register",
 	FORGOT_PASSWORD: "/forgot-password",
 	PRODUCTS: "/products",
-	BLOGS: "/blogs",
+	BLOGS: "/blog",
 	OUR_SERVICES: "/our-services",
+	ABOUT_US: "/about-us",
+	CONTACT_US: "/contact-us",
 	FAQS: "/faqs",
 	CART: "/cart",
 
@@ -19,6 +21,10 @@ export const path = {
 	CREATE_BRAND: "create-brand",
 	MANAGE_CATEGORIES: "manage-categories",
 	CREATE_CATEGORY: "create-category",
+	MANAGE_BLOGS: "manage-blogs",
+	CREATE_BLOG: "create-blog",
+	MANAGE_BLOG_CATEGORIES: "manage-blog-categories",
+	MANAGE_CHAT_ROOMS: "manage-chat",
 
 	MEMEBER: "/member",
 

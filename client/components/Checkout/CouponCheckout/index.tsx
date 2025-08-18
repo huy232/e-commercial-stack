@@ -43,9 +43,13 @@ const CouponCheckout = ({
 			<input
 				type="text"
 				placeholder="Enter discount code here"
-				className="w-full border rounded-md py-2 px-4"
+				className={clsx(
+					"w-full border rounded-md py-2 px-4 mt-2",
+					readOnly && "disabled:cursor-not-allowed"
+				)}
 				{...register("couponCode")}
 				readOnly={readOnly}
+				disabled={readOnly}
 			/>
 		</div>
 	)

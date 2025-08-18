@@ -6,7 +6,6 @@ import cors from "cors"
 import { OrderController } from "./controllers"
 import http from "http" // Import http
 import configureSocket from "./config/socket"
-import logVisit from "./middlewares/logVisit"
 
 require("dotenv").config()
 

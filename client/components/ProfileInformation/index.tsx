@@ -9,12 +9,16 @@ import { useDispatch, useSelector } from "react-redux"
 import defaultAvatar from "@/assets/images/defaultAvatar.png"
 import { Button, CustomImage, InputForm } from "@/components"
 import { FieldError, FieldValues, useForm } from "react-hook-form"
-import { ChangeEvent, FC, useCallback, useState } from "react"
+import { ChangeEvent, FC, useCallback, useEffect, useState } from "react"
 import clsx from "clsx"
 import moment from "moment"
 import { validatePhoneNumber } from "@/validators"
 import { FaFileUpload } from "@/assets/icons"
 import { API } from "@/constant"
+import { useRouter } from "next/navigation"
+import { useMounted } from "@/hooks"
+import { path } from "@/utils"
+import { WEB_URL } from "@/constant"
 interface CustomFieldError extends FieldError {
 	message: string
 }
@@ -26,17 +30,19 @@ interface FormData extends FieldValues {
 	address: string
 }
 
-interface ProfileInformationProps {
-	user: ProfileUser
-}
-const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
+const ProfileInformation = () => {
 	const dispatch = useDispatch<AppDispatch>()
+	const router = useRouter()
+	const mounted = useMounted()
+	const user: ProfileUser = useSelector(selectAuthUser)
+
 	const [imageAvatar, setImageAvatar] = useState<string | File | null>(
 		user?.avatar || null
 	)
 	const [removeAvatar, setRemoveAvatar] = useState(false)
 	const [isImageChanged, setIsImageChanged] = useState(false)
 	const [loading, setLoading] = useState(false)
+
 	const {
 		register,
 		reset,
@@ -44,13 +50,35 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 		formState: { errors, isDirty },
 	} = useForm<FormData>({
 		defaultValues: {
-			email: user.email,
-			firstName: user.firstName,
-			lastName: user.lastName,
+			email: user?.email || "",
+			firstName: user?.firstName || "",
+			lastName: user?.lastName || "",
 			mobile: user?.mobile,
-			address: user?.address[0],
+			address: user?.address?.[0] || "",
 		},
 	})
+
+	useEffect(() => {
+		if (mounted && !user) {
+			router.push(`${WEB_URL}${path.LOGIN}`)
+		}
+	}, [mounted, user, router])
+
+	useEffect(() => {
+		if (user) {
+			reset({
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				mobile: user.mobile,
+				address: user.address?.[0] || "",
+			})
+		}
+	}, [user, reset])
+
+	if (!mounted || !user) {
+		return null
+	}
 
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0]
@@ -84,13 +112,14 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 					return
 				}
 				setLoading(true)
-				// const response = await updateUserProfile(formData)
+
 				const updateUserResponse = await fetch(API + "/user/user-update", {
 					method: "PUT",
 					credentials: "include",
 					body: formData,
 				})
 				const updateUser = await updateUserResponse.json()
+
 				if (updateUser.success) {
 					const currentUserResponse = await fetch(`${API}/user/current`, {
 						method: "GET",
@@ -100,20 +129,34 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 						},
 					})
 					const currentUser = await currentUserResponse.json()
-					const userData = currentUser.data
-					await dispatch(loginSuccess(userData))
+					const updatedUserData = currentUser.data
+
+					// Dispatch new user data to Redux
+					await dispatch(loginSuccess(updatedUserData))
+
+					// Reset form with updated data
+					reset({
+						email: updatedUserData.email,
+						firstName: updatedUserData.firstName,
+						lastName: updatedUserData.lastName,
+						mobile: updatedUserData.mobile,
+						address: updatedUserData.address[0],
+					})
+
 					setRemoveAvatar(false)
+					setIsImageChanged(false) // Reset image change flag
 				}
 				setLoading(false)
 			}
 		}
 	)
 	const submitClass = clsx(
-		`border-2 hover-effect rounded p-1`,
+		`w-[120px] h-[40px] relative block ml-auto mr-0 border-2 hover-effect rounded p-1 group overflow-hidden my-2`,
 		loading || !(isDirty || isImageChanged)
 			? `border-gray-500 bg-gray-500 opacity-80 cursor-not-allowed`
 			: `border-red-500 hover:bg-red-500`
 	)
+
 	return (
 		<div className="flex w-full">
 			<div className="flex flex-col items-center w-1/5">
@@ -162,12 +205,23 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 				<span>
 					{user.firstName} {user.lastName}
 				</span>
+				<div className="flex flex-col items-center">
+					<span
+						className={clsx(
+							"text-xs p-[4px] rounded bg-opacity-70 tracking-wider",
+							user.isBlocked ? "bg-red-500" : "bg-green-500"
+						)}
+					>
+						{user.isBlocked ? "Blocked" : "Active"}
+					</span>
+					<span className="text-xs">{moment(user.createdAt).fromNow()}</span>
+				</div>
 			</div>
 			<form onSubmit={handleSubmitProfile} className="w-4/5">
 				<div>
 					<InputForm
 						register={register}
-						errors={errors as { [key: string]: CustomFieldError }}
+						errorMessage={errors as { [key: string]: CustomFieldError }}
 						id="email"
 						defaultValue={user.email}
 						label="Email"
@@ -177,44 +231,45 @@ const ProfileInformation: FC<ProfileInformationProps> = ({ user }) => {
 				</div>
 				<InputForm
 					register={register}
-					errors={errors as { [key: string]: CustomFieldError }}
+					errorMessage={errors as { [key: string]: CustomFieldError }}
 					id={"firstName"}
 					defaultValue={user.firstName}
 					label="First name"
 				/>
 				<InputForm
 					register={register}
-					errors={errors as { [key: string]: CustomFieldError }}
+					errorMessage={errors as { [key: string]: CustomFieldError }}
 					id={"lastName"}
 					defaultValue={user.lastName}
 					label="Last name"
 				/>
 				<InputForm
 					register={register}
-					errors={errors as { [key: string]: CustomFieldError }}
+					errorMessage={errors as { [key: string]: CustomFieldError }}
 					id={"address"}
 					defaultValue={user.address}
 					label="Address"
 				/>
 				<InputForm
 					register={register}
-					errors={errors as { [key: string]: CustomFieldError }}
+					errorMessage={errors as { [key: string]: CustomFieldError }}
 					id={"mobile"}
 					defaultValue={user.mobile ? user.mobile.toString() : ""}
 					label="Phone number"
 					// validate={validatePhoneNumber}
 				/>
-				<div className="flex flex-col">
-					<span>Status: {user.isBlocked ? "Blocked" : "Active"}</span>
-					<span>Created: {moment(user.createdAt).fromNow()}</span>
-				</div>
 				<Button
 					className={submitClass}
 					type="submit"
 					disabled={loading || !(isDirty || isImageChanged)}
 					loading={loading}
 				>
-					Update information
+					<span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-full">
+						Update
+					</span>
+					<span className="absolute inset-0 flex items-center justify-center translate-y-full transition-transform duration-300 group-hover:translate-y-0">
+						Information
+					</span>
 				</Button>
 			</form>
 		</div>

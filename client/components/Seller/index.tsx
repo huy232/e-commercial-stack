@@ -1,14 +1,13 @@
 "use client"
 import { FC, useMemo, useState, useCallback, useEffect } from "react"
 import { CustomImage } from "@/components"
-import { ProductType } from "@/types/product"
-import { BannerLeft, BannerRight } from "@/assets/images"
+import { ProductExtraType, ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
-import { URL } from "@/constant"
+import { WEB_URL } from "@/constant"
 
 interface SellerProps {
-	initialProducts: ProductType[] | []
+	initialProducts: ProductExtraType[] | []
 }
 
 const Seller: FC<SellerProps> = ({ initialProducts }) => {
@@ -20,7 +19,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 		[]
 	)
 
-	const [products, setProducts] = useState<ProductType[] | null>(
+	const [products, setProducts] = useState<ProductExtraType[] | null>(
 		initialProducts
 	)
 	const [titleId, setTitleId] = useState(tabs[0].id)
@@ -29,7 +28,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 		async (sort: {}, tabId: number) => {
 			try {
 				const response = await fetch(
-					URL + `/api/product?` + new URLSearchParams(sort),
+					WEB_URL + `/api/product?` + new URLSearchParams(sort),
 					{ method: "GET", cache: "no-cache" }
 				)
 				const data = await response.json()
@@ -44,12 +43,12 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 
 	const titleClass = (id: number) =>
 		clsx(
-			`rounded border-rose-500 p-1 hover:bg-rose-500 hover-effect`,
+			`rounded border-2 border-transparent p-1 hover:border-rose-500 hover-effect font-bebasNeue`,
 			titleId === id && "bg-red-500"
 		)
 	return (
-		<div className="w-full">
-			<div className="flex flex-row gap-2">
+		<div className="flex flex-col my-2 sm:my-4">
+			<div className="flex flex-row gap-2 mb-4 max-sm:mx-auto md:ml-2">
 				{tabs.map((tab) => (
 					<button
 						onClick={() => fetchProductsComponent({ sort: tab.sort }, tab.id)}
@@ -60,16 +59,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 					</button>
 				))}
 			</div>
-
 			<CustomSlider products={products} supportHover />
-			<div className="w-full flex gap-4 mt-8">
-				<div className="w-1/2">
-					<CustomImage src={BannerLeft} alt="Banner left" fill />
-				</div>
-				<div className="w-1/2">
-					<CustomImage src={BannerRight} alt="Banner right" fill />
-				</div>
-			</div>
 		</div>
 	)
 }

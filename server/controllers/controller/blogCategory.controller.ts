@@ -1,11 +1,23 @@
 import { Request, Response } from "express"
 import { BlogCategory } from "../../models"
 import asyncHandler from "express-async-handler"
+import mongoose from "mongoose"
+import slugify from "slugify"
 
 class BlogCategoryController {
 	createCategory = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const response = await BlogCategory.create(req.body)
+			const { title } = req.body
+			if (!title) {
+				res.status(400).json({
+					success: false,
+					message: "Title is required to create a blog category",
+					data: {},
+				})
+			}
+			const response = await BlogCategory.create({ title })
+			const io = req.app.get("io")
+			io.emit("blogCategoriesUpdate")
 			res.json({
 				success: response ? true : false,
 				message: response
@@ -18,7 +30,7 @@ class BlogCategoryController {
 
 	getCategories = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
-			const response = await BlogCategory.find().select("title _id")
+			const response = await BlogCategory.find()
 			res.json({
 				success: response ? true : false,
 				message: response

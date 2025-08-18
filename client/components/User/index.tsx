@@ -4,8 +4,9 @@ import {
 	logout,
 	selectAuthUser,
 	selectIsAuthenticated,
+	selectIsUserLoading,
 } from "@/store/slices/authSlice"
-import { checkAuthentication } from "@/store/actions/"
+import { checkAuthentication, handleGetUserCart } from "@/store/actions/"
 import { useEffect, useCallback, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { AiOutlineLoading } from "@/assets/icons"
@@ -13,17 +14,23 @@ import Link from "next/link"
 import { path } from "@/utils"
 import { useDropdown } from "@/hooks"
 import { Button, CustomImage } from "@/components"
-import { AppDispatch } from "@/types"
+import { AppDispatch, NotifyProps, ProfileUser } from "@/types"
 import defaultAvatar from "@/assets/images/defaultAvatar.png"
 import clsx from "clsx"
 import { API } from "@/constant"
+import { notificationLogout } from "@/store/slices/notifySlice"
 
-const User = () => {
-	const [loading, setLoading] = useState(true)
+interface UserProps {
+	user: ProfileUser
+}
+
+const User = ({ user }: UserProps) => {
 	const { isOpen, toggleDropdown } = useDropdown()
 	const dispatch = useDispatch<AppDispatch>()
-	const user = useSelector(selectAuthUser)
-	const isAuthenticated = useSelector(selectIsAuthenticated)
+
+	const itemClass = clsx(
+		`hover-effect hover:opacity-80 hover:bg-black/20 p-1 m-1 rounded w-full`
+	)
 
 	const requestLogout = async () => {
 		try {
@@ -45,67 +52,27 @@ const User = () => {
 	const handleLogout = useCallback(async () => {
 		await requestLogout()
 		await dispatch(logout())
+		await dispatch(handleGetUserCart())
+		await dispatch(notificationLogout())
 	}, [dispatch])
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await dispatch(checkAuthentication())
-				if (response.payload) {
-					const response = await fetch(`${API}/user/current`, {
-						method: "GET",
-						credentials: "include",
-					})
-					const userCheck = await response.json()
-					const userData = userCheck.data
-					dispatch(loginSuccess(userData))
-				} else if (!response.payload) {
-					dispatch(logout())
-				}
-			} catch (error) {
-				dispatch(logout())
-			} finally {
-				setLoading(false)
-			}
-		}
-
-		if (loading) {
-			fetchData()
-		}
-	}, [dispatch, user, loading])
-
-	if (loading) {
-		return (
-			<button
-				type="button"
-				className="bg-black/20 rounded w-[100px] flex justify-center items-center p-1"
-				disabled
-			>
-				<AiOutlineLoading className="animate-spin h-[20px] w-[20px]" />
-			</button>
-		)
-	}
-
-	const itemClass = clsx(
-		`hover-effect hover:opacity-80 hover:bg-black/20 p-1 m-1 rounded`
-	)
-
 	return (
-		<div className="flex items-center justify-center gap-2 px-6 relative">
+		<div className="px-4 relative" data-popover-target="menu">
 			{user ? (
 				<div
 					className="flex gap-2 items-center cursor-pointer hover-effect hover:opacity-80 select-none"
 					onClick={toggleDropdown}
 				>
-					<CustomImage
-						src={user?.avatar || defaultAvatar}
-						alt="User's avatar"
-						className="rounded"
-						width={40}
-						height={40}
-					/>
-
-					<span>{user.firstName}</span>
+					<div className="relative">
+						<CustomImage
+							src={user?.avatar || defaultAvatar}
+							alt="User's avatar"
+							className="rounded"
+							width={40}
+							height={40}
+						/>
+					</div>
+					<span className="hidden lg:block">{user.firstName}</span>
 				</div>
 			) : (
 				<Link className="hover-effect hover:opacity-80" href={path.LOGIN}>
@@ -114,26 +81,47 @@ const User = () => {
 			)}
 
 			{user && isOpen && (
-				<div className="absolute h-full w-full mt-1 z-10">
-					<div className="bg-black/70 rounded flex flex-col gap-1">
+				<ul
+					className={clsx(
+						"absolute z-10 min-w-[160px] duration-300 transition-all",
+						user && isOpen
+							? "min-h-[100px] p-1.5 opacity-100 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-heavy focus:outline-none top-[44px] left-[-100px] lg:left-[-60px] xl:left-[20px]"
+							: "h-0 opacity-0"
+					)}
+					role="menu"
+					data-popover="menu"
+					data-popover-placement="bottom"
+				>
+					<li
+						role="menuitem"
+						className="cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md px-1 pt-0.5 transition-all hover:bg-slate-100"
+					>
 						<Link className={itemClass} href={"/profile"}>
 							Profile
 						</Link>
-
-						{user.role.includes("admin") && (
+					</li>
+					{user.role.includes("admin") && (
+						<li
+							role="menuitem"
+							className="cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md px-1 pt-0.5 transition-all hover:bg-slate-100"
+						>
 							<Link className={itemClass} href={"/admin"}>
 								Admin
 							</Link>
-						)}
-
+						</li>
+					)}
+					<li
+						role="menuitem"
+						className="cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md px-1 pt-0.5 transition-all hover:bg-slate-100"
+					>
 						<Button
 							className={clsx(itemClass, "text-left")}
 							onClick={handleLogout}
 						>
 							Logout
 						</Button>
-					</div>
-				</div>
+					</li>
+				</ul>
 			)}
 		</div>
 	)

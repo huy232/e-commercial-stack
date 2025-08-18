@@ -4,19 +4,20 @@ import {
 	BrandSelect,
 	Button,
 	Checkbox,
+	EditorPreviewContainer,
 	ImagePreview,
 	ImageUpload,
 	InputField,
 	LoadingSpinner,
 	Modal,
 	Select,
-	TextEditor,
 	VariantOptions,
 } from "@/components"
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { CategoryType, ProductCategoryType } from "@/types"
 import { useMounted } from "@/hooks"
-import { URL } from "@/constant"
+import { API, URL } from "@/constant"
+import { processEditorContentWithUpload } from "@/utils"
 
 interface CreateProductProps {
 	categories: ProductCategoryType[]
@@ -51,7 +52,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	)
 	const [allowVariants, setAllowVariants] = useState<boolean>(false)
 	const [variantFields, setVariantFields] = useState<any[]>([])
-	const [description, setDescription] = useState("")
+
 	const [thumbnail, setThumbnail] = useState<File | null>(null)
 	const [productImages, setProductImages] = useState<File[]>([])
 	const [publicProduct, setPublicProduct] = useState<boolean>(false)
@@ -62,11 +63,22 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	const [productImagesError, setProductImagesError] = useState<string>("")
 	const [descriptionError, setDescriptionError] = useState<string>("")
 
+	const descriptionRef = useRef<string>("")
+	const editorPreviewRef = useRef<{
+		clear: () => void
+		getContent: () => string
+		getLocalImages: () => string[]
+	} | null>(null)
+
+	const [images, setImages] = useState<string[]>([])
+
 	const selectValueGetterTitle = (option: ProductCategoryType) => option._id
 	const selectLabelGetterTitle = (option: ProductCategoryType) => option.title
+
 	const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedCategory(e.target.value)
 	}
+
 	const selectedCategoryData = categories.find(
 		(category) => category._id === selectedCategory
 	) as CategoryType
@@ -77,17 +89,21 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			setThumbnailError("")
 		}
 	}
+
 	const handleProductImagesUpload = (files: File[]) => {
 		setProductImages([...productImages, ...files])
 		setProductImagesError("")
 	}
+
 	const handleDeleteThumbnail = () => {
 		setThumbnail(null)
 	}
+
 	const handleDeleteProductImage = (index: number) => {
 		const updatedImages = productImages.filter((_, i) => i !== index)
 		setProductImages(updatedImages)
 	}
+
 	const handleAllowVariantsChange = (
 		e: React.ChangeEvent<HTMLInputElement>
 	) => {
@@ -96,6 +112,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			setValue("quantity", "0")
 		}
 	}
+
 	const handlePublicProduct = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPublicProduct(e.target.checked)
 	}
@@ -112,12 +129,18 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			}
 		}
 		formData.append("allowVariants", JSON.stringify(allowVariants))
-		if (description) {
-			formData.append("description", description)
-		} else {
-			setDescriptionError("Please enter description for the product")
+
+		const { description, error } = await processEditorContentWithUpload(
+			editorPreviewRef
+		)
+
+		if (error) {
+			setDescriptionError(error)
 			hasError = true
+		} else {
+			formData.append("description", description)
 		}
+
 		if (thumbnail) {
 			formData.append("thumbnail", thumbnail)
 		} else {
@@ -139,9 +162,11 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 		}
 
 		setLoading(true)
-		const createProductResponse = await fetch(URL + "/api/product", {
+
+		const createProductResponse = await fetch(API + "/product/create-product", {
 			method: "POST",
 			body: formData,
+			credentials: "include",
 		})
 		const responseData = await createProductResponse.json()
 		if (responseData.success) {
@@ -153,10 +178,12 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			setValue("quantity", "0")
 			setThumbnail(null)
 			setProductImages([])
-			setDescription("")
 			setVariantFields([])
 			setAllowVariants(false)
 			setPublicProduct(false)
+			if (editorPreviewRef.current) {
+				editorPreviewRef.current.clear()
+			}
 		}
 		setLoading(false)
 	})
@@ -184,77 +211,80 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 		<>
 			{loading && (
 				<Modal isOpen={true}>
-					<div>
-						<LoadingSpinner color="red-500" text="Creating product..." />
-					</div>
+					<LoadingSpinner color="red-500" text="Creating product..." />
 				</Modal>
 			)}
-			<form onSubmit={handleSubmitProduct} className="w-full flex flex-col">
-				<div className="flex gap-4">
-					<InputField
-						label="Product name"
-						name="productName"
-						register={register}
-						required="Product name is required"
-						errorMessage={
-							errors.productName &&
-							(errors.productName.message?.toString() ||
-								"Please enter a valid product name.")
-						}
-					/>
-				</div>
-				<div className="flex gap-4">
-					<InputField
-						label="Default price"
-						name="price"
-						register={register}
-						required="Price is required"
-						validateType={"onlyNumbers"}
-						errorMessage={
-							errors.price &&
-							(errors.price.message?.toString() || "Please enter a valid price")
-						}
-					/>
-					<InputField
-						label="Quantity"
-						name="quantity"
-						register={register}
-						required="Quantity is required"
-						validateType={"onlyNumbers"}
-						errorMessage={
-							errors.quantity &&
-							(errors.quantity.message?.toString() ||
-								"Please enter a valid quantity.")
-						}
-						disabled={allowVariants}
-					/>
-				</div>
-				<div className="flex gap-4">
-					<Select
-						label="Category"
-						name="category"
-						register={register}
-						required
-						options={categories}
-						getValue={selectValueGetterTitle}
-						getLabel={selectLabelGetterTitle}
-						onChange={handleCategoryChange}
-					/>
-					{selectedCategoryData && selectedCategoryData.brand && (
-						<BrandSelect
-							name="brand"
-							label="Brand"
+			<form
+				onSubmit={handleSubmitProduct}
+				className="w-full grid grid-cols-2 gap-4"
+			>
+				<div className="bg-neutral-400 bg-opacity-50 rounded py-1 px-3 mt-2 mb-6 inline-block h-fit">
+					<div className="flex gap-2 mb-2">
+						<InputField
+							label="Name"
+							name="productName"
+							register={register}
+							required="Product name is required"
+							errorMessage={
+								errors.productName &&
+								(errors.productName.message?.toString() ||
+									"Please enter a valid product name.")
+							}
+							inputAdditionalClass="w-full"
+						/>
+					</div>
+					<div className="flex gap-2 mb-2">
+						<InputField
+							label="Price"
+							name="price"
+							register={register}
+							required="Price is required"
+							validateType={"onlyNumbers"}
+							errorMessage={
+								errors.price &&
+								(errors.price.message?.toString() ||
+									"Please enter a valid price")
+							}
+						/>
+						<InputField
+							label="Quantity"
+							name="quantity"
+							register={register}
+							required="Quantity is required"
+							validateType={"onlyNumbers"}
+							errorMessage={
+								errors.quantity &&
+								(errors.quantity.message?.toString() ||
+									"Please enter a valid quantity.")
+							}
+							disabled={allowVariants}
+						/>
+					</div>
+					<div className="flex gap-2 mb-2">
+						<Select
+							label="Category"
+							name="category"
 							register={register}
 							required
-							options={selectedCategoryData.brand}
+							options={categories}
+							getValue={selectValueGetterTitle}
+							getLabel={selectLabelGetterTitle}
+							onChange={handleCategoryChange}
 						/>
-					)}
-				</div>
-				<div>
+						{selectedCategoryData && selectedCategoryData.brand && (
+							<BrandSelect
+								name="brand"
+								label="Brand"
+								register={register}
+								required
+								options={selectedCategoryData.brand}
+							/>
+						)}
+					</div>
 					{selectedCategoryData.option &&
 					selectedCategoryData.option.length > 0 ? (
 						<Checkbox
-							label="Allow Variants"
+							label="Allow variants"
 							name="allowVariants"
 							checked={allowVariants}
 							onChange={handleAllowVariantsChange}
@@ -270,47 +300,62 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 							categories={categories}
 						/>
 					)}
+					<div className="w-full px-2">
+						<EditorPreviewContainer
+							ref={editorPreviewRef}
+							initialContent={descriptionRef.current}
+							onContentChange={(content) => (descriptionRef.current = content)}
+							images={images}
+							onImageChange={setImages}
+						/>
+					</div>
 				</div>
-				<TextEditor value={description} onChange={setDescription} />
-				<div className="w-full h-full">
+				<div className="px-4">
 					<h3 className="font-semibold">Thumbnail preview</h3>
-					<div className="flex items-center">
-						{thumbnail && (
+					{thumbnail && (
+						<div className="flex items-center">
 							<ImagePreview
-								images={thumbnail}
+								images={[thumbnail]}
 								onDelete={handleDeleteThumbnail}
 							/>
-						)}
-					</div>
+						</div>
+					)}
 					<ImageUpload onUpload={handleThumbnailUpload} />
 
-					<h3 className="font-semibold">Product images</h3>
-					<div className="flex items-center">
-						{productImages.length > 0 && (
+					<h3 className="font-semibold mt-4">Product images</h3>
+					{productImages.length > 0 && (
+						<div className="lg:w-full overflow-y-auto flex flex-wrap max-h-[320px]">
 							<ImagePreview
 								images={productImages}
 								onDelete={handleDeleteProductImage}
 							/>
-						)}
-					</div>
+						</div>
+					)}
 					<ImageUpload multiple onUpload={handleProductImagesUpload} />
 				</div>
-				<Checkbox
-					label="Public right away?"
-					name="public"
-					checked={publicProduct}
-					onChange={handlePublicProduct}
-				/>
-				{thumbnailError && (
-					<span className="text-red-500">{thumbnailError}</span>
-				)}
-				{productImagesError && (
-					<span className="text-red-500">{productImagesError}</span>
-				)}
-				{descriptionError && (
-					<span className="text-red-500">{descriptionError}</span>
-				)}
-				<Button type="submit">Create product</Button>
+				<div className="flex flex-col items-end gap-2">
+					<Checkbox
+						label="Public right away?"
+						name="public"
+						checked={publicProduct}
+						onChange={handlePublicProduct}
+					/>
+					{thumbnailError && (
+						<span className="text-red-500">{thumbnailError}</span>
+					)}
+					{productImagesError && (
+						<span className="text-red-500">{productImagesError}</span>
+					)}
+					{descriptionError && (
+						<span className="text-red-500">{descriptionError}</span>
+					)}
+					<Button
+						type="submit"
+						className="w-fit bg-rose-500 p-1 hover:bg-opacity-70 hover:brightness-125 duration-300 ease-in-out rounded"
+					>
+						Create product
+					</Button>
+				</div>
 			</form>
 		</>
 	)

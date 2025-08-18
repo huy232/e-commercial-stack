@@ -30,7 +30,6 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			let value = parseInt(e.target.value, 10)
-
 			if (isNaN(value) || value < 1) {
 				value = 1 // Set to the minimum value if the entered value is less than 1
 			} else if (value > quantityLimit) {
@@ -48,7 +47,7 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 	}, [quantity, quantityLimit, setQuantity])
 
 	return (
-		<div className="flex gap-2 items-center">
+		<div className="flex gap-2 items-center mt-2">
 			{allowQuantity && (
 				<>
 					<span className="font-semibold">Quantity</span>
@@ -57,7 +56,7 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 							-
 						</Button>
 						<input
-							className="py-2 outline-none w-[100px] text-black text-center"
+							className="py-2 outline-none w-[60px] text-black text-center"
 							type="number"
 							value={quantity}
 							onChange={handleChange}

@@ -1,5 +1,5 @@
 import { UpdateProduct } from "@/components"
-import { URL } from "@/constant"
+import { API } from "@/constant"
 
 type Props = {
 	params: {
@@ -8,36 +8,43 @@ type Props = {
 	searchParams: { [key: string]: string | string[] | undefined }
 }
 
+export const metadata = {
+	title: "Update Product | Digital World Admin",
+	description:
+		"Update product details, categories, pricing, and availability in the Digital World store.",
+	robots: { index: false, follow: false },
+}
+
 export default async function AdminUpdateProduct(props: Props) {
 	const { productSlug } = props.params
-
-	console.log("Product slug: ", productSlug)
-
-	const productResponse = await fetch(URL + `/api/product/` + productSlug, {
-		method: "GET",
-		cache: "no-cache",
-	})
-	const categoryResponse = await fetch(URL + "/api/category", {
+	const productResponse = await fetch(
+		API + `/product/get-product/` + productSlug,
+		{
+			method: "GET",
+			cache: "no-cache",
+		}
+	)
+	const categoryResponse = await fetch(API + "/product-category", {
 		method: "GET",
 		cache: "no-cache",
 	})
 
 	const product = await productResponse.json()
 	const categories = await categoryResponse.json()
-	const { success, data } = categories
-	let categoriesData = []
-	if (success) {
-		categoriesData = data
+	let content
+	if (product.success && categories.success) {
+		content = (
+			<UpdateProduct productResponse={product} categories={categories.data} />
+		)
+	} else {
+		content = <div>Something went wrong</div>
 	}
-
-	console.log(product)
-
 	return (
-		<main>
-			<h1 className="h-[75px] flex justify-between items-center text-3xl font-bold px-4">
+		<main className="w-full">
+			<h1 className="text-center text-3xl font-bold font-bebasNeue mt-8">
 				Update product
 			</h1>
-			<UpdateProduct productResponse={product} categories={categoriesData} />
+			{content}
 		</main>
 	)
 }

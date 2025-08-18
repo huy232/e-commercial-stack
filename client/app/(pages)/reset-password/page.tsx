@@ -1,9 +1,22 @@
 import { ResetPasswordForm } from "@/components"
+import { Metadata } from "next"
 import Link from "next/link"
 
 type Props = {
 	params: {}
 	searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export const metadata: Metadata = {
+	title: "Reset Password | Digital World",
+	description:
+		"Securely set a new password for your Digital World account and continue enjoying a safe and personalized shopping experience.",
+	keywords: [
+		"Digital World reset password",
+		"set new password",
+		"password update",
+		"secure account",
+	],
 }
 
 export default function ResetPassword(props: Props) {

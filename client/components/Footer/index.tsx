@@ -3,7 +3,7 @@ import { memo } from "react"
 
 const Footer = memo(() => {
 	return (
-		<div className="w-full">
+		<div className="w-full mt-auto">
 			<MailNotify />
 			<FooterContent />
 		</div>

@@ -1,6 +1,14 @@
+@import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+	.pause {
+		-webkit-animation-play-state: paused;
+		animation-play-state: paused;
+	}
+}
 
 .hover-effect {
 	@apply duration-300 ease-in-out hover:brightness-125 transition-all;
@@ -63,9 +71,9 @@ button.slick-prev::before {
 	content: "\2039";
 }
 
-img {
+/* img {
 	max-width: unset;
-}
+} */
 
 .glass-magnifier > img:first-of-type {
 	-o-object-fit: contain;
@@ -84,4 +92,67 @@ img {
 	cursor: pointer;
 	-webkit-transition: background-color 0.35s ease;
 	transition: background-color 0.35s ease;
+}
+
+.clip-bottom {
+	-webkit-clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.editor-content a {
+	color: #2563eb; /* Tailwind blue-600 */
+	text-decoration: underline;
+}
+.editor-content a:hover {
+	color: #1d4ed8; /* Tailwind blue-700 */
+}
+
+.prose ol {
+	list-style-type: decimal;
+}
+
+.prose ul {
+	list-style-type: disc;
+}
+
+.prose menu {
+	list-style-type: none;
+}
+
+.prose ol,
+.prose ul {
+	padding-left: 1.5rem;
+}
+
+.prose menu {
+	margin-bottom: 0.5rem;
+}
+
+blockquote {
+	display: block;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 40px;
+	margin-right: 40px;
+}
+
+::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #0000;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
 }

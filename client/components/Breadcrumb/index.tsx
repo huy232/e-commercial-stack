@@ -36,7 +36,7 @@ const Breadcrumb: FC<BreadcrumbProps> = ({
 	})
 
 	return (
-		<div className="flex gap-1 items-center text-sm uppercase">
+		<div className="max-sm:mx-2 flex gap-1 items-center text-sm uppercase flex-wrap">
 			{breadcrumbItems}
 			{allowTitle && (
 				<>

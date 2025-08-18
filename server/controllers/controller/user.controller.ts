@@ -1,11 +1,4 @@
-import {
-	ICartItem,
-	ICartItemPopulate,
-	IProduct,
-	IVariant,
-	Product,
-	User,
-} from "../../models"
+import { ICartItem, IProduct, IVariant, Product, User } from "../../models"
 import asyncHandler from "express-async-handler"
 import { Request, Response } from "express"
 import {
@@ -21,11 +14,11 @@ import { validationResult } from "express-validator"
 import { parseInteger } from "../../utils/parseInteger"
 import { UploadedFiles } from "../../types/uploadFile"
 import { transformCartItems } from "../../utils/cartUtils"
+import { userCartPopulate } from "../../constant"
 
 class UserController {
 	register = async (req: Request, res: Response): Promise<void> => {
 		try {
-			console.log("BODY: ", req.body)
 			await Promise.all(
 				Validators.validateRegisterUser.map((validation) => validation.run(req))
 			)
@@ -114,7 +107,6 @@ class UserController {
 	verifyRegister = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const { token } = req.query
-			console.log("Token: ", token)
 			if (!token) {
 				res.status(400).json({
 					success: false,
@@ -181,7 +173,6 @@ class UserController {
 
 	checkAdmin = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			// console.log("Admin check: ", req.user)
 			res.status(200).json({ success: true, message: "Valid role" })
 		}
 	)
@@ -191,15 +182,29 @@ class UserController {
 			Validators.validateLogin.forEach((validation) => validation.run(req))
 			Validators.runValidation(req, res, async () => {
 				let { email, password } = req.body
-				const user = await User.findOne({ email }).populate({
-					path: "cart.product_id",
-					select: "title thumbnail price allowVariants variants quantity",
-				})
 
-				if (!user) {
+				if (!email || !password) {
 					res.status(400).json({
 						success: false,
-						message: "User does not exist",
+						message: "Email and password are required",
+					})
+					return
+				}
+
+				const user = await User.findOne({ email })
+
+				if (!user) {
+					res
+						.status(401)
+						.json({ success: false, message: "Invalid credentials" })
+					return
+				}
+
+				if (user.socialProvider !== "normal") {
+					res.status(400).json({
+						success: false,
+						message:
+							"Email already registered with another provider. Please login with that provider.",
 					})
 					return
 				}
@@ -232,35 +237,13 @@ class UserController {
 						secure: true,
 					})
 
-					// const populatedCart = user.cart.map((item: ICartItem) => {
-					// 	const productDetails = item.product_id as unknown as IProduct
-					// 	const variantDetails = item.variant_id
-					// 		? productDetails.variants?.find(
-					// 				(v) => v._id.toString() === item.variant_id?.toString()
-					// 		  )
-					// 		: undefined
-
-					// 	return {
-					// 		product: {
-					// 			_id: productDetails._id,
-					// 			title: productDetails.title,
-					// 			thumbnail: productDetails.thumbnail,
-					// 			price: productDetails.price,
-					// 			allowVariants: productDetails.allowVariants,
-					// 			// variants: productDetails.variants,
-					// 			quantity: productDetails.quantity,
-					// 		},
-					// 		variant: variantDetails || undefined,
-					// 		quantity: item.quantity,
-					// 	}
-					// })
-					const populatedCart = transformCartItems(user.cart)
-					// const { io } = req.app.get("io")
-					// io.emit("userLoggedIn")
 					res.status(200).json({
 						success: true,
 						message: "Login successfully",
-						userData: { ...rest, cart: populatedCart },
+						userData: {
+							...rest,
+							// cart: populatedCart
+						},
 						accessToken,
 					})
 				} else {
@@ -278,25 +261,83 @@ class UserController {
 		}
 	}
 
+	googleLogin = asyncHandler(async (req: Request, res: Response) => {
+		const { googleId, firstName, lastName, email, avatar } = req.body
+
+		if (!googleId || !email) {
+			res
+				.status(400)
+				.json({ success: false, message: "Missing Google user data" })
+			return
+		}
+
+		let user = await User.findOne({ email })
+
+		if (user) {
+			if (user.socialProvider === "normal") {
+				res.status(400).json({
+					success: false,
+					message:
+						"This email is registered with a normal account. Please log in with your password.",
+				})
+				return
+			}
+		} else {
+			// Create new Google user
+			user = new User({
+				firstName,
+				lastName,
+				email,
+				avatar,
+				socialProvider: "google",
+				googleId,
+			})
+			await user.save()
+		}
+
+		// Generate tokens
+		const accessToken = generateAccessToken(user._id, user.role)
+		const newRefreshToken = generateRefreshToken(user._id)
+
+		// Save refresh token to database
+		await User.findByIdAndUpdate(
+			user._id,
+			{ refreshToken: newRefreshToken },
+			{ new: true }
+		)
+
+		// Set refresh token cookie
+		res.cookie("refreshToken", newRefreshToken, {
+			httpOnly: true,
+			maxAge: 7 * 24 * 60 * 60 * 1000,
+			sameSite: "none",
+			secure: true,
+		})
+
+		// Set access token cookie
+		res.cookie("accessToken", accessToken, {
+			httpOnly: true,
+			maxAge: 60 * 1000,
+			sameSite: "none",
+			secure: true,
+		})
+
+		res
+			.status(200)
+			.json({ success: true, message: "Google login successful", user })
+	})
+
 	getCurrentUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
-			const user = await User.findById({ _id })
-				.select("-refreshToken -password")
-				.populate({
-					path: "cart.product_id",
-					select: "title thumbnail price allowVariants variants quantity",
-				})
-			if (user) {
-				const populatedCart = transformCartItems(user.cart)
-				const transformedUser = {
-					...user.toObject(),
-					cart: populatedCart,
-				}
+			const user = await User.findById({ _id }).select(
+				"-refreshToken -password"
+			)
 
+			if (user) {
 				res.status(200).json({
 					success: true,
-					data: transformedUser,
+					data: user,
 				})
 			} else {
 				res.status(404).json({
@@ -335,8 +376,9 @@ class UserController {
 	logout = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const cookies = req.cookies
-			const { io } = req.app.get("io")
-			if (!cookies && !cookies.refreshToken) {
+			const io = req.app.get("io")
+
+			if (!cookies?.refreshToken) {
 				throw new Error("No refresh token in cookies")
 			}
 
@@ -348,10 +390,17 @@ class UserController {
 
 			res.clearCookie("refreshToken", { httpOnly: true, secure: true })
 			res.clearCookie("accessToken", { httpOnly: true, secure: true })
-			io.emit("userLoggedOut")
+
+			// ✅ Ensure `io` exists before emitting
+			if (io) {
+				io.emit("userLoggedOut")
+			} else {
+				console.warn("Socket.IO is not initialized, skipping emit.")
+			}
+
 			res.status(200).json({
 				success: true,
-				message: "Successfully logout",
+				message: "Successfully logged out",
 			})
 		}
 	)
@@ -360,7 +409,6 @@ class UserController {
 		async (req: Request, res: Response): Promise<void> => {
 			try {
 				const { email } = req.body
-				console.log("Forgot password: ", req.body)
 				if (!email) {
 					throw new Error("Missing email")
 				}
@@ -441,7 +489,7 @@ class UserController {
 	getAllUsers = asyncHandler(
 		async (req: Request, res: Response): Promise<void> => {
 			const queries = { ...req.query }
-			const excludeFields = ["limit", "sort", "page", "fields"]
+			const excludeFields = ["limit", "sort", "page", "fields", "type", "order"]
 			excludeFields.forEach((element) => delete queries[element])
 
 			let queryString = JSON.stringify(queries)
@@ -450,25 +498,39 @@ class UserController {
 				(matchedElement) => `$${matchedElement}`
 			)
 			const formattedQueries = JSON.parse(queryString)
-
 			// Filtering
 			if (queries.name) {
 				formattedQueries.name = { $regex: queries.name, $options: "i" }
 			}
+
 			if (req.query.search as string) {
-				delete formattedQueries.search
-				formattedQueries["$or"] = [
-					{ firstName: { $regex: req.query.search, $options: "i" } },
-					{ lastName: { $regex: req.query.search, $options: "i" } },
-					{ email: { $regex: req.query.search, $options: "i" } },
-				]
+				delete formattedQueries.search // Remove "search" from the query object
+				delete formattedQueries.type // Ensure "type" does not exist in formattedQueries
+
+				const searchValue = req.query.search as string
+				const searchType = req.query.type as string // Get the type parameter
+				const searchableFields = ["email", "firstName", "lastName"] // Define valid search fields
+
+				if (searchType && searchableFields.includes(searchType)) {
+					// If type is a valid field, search only within that field
+					formattedQueries[searchType] = { $regex: searchValue, $options: "i" }
+				} else {
+					// If type is "all" or not specified, search across all fields
+					formattedQueries["$or"] = searchableFields.map((field) => ({
+						[field]: { $regex: searchValue, $options: "i" },
+					}))
+				}
 			}
 
 			let query = User.find(formattedQueries)
 			// Sorting
-			if (req.query.sort as string) {
-				const sortBy = (req.query.sort as string).split(",").join(" ")
-				query = query.sort(sortBy)
+
+			if (req.query.sort) {
+				delete formattedQueries.type
+				delete formattedQueries.order
+				const sortField = req.query.sort as string
+				const sortOrder = req.query.order === "desc" ? -1 : 1 // Default to "asc"
+				query = query.sort({ [sortField]: sortOrder })
 			}
 
 			// Fields limiting
@@ -627,160 +689,158 @@ class UserController {
 		}
 	)
 
-	updateUserCart = asyncHandler(
-		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			const { _id } = req.user
-			const { product_id, variant_id, quantity = 1 } = req.body
-			console.log("Body: ", req.body)
+	// updateUserCart = asyncHandler(
+	// 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+	// 		const { _id } = req.user
+	// 		const { product_id, variant_id, quantity = 1 } = req.body
+	// 		if (!product_id) {
+	// 			res.status(400).json({ success: false, message: "Missing product ID" })
+	// 			return
+	// 		}
 
-			if (!product_id) {
-				res.status(400).json({ success: false, message: "Missing product ID" })
-				return
-			}
+	// 		try {
+	// 			// Validate product
+	// 			const product = await Product.findById(product_id)
+	// 			if (!product) {
+	// 				res.status(404).json({ success: false, message: "Product not found" })
+	// 				return
+	// 			}
 
-			try {
-				// Validate product
-				const product = await Product.findById(product_id)
-				if (!product) {
-					res.status(404).json({ success: false, message: "Product not found" })
-					return
-				}
+	// 			// Validate variant if provided
+	// 			let variant: IVariant | null = null
+	// 			if (
+	// 				variant_id &&
+	// 				product.allowVariants &&
+	// 				product.variants &&
+	// 				product.variants.length > 0
+	// 			) {
+	// 				variant =
+	// 					product.variants.find((v) => v._id.toString() === variant_id) ||
+	// 					null
+	// 				if (!variant) {
+	// 					res
+	// 						.status(404)
+	// 						.json({ success: false, message: "Variant not found" })
+	// 					return
+	// 				}
+	// 			}
 
-				// Validate variant if provided
-				let variant: IVariant | null = null
-				if (
-					variant_id &&
-					product.allowVariants &&
-					product.variants &&
-					product.variants.length > 0
-				) {
-					variant =
-						product.variants.find((v) => v._id.toString() === variant_id) ||
-						null
-					if (!variant) {
-						res
-							.status(404)
-							.json({ success: false, message: "Variant not found" })
-						return
-					}
-				}
+	// 			// Update user cart
+	// 			const user = await User.findById(_id).select("cart")
+	// 			if (!user) {
+	// 				res.status(404).json({ success: false, message: "User not found" })
+	// 				return
+	// 			}
 
-				// Update user cart
-				const user = await User.findById(_id).select("cart")
-				if (!user) {
-					res.status(404).json({ success: false, message: "User not found" })
-					return
-				}
+	// 			// Check if product and variant (if provided) are already in the cart
+	// 			const cartItemIndex = user.cart.findIndex(
+	// 				(item) =>
+	// 					item.product_id.toString() === product_id &&
+	// 					(!variant_id || item.variant_id?.toString() === variant_id)
+	// 			)
 
-				// Check if product and variant (if provided) are already in the cart
-				const cartItemIndex = user.cart.findIndex(
-					(item) =>
-						item.product_id.toString() === product_id &&
-						(!variant_id || item.variant_id?.toString() === variant_id)
-				)
+	// 			if (cartItemIndex > -1) {
+	// 				// Update quantity if item already in cart
+	// 				user.cart[cartItemIndex].quantity += quantity
+	// 			} else {
+	// 				// Add new item to cart
+	// 				user.cart.push({
+	// 					product_id,
+	// 					variant_id,
+	// 					quantity,
+	// 				} as ICartItem)
+	// 			}
 
-				if (cartItemIndex > -1) {
-					// Update quantity if item already in cart
-					user.cart[cartItemIndex].quantity += quantity
-				} else {
-					// Add new item to cart
-					user.cart.push({
-						product_id,
-						variant_id,
-						quantity,
-					} as ICartItem)
-				}
+	// 			await user.save()
 
-				await user.save()
+	// 			// Populate cart with product details
+	// 			const populatedUserCart = await User.findById(_id)
+	// 				.populate({
+	// 					path: "cart.product_id",
+	// 					select: userCartPopulate,
+	// 				})
+	// 				.exec()
 
-				// Populate cart with product details
-				const populatedUserCart = await User.findById(_id)
-					.populate({
-						path: "cart.product_id",
-						select: "title thumbnail price allowVariants variants quantity",
-					})
-					.exec()
+	// 			if (!populatedUserCart) {
+	// 				res.status(500).json({
+	// 					success: false,
+	// 					message: "An unexpected error occurred during population.",
+	// 				})
+	// 				return
+	// 			}
 
-				if (!populatedUserCart) {
-					res.status(500).json({
-						success: false,
-						message: "An unexpected error occurred during population.",
-					})
-					return
-				}
+	// 			// Map the populated cart to the expected ICartItemPopulate type
+	// 			const populatedCart = transformCartItems(populatedUserCart.cart)
 
-				// Map the populated cart to the expected ICartItemPopulate type
-				const populatedCart = transformCartItems(populatedUserCart.cart)
+	// 			res.status(200).json({
+	// 				success: true,
+	// 				message: "User cart updated",
+	// 				cart: populatedCart,
+	// 			})
+	// 		} catch (error) {
+	// 			console.error("Error updating user cart:", error)
+	// 			res.status(500).json({
+	// 				success: false,
+	// 				message: "An unexpected error occurred.",
+	// 			})
+	// 		}
+	// 	}
+	// )
 
-				res.status(200).json({
-					success: true,
-					message: "User cart updated",
-					cart: populatedCart,
-				})
-			} catch (error) {
-				console.error("Error updating user cart:", error)
-				res.status(500).json({
-					success: false,
-					message: "An unexpected error occurred.",
-				})
-			}
-		}
-	)
+	// updateBulkUserCart = asyncHandler(
+	// 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+	// 		const { _id } = req.user
+	// 		const newCart = req.body
 
-	updateBulkUserCart = asyncHandler(
-		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			const { _id } = req.user
-			const newCart = req.body
+	// 		if (!Array.isArray(newCart)) {
+	// 			res.status(400).json({ success: false, message: "Invalid cart data" })
+	// 			return
+	// 		}
+	// 		try {
+	// 			// Update user cart
+	// 			const user = await User.findById(_id).select("cart")
+	// 			if (!user) {
+	// 				res.status(404).json({ success: false, message: "User not found" })
+	// 				return
+	// 			}
 
-			if (!Array.isArray(newCart)) {
-				res.status(400).json({ success: false, message: "Invalid cart data" })
-				return
-			}
-			try {
-				// Update user cart
-				const user = await User.findById(_id).select("cart")
-				if (!user) {
-					res.status(404).json({ success: false, message: "User not found" })
-					return
-				}
+	// 			// Replace user's cart with the new cart array
+	// 			user.cart = newCart
+	// 			await user.save()
 
-				// Replace user's cart with the new cart array
-				user.cart = newCart
-				await user.save()
+	// 			// Populate cart with product details
+	// 			const populatedUserCart = await User.findById(_id)
+	// 				.populate({
+	// 					path: "cart.product_id",
+	// 					select: userCartPopulate,
+	// 				})
+	// 				.exec()
 
-				// Populate cart with product details
-				const populatedUserCart = await User.findById(_id)
-					.populate({
-						path: "cart.product_id",
-						select: "title thumbnail price allowVariants variants quantity",
-					})
-					.exec()
+	// 			if (!populatedUserCart) {
+	// 				res.status(500).json({
+	// 					success: false,
+	// 					message: "An unexpected error occurred during population.",
+	// 				})
+	// 				return
+	// 			}
 
-				if (!populatedUserCart) {
-					res.status(500).json({
-						success: false,
-						message: "An unexpected error occurred during population.",
-					})
-					return
-				}
+	// 			// Map the populated cart to the expected ICartItemPopulate type
+	// 			const populatedCart = transformCartItems(populatedUserCart.cart)
 
-				// Map the populated cart to the expected ICartItemPopulate type
-				const populatedCart = transformCartItems(populatedUserCart.cart)
-
-				res.status(200).json({
-					success: true,
-					message: "User cart updated",
-					cart: populatedCart,
-				})
-			} catch (error) {
-				console.error("Error updating user cart:", error)
-				res.status(500).json({
-					success: false,
-					message: "An unexpected error occurred.",
-				})
-			}
-		}
-	)
+	// 			res.status(200).json({
+	// 				success: true,
+	// 				message: "User cart updated",
+	// 				cart: populatedCart,
+	// 			})
+	// 		} catch (error) {
+	// 			console.error("Error updating user cart:", error)
+	// 			res.status(500).json({
+	// 				success: false,
+	// 				message: "An unexpected error occurred.",
+	// 			})
+	// 		}
+	// 	}
+	// )
 
 	verifyAccessToken = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -800,81 +860,81 @@ class UserController {
 			res.status(200).json({ success: true, message: "Valid user" })
 		}
 	)
-	userWishlist = asyncHandler(
-		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			const { _id } = req.user
-			const { product_id } = req.body
-			if (!_id || !product_id) {
-				res.status(400).json({
-					success: false,
-					message: "User ID and Product ID are required",
-				})
-				return
-			}
-			const user = await User.findById(_id)
+	// userWishlist = asyncHandler(
+	// 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+	// 		const { _id } = req.user
+	// 		const { product_id } = req.body
+	// 		if (!_id || !product_id) {
+	// 			res.status(400).json({
+	// 				success: false,
+	// 				message: "User ID and Product ID are required",
+	// 			})
+	// 			return
+	// 		}
+	// 		const user = await User.findById(_id)
 
-			if (!user) {
-				res.status(404).json({ success: false, message: "User not found" })
-				return
-			}
-			const productIndex = user.wishlist.indexOf(product_id)
-			if (productIndex > -1) {
-				// If product_id exists in the wishlist, remove it
-				user.wishlist.splice(productIndex, 1)
-			} else {
-				// If product_id does not exist, add it
-				user.wishlist.push(product_id)
-			}
-			user.save()
-			res.status(200).json({
-				success: true,
-				message: "Wishlist updated successfully",
-				data: user.wishlist,
-			})
-		}
-	)
+	// 		if (!user) {
+	// 			res.status(404).json({ success: false, message: "User not found" })
+	// 			return
+	// 		}
+	// 		const productIndex = user.wishlist.indexOf(product_id)
+	// 		if (productIndex > -1) {
+	// 			// If product_id exists in the wishlist, remove it
+	// 			user.wishlist.splice(productIndex, 1)
+	// 		} else {
+	// 			// If product_id does not exist, add it
+	// 			user.wishlist.push(product_id)
+	// 		}
+	// 		user.save()
+	// 		res.status(200).json({
+	// 			success: true,
+	// 			message: "Wishlist updated successfully",
+	// 			data: user.wishlist,
+	// 		})
+	// 	}
+	// )
 
-	getUserWishlist = asyncHandler(
-		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			const { _id } = req.user
-			const { page = 1, limit = 10 } = req.query // Default to page 1 and limit 10
+	// getUserWishlist = asyncHandler(
+	// 	async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+	// 		const { _id } = req.user
+	// 		const { page = 1, limit = 10 } = req.query // Default to page 1 and limit 10
 
-			if (!_id) {
-				res.status(400).json({
-					success: false,
-					message: "User ID is required",
-				})
-				return
-			}
+	// 		if (!_id) {
+	// 			res.status(400).json({
+	// 				success: false,
+	// 				message: "User ID is required",
+	// 			})
+	// 			return
+	// 		}
 
-			const user = await User.findById(_id).populate("wishlist")
+	// 		const user = await User.findById(_id).populate("wishlist")
 
-			if (!user) {
-				res.status(404).json({ success: false, message: "User not found" })
-				return
-			}
+	// 		if (!user) {
+	// 			res.status(404).json({ success: false, message: "User not found" })
+	// 			return
+	// 		}
 
-			const wishlist = user.wishlist
-			const totalItems = wishlist.length
-			const totalPages = Math.ceil(totalItems / Number(limit))
-			const currentPage = Number(page)
-			const hasNextPage = currentPage < totalPages
+	// 		const wishlist = user.wishlist
+	// 		const totalItems = wishlist.length
+	// 		const totalPages = Math.ceil(totalItems / Number(limit))
+	// 		const currentPage = Number(page)
+	// 		const hasNextPage = currentPage < totalPages
 
-			const startIndex = (currentPage - 1) * Number(limit)
-			const endIndex = startIndex + Number(limit)
-			const paginatedWishlist = wishlist.slice(startIndex, endIndex)
+	// 		const startIndex = (currentPage - 1) * Number(limit)
+	// 		const endIndex = startIndex + Number(limit)
+	// 		const paginatedWishlist = wishlist.slice(startIndex, endIndex)
 
-			res.status(200).json({
-				success: true,
-				message: "Get wishlist successfully",
-				data: paginatedWishlist,
-				totalPages,
-				currentPage,
-				hasNextPage,
-				totalItems,
-			})
-		}
-	)
+	// 		res.status(200).json({
+	// 			success: true,
+	// 			message: "Get wishlist successfully",
+	// 			data: paginatedWishlist,
+	// 			totalPages,
+	// 			currentPage,
+	// 			hasNextPage,
+	// 			totalItems,
+	// 		})
+	// 	}
+	// )
 }
 
 export default new UserController()

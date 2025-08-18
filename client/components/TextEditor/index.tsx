@@ -1,45 +1,47 @@
 "use client"
-import { useState, useEffect } from "react"
-import { useEditor, EditorContent, Editor } from "@tiptap/react"
+import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Underline from "@tiptap/extension-underline"
+import BulletList from "@tiptap/extension-bullet-list"
+import OrderedList from "@tiptap/extension-ordered-list"
+import ListItem from "@tiptap/extension-list-item"
+import Blockquote from "@tiptap/extension-blockquote"
+import Heading from "@tiptap/extension-heading"
 import Toolbar from "./Toolbar"
 
-type TextEditorProps = {
+const TextEditor = ({
+	value,
+	onChange,
+}: {
 	value: string
 	onChange: (value: string) => void
-}
-
-const TextEditor = ({ value, onChange }: TextEditorProps) => {
-	const [content, setContent] = useState(value)
-
+}) => {
 	const editor = useEditor({
-		extensions: [StarterKit, Underline],
-		content: content, // Set initial content
+		extensions: [
+			StarterKit.configure({
+				heading: false, // Disable StarterKit's heading
+			}),
+			Heading.configure({ levels: [1, 2, 3] }), // Allow H1, H2, H3
+			BulletList,
+			OrderedList,
+			ListItem,
+			Blockquote,
+		],
+		content: value,
 		editorProps: {
 			attributes: {
-				class:
-					"flex flex-col px-4 py-3 justify-start border-b border-r border-l border-gray-700 text-gray-400 items-start w-full gap-3 font-medium text-[16px] pt-4 rounded-bl-md rounded-br-md outline-none",
+				class: "p-1 border text-black w-full h-[120px] overflow-y-scroll",
 			},
 		},
 		onUpdate: ({ editor }) => {
-			const html = editor.getHTML()
-			setContent(html)
-			onChange(html)
+			onChange(editor.getHTML())
 		},
 	})
 
-	// Update editor content when value prop changes
-	useEffect(() => {
-		if (editor && editor.getHTML() !== value) {
-			editor.commands.setContent(value)
-		}
-	}, [value, editor])
-
 	return (
-		<div className="w-full px-4">
-			<Toolbar editor={editor} content={content} />
-			<EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
+		<div className="border border-gray-300 rounded-md p-2">
+			{editor && <Toolbar editor={editor} />} {/* ✅ Toolbar is included */}
+			<EditorContent editor={editor} />
 		</div>
 	)
 }

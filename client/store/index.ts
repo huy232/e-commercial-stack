@@ -3,6 +3,7 @@ import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux"
 import { persistReducer } from "redux-persist"
 import authReducer from "@/store/slices/authSlice"
 import storage from "./storage"
+import { cartReducer, notifyReducer } from "./slices"
 
 const persistConfig = {
 	key: "root",
@@ -11,6 +12,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
 	auth: persistReducer(persistConfig, authReducer),
+	cart: persistReducer(persistConfig, cartReducer),
+	notify: persistReducer(persistConfig, notifyReducer),
 })
 
 export const store = configureStore({

@@ -8,13 +8,12 @@ interface HotCollectionsProps {
 }
 
 const HotCollections: FC<HotCollectionsProps> = ({ categories }) => {
-	console.log(categories)
 	return (
 		<>
 			<h3 className="uppercase text-lg font-semibold border-b-2 border-main py-2 mb-8">
 				Hot collections
 			</h3>
-			<div className="w-full flex-wrap gap-12 grid grid-cols-2 md:grid-cols-3">
+			<div className="w-full flex-wrap gap-12 grid grid-cols-2 lg:grid-cols-3">
 				{categories.data &&
 					categories.data.map((category: any) => (
 						<div key={category._id} className="flex">

@@ -52,7 +52,7 @@ export const introduceList = [
 ]
 
 export const introduceMainTitle = {
-	title: "Great outfits and excellent service await you in our online store",
+	title: "Excellent service await you in our online store",
 	description:
 		"Welcome to our exclusive online store, where first-class outfits meet first-class service. Immerse yourself in a world of elegance and style, where every visit is an unforgettable shopping experience",
 }

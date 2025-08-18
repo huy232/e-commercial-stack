@@ -1,17 +1,10 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
-import { Footer, Header, Navbar, Toast } from "@/components"
+import { AdminSidebar, Toast } from "@/components"
 import clsx from "clsx"
-import ReduxProvider from "@/context/reduxProvider"
+import { anton, bebasNeue, inter, poppins } from "@/utils"
 import "../globals.css"
-import AdminSidebar from "@/components/AdminSidebar"
-
-const poppins = Poppins({
-	subsets: ["latin"],
-	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-	display: "swap",
-	style: ["normal", "italic"],
-})
+import { AuthProvider, ReduxProvider } from "@/context"
 
 export const metadata: Metadata = {
 	title: "Create Next App",
@@ -19,8 +12,11 @@ export const metadata: Metadata = {
 }
 
 const bodyClassName = clsx(
-	"w-full flex flex-col min-h-screen",
-	poppins.className
+	"w-full flex flex-col items-center min-h-screen",
+	poppins.variable,
+	anton.variable,
+	inter.variable,
+	bebasNeue.variable
 )
 
 export default function AdminLayout({
@@ -32,11 +28,13 @@ export default function AdminLayout({
 		<html lang="en">
 			<body className={bodyClassName}>
 				<ReduxProvider>
-					<Toast />
-					<div className="flex flex-grow">
-						<AdminSidebar />
-						<div>{children}</div>
-					</div>
+					<AuthProvider>
+						<Toast />
+						<div className="flex flex-grow w-full">
+							<AdminSidebar />
+							{children}
+						</div>
+					</AuthProvider>
 				</ReduxProvider>
 			</body>
 		</html>

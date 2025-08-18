@@ -1,24 +1,37 @@
 "use client"
-import { ProductType } from "@/types"
+import { ProductExtraType, ProductType } from "@/types"
 import { FC, useCallback, useEffect, useState } from "react"
 import { Pagination } from "@/components"
 import { useSearchParams } from "next/navigation"
 import SearchProduct from "./SearchProduct"
 import ProductTableRow from "./ProductTableRow"
-import { URL } from "@/constant"
+import { API, URL } from "@/constant"
 
 const ManageProducts: FC = () => {
-	const [productList, setProductList] = useState<ProductType[]>([])
+	const [productList, setProductList] = useState<ProductExtraType[]>([])
 	const [totalPages, setTotalPages] = useState(1)
 	const [loading, setLoading] = useState(true)
 	const [productListChanged, setProductListChanged] = useState(false)
-	const params = useSearchParams() as URLSearchParams
+	const params = useSearchParams()
 
-	const fetchProducts = useCallback(async (params: any) => {
+	const fetchProducts = useCallback(async () => {
 		setLoading(true)
 		try {
+			// Convert search params into an object dynamically
+			const queryParams: Record<string, string> = {}
+			params.forEach((value, key) => {
+				queryParams[key] = value
+			})
+
+			// Ensure default pagination limit is set if not provided
+			if (!queryParams.limit) {
+				queryParams.limit = "10"
+			}
+
+			const queryString = new URLSearchParams(queryParams).toString()
+
 			const fetchProductResponse = await fetch(
-				URL + "/api/product?" + new URLSearchParams(params),
+				`${API}/product/get-all-product?${queryString}`,
 				{ method: "GET" }
 			)
 			const data = await fetchProductResponse.json()
@@ -31,16 +44,10 @@ const ManageProducts: FC = () => {
 		} finally {
 			setLoading(false)
 		}
-	}, [])
+	}, [params])
 
 	useEffect(() => {
-		const page = params.has("page") ? Number(params.get("page")) : 1
-		const search = params.has("search") ? params.get("search") ?? "" : ""
-		if (search !== "") {
-			fetchProducts({ page, search, limit: 10 })
-		} else {
-			fetchProducts({ page, limit: 10 })
-		}
+		fetchProducts()
 	}, [params, productListChanged, fetchProducts])
 
 	const handleProductListChange = () => {

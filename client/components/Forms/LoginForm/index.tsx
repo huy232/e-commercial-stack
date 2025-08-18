@@ -8,6 +8,8 @@ import { loginSuccess } from "@/store/slices/authSlice"
 import { useDispatch } from "react-redux"
 import { API, URL } from "@/constant"
 import { AppDispatch } from "@/types"
+import { handleUserLogin } from "@/store/actions"
+import { CiLogin } from "@/assets/icons"
 
 type LoginFormData = {
 	email: string
@@ -23,36 +25,22 @@ const LoginForm: FC = () => {
 		formState: { errors },
 	} = useForm<LoginFormData>()
 	const [errorMessage, setErrorMessage] = useState("")
-	const login = useCallback(async (email: string, hashPassword: string) => {
-		const loginResponse = await fetch(API + "/user/login", {
-			method: "POST",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				email,
-				password: hashPassword,
-			}),
-		})
-
-		const response = await loginResponse.json()
-		return response
-	}, [])
 
 	const handleLogin: SubmitHandler<LoginFormData> = async (data) => {
 		const { email, password } = data
 		const hashPassword = await passwordHashingClient(password)
 		try {
-			const response = await login(email, hashPassword)
-			if (!response.success) {
+			// const response = await login(email, hashPassword)
+			const response = await dispatch(
+				handleUserLogin({ email, password: hashPassword })
+			)
+			if (!response.payload.success) {
 				const responseErrorMessage =
 					response.message || "An error occurred while login"
 				setErrorMessage(responseErrorMessage)
 			} else {
-				await dispatch(loginSuccess(response.userData))
+				// await dispatch(loginSuccess(response.userData))
 				router.push("/")
-				// router.refresh()
 			}
 		} catch (error) {
 			setErrorMessage("An error occurred while login due to server")
@@ -85,11 +73,11 @@ const LoginForm: FC = () => {
 					errorMessage={errors.password?.message}
 				/>
 				<Button
-					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
+					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded py-1 px-4 mt-4 group hover:text-white flex items-center justify-center gap-0.5"
 					type="submit"
 					form="hook-form"
 				>
-					Login
+					<span>Login</span> <CiLogin size={20} />
 				</Button>
 				{errorMessage && (
 					<p className="text-main text-center hover-effect">{errorMessage}</p>

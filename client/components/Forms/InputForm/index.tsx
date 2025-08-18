@@ -1,4 +1,5 @@
 "use client"
+import { inputClass } from "@/utils"
 import clsx from "clsx"
 import { FC, memo } from "react"
 import { FieldError, FieldValues, UseFormRegister } from "react-hook-form"
@@ -11,7 +12,7 @@ interface InputFormProps<T extends FieldValues> {
 	label?: string
 	disabled?: boolean
 	register: UseFormRegister<T>
-	errors: { [key: string]: CustomFieldError } | undefined
+	errorMessage: { [key: string]: CustomFieldError } | undefined
 	id?: string
 	validate?: (value: any) => boolean | string | Promise<boolean | string>
 	type?: string
@@ -25,7 +26,7 @@ const InputForm: FC<InputFormProps<any>> = ({
 	label,
 	disabled,
 	register,
-	errors,
+	errorMessage,
 	id,
 	validate,
 	type = "text",
@@ -34,13 +35,9 @@ const InputForm: FC<InputFormProps<any>> = ({
 	defaultValue,
 	className,
 }) => {
-	const inputClass = clsx(
-		"form-input rounded",
-		fullWidth && "w-full",
-		className
-	)
+	const inputClassName = clsx(inputClass(className), fullWidth && "w-full")
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-1">
 			{label && <label htmlFor={id}>{label}</label>}
 			<input
 				type={type}
@@ -48,11 +45,13 @@ const InputForm: FC<InputFormProps<any>> = ({
 				{...register(id || "", { validate })}
 				disabled={disabled}
 				placeholder={placeholder}
-				className={inputClass}
+				className={inputClassName}
 				defaultValue={defaultValue}
 			/>
-			{errors && id && errors[id]?.message && (
-				<small className="text-xs text-red-500">{errors[id]?.message}</small>
+			{errorMessage && id && errorMessage[id]?.message && (
+				<small className="text-xs text-red-500">
+					{errorMessage[id]?.message}
+				</small>
 			)}
 		</div>
 	)

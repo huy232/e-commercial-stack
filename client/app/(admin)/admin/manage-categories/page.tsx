@@ -1,6 +1,13 @@
 import { ManageCategories } from "@/components"
 import { API } from "@/constant"
 
+export const metadata = {
+	title: "Manage Product Categories | Digital World Admin",
+	description:
+		"Add, edit, and remove product categories to keep your store organized.",
+	robots: { index: false, follow: false },
+}
+
 export default async function AdminManageCategories() {
 	const brandResponse = await fetch(API + "/brand", {
 		method: "GET",
@@ -13,11 +20,11 @@ export default async function AdminManageCategories() {
 	const { data: brandData } = await brandResponse.json()
 	const { data: categoriesData } = await categoryResponse.json()
 	return (
-		<div>
-			<h1 className="h-[75px] flex justify-between items-center text-3xl font-bold px-4">
+		<main className="w-full">
+			<h1 className="text-center text-3xl font-bold font-bebasNeue mt-8">
 				Manage categories
 			</h1>
 			<ManageCategories brands={brandData} categories={categoriesData} />
-		</div>
+		</main>
 	)
 }

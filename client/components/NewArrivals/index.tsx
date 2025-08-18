@@ -1,26 +1,26 @@
 "use client"
 import { FC, useCallback, useMemo, useState } from "react"
-import { ProductType } from "@/types/product"
+import { ProductExtraType, ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
 import { ApiProductResponse } from "@/types"
-import { URL } from "@/constant"
+import { API, URL } from "@/constant"
 
 interface NewArrivalsProps {
-	initialProducts: ProductType[] | []
+	initialProducts: ProductExtraType[] | []
 }
 
 const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 	const tabs = useMemo(
 		() => [
-			{ id: 1, name: "Smartphone", sort: "-sold" },
-			{ id: 2, name: "Tablet", sort: "-createdAt" },
-			{ id: 3, name: "Laptop", sort: "-createdAt" },
+			{ id: 1, name: "Smartphone", category: "Smartphone" },
+			{ id: 2, name: "Tablet", category: "Tablet" },
+			{ id: 3, name: "Speaker", category: "Speaker" },
 		],
 		[]
 	)
 
-	const [products, setProducts] = useState<ProductType[] | null>(
+	const [products, setProducts] = useState<ProductExtraType[] | null>(
 		initialProducts
 	)
 	const [titleId, setTitleId] = useState(tabs[0].id)
@@ -29,7 +29,7 @@ const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 		async (sort: {}, tabId: number) => {
 			try {
 				const response = await fetch(
-					URL + `/api/product?` + new URLSearchParams(sort),
+					API + `/product/get-all-product?` + new URLSearchParams(sort),
 					{ method: "GET" }
 				)
 				const data = await response.json()
@@ -44,18 +44,22 @@ const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 
 	const titleClass = (id: number) =>
 		clsx(
-			`rounded p-1 hover:bg-rose-500 hover-effect border-2`,
+			`rounded p-1 hover:bg-rose-500 hover-effect border-2 duration-300 transition-all`,
 			titleId === id ? "border-rose-500" : "border-transparent"
 		)
 
 	return (
 		<div className="w-full">
-			<div className="flex flex-row items-center justify-center gap-2">
-				<h2 className="font-semibold text-xl">Suggested section</h2>
-				<div className="ml-auto flex gap-2 text-xs">
+			<div className="flex flex-col items-center justify-center gap-2">
+				<h2 className="uppercase text-2xl font-semibold mx-4 lg:text-3xl font-bebasNeue">
+					Suggested section
+				</h2>
+				<div className="mx-auto md:ml-auto md:mr-0 flex gap-4 text-xs font-anton mb-2">
 					{tabs.map((tab) => (
 						<button
-							onClick={() => fetchProductsComponent({ sort: tab.sort }, tab.id)}
+							onClick={() =>
+								fetchProductsComponent({ category: tab.category }, tab.id)
+							}
 							key={tab.id}
 							className={titleClass(tab.id)}
 						>

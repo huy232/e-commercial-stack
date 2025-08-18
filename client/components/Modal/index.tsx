@@ -3,6 +3,8 @@ import { FC, ReactNode, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import clsx from "clsx"
 import { useClickOutside } from "@/hooks"
+import Button from "../Button"
+import { IoIosCloseCircle } from "@/assets/icons"
 
 interface ModalProps {
 	isOpen: boolean
@@ -45,7 +47,16 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 				<>
 					<div className={overlayClass}>
 						<div className={modalClass}>
-							<div className="bg-white p-4" ref={modalRef}>
+							<div
+								className="max-h-full bg-white p-4 relative overflow-y-auto"
+								ref={modalRef}
+							>
+								<Button
+									className="absolute top-0 right-0 mr-2 mt-2 hover:opacity-80 duration-300 ease-linear z-10"
+									onClick={onClose}
+								>
+									<IoIosCloseCircle size={24} />
+								</Button>
 								{children}
 							</div>
 						</div>

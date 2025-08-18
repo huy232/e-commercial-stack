@@ -7,6 +7,8 @@ import {
 } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
+import { inputClass } from "@/utils"
+import clsx from "clsx"
 
 interface InputFieldProps {
 	value?: string | number
@@ -24,6 +26,8 @@ interface InputFieldProps {
 	readOnly?: boolean
 	onChange?: ChangeEventHandler<HTMLInputElement>
 	disabled?: boolean
+	inputAdditionalClass?: string
+	labelClassName?: string
 	validateType?:
 		| "email"
 		| "noSpaceNoNumber"
@@ -67,6 +71,8 @@ const InputField: React.FC<InputFieldProps> = ({
 	onChange,
 	disabled = false,
 	value,
+	inputAdditionalClass,
+	labelClassName,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -74,79 +80,74 @@ const InputField: React.FC<InputFieldProps> = ({
 		setPasswordVisible(!passwordVisible)
 	}
 	const formatInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		let { value } = e.target
-
-		if (validateType === "onlyNumbers") {
-			// Remove any non-numeric characters
-			value = value.replace(/[^0-9]/g, "")
-
-			// Check if value is empty, set to "0"
-			if (value === "") {
-				value = "0"
-			}
-
-			// Convert to number and format with commas
-			const numberValue = parseFloat(value)
-			if (!isNaN(numberValue)) {
-				e.target.value = numberValue.toLocaleString()
-			} else {
-				e.target.value = value
-			}
+		if (validateType !== "onlyNumbers") {
+			onChange && onChange(e)
+			return
 		}
+
+		let { value } = e.target
+		value = value.replace(/[^0-9]/g, "")
+
+		if (value) {
+			const numberValue = parseFloat(value)
+			e.target.value = isNaN(numberValue) ? "" : numberValue.toLocaleString()
+		} else {
+			e.target.value = "0"
+		}
+
 		onChange && onChange(e)
 	}
 
 	return (
-		<div className="w-[320px]">
-			<div className="flex flex-col gap-2 py-2">
-				{label && (
-					<label className="text-md font-medium capitalize">{label}</label>
+		<>
+			{label && (
+				<label className={clsx("text-md font-medium mr-1", labelClassName)}>
+					{label}
+				</label>
+			)}
+			<div className="relative w-full">
+				<input
+					disabled={disabled}
+					readOnly={readOnly}
+					className={clsx(
+						"w-full", // Ensure full width
+						togglePassword && "pr-10", // Add right padding only if togglePassword is enabled
+						inputClass(inputAdditionalClass)
+					)}
+					type={togglePassword ? (passwordVisible ? "text" : "password") : type}
+					value={value === null ? "" : value?.toString()}
+					{...register(name, {
+						required,
+						pattern: validateType
+							? validateTypePatterns[validateType]
+							: pattern,
+						validate: (inputValue) => {
+							if (validate) return validate(inputValue)
+							if (minLength && inputValue.length < minLength)
+								return `Password must be at least ${minLength} characters`
+							return true
+						},
+						onChange: formatInput,
+					})}
+					placeholder={placeholder}
+					autoComplete="true"
+					onBlur={formatInput}
+				/>
+				{togglePassword && (
+					<Button
+						className="absolute right-2 top-1/2 -translate-y-1/2 px-1"
+						type="button"
+						onClick={togglePasswordVisibility}
+						disabled={disabled}
+					>
+						{passwordVisible ? <BiHide /> : <BiShow />}
+					</Button>
 				)}
-				<div className="flex items-center gap-4">
-					<div className="w-full">
-						<input
-							disabled={disabled}
-							readOnly={readOnly}
-							className="rounded p-1 border-[1px] border-black"
-							type={
-								togglePassword ? (passwordVisible ? "text" : "password") : type
-							}
-							value={value === null ? "" : value?.toString()} // Set the value here
-							{...register(name, {
-								required,
-								pattern: validateType
-									? validateTypePatterns[validateType]
-									: pattern,
-								validate: (inputValue) => {
-									if (validate) {
-										return validate(inputValue)
-									}
-									if (minLength && inputValue.length < minLength) {
-										return `Password must be at least ${minLength} characters`
-									}
-									return true
-								},
-								onChange: formatInput,
-							})}
-							placeholder={placeholder}
-							autoComplete="true"
-							onBlur={formatInput}
-						/>
-						{togglePassword && (
-							<Button
-								className="hover-effect px-1"
-								type="button"
-								onClick={togglePasswordVisibility}
-								disabled={disabled}
-							>
-								{passwordVisible ? <BiHide /> : <BiShow />}
-							</Button>
-						)}
-					</div>
-				</div>
+				{errorMessage && (
+					<p className="text-main hover-effect">{errorMessage}</p>
+				)}
 			</div>
-			{errorMessage && <p className="text-main hover-effect">{errorMessage}</p>}
-		</div>
+		</>
 	)
 }
 
