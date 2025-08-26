@@ -3,8 +3,8 @@ import { MdEmail } from "@/assets/icons"
 const MailNotify = () => {
 	return (
 		<div className="w-full flex justify-center items-center bg-main">
-			<div className="w-full flex-col gap-2 lg:flex-row lg:w-main flex justify-between items-center my-2">
-				<div className="flex flex-1 flex-col items-center lg:items-start">
+			<div className="w-full flex-col gap-2 lg:flex-row xl:w-main flex justify-between items-center my-2">
+				<div className="flex flex-1 flex-col items-center lg:items-start mx-2">
 					<span className="text-md font-semibold text-gray-100">
 						SIGN UP TO NEWSLETTER
 					</span>
@@ -12,7 +12,7 @@ const MailNotify = () => {
 						Subscribe now and receive weekly newsletter
 					</small>
 				</div>
-				<div className="flex flex-1 items-center">
+				<div className="flex flex-1 items-center mx-2">
 					<input
 						className="p-4 pr-1 rounded-l-full w-full h-[40px] bg-white/30 outline-none text-gray-100 placeholder:text-gray-200 placeholder:text-sm placeholder:italic"
 						type="text"

@@ -95,13 +95,13 @@ export default async function Blogs(props: Props) {
 	const technologyBlogs = await getBlogsByCategory("technology")
 
 	return (
-		<main className="w-main">
+		<main className="w-full xl:w-main">
 			<h1 className="font-bebasNeue text-right mx-4 text-3xl font-black">
 				News / blog
 			</h1>
 
 			<div className="grid grid-cols-12 gap-1 p-1 mt-4">
-				<div className="col-span-12 lg:col-span-8">
+				<div className="col-span-12 xl:col-span-8">
 					<section>
 						<h2 className="font-bebasNeue text-2xl font-bold mb-2">
 							Most Viewed Blogs
@@ -115,33 +115,33 @@ export default async function Blogs(props: Props) {
 					</section>
 				</div>
 
-				<div className="col-span-12 lg:col-span-4 space-y-6">
-					<section className="">
-						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#03304b] rounded relative">
+				<div className="col-span-12 xl:col-span-4 gap-6 md:grid md:grid-cols-2 xl:block">
+					<section className="mb-6">
+						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-center md:text-right uppercase p-2 bg-[#03304b] rounded relative">
 							<span className="text-white mx-4">E-commercial Blogs</span>
 							<FaBoltLightning
 								size={42}
-								className="text-yellow-500 absolute top-[-16px] right-[-14px] rounded-full p-2 bg-black"
+								className="text-yellow-500 absolute top-[-12px] right-[-8px] md:top-[-16px] md:right-[-14px] rounded-full p-2 bg-black"
 							/>
 						</h2>
 						<BlogCategory blogCategoryData={ecommercialBlogs} />
 					</section>
-					<section className="">
-						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#771f5d] rounded relative">
+					<section className="mb-6">
+						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-center md:text-right uppercase p-2 bg-[#771f5d] rounded relative">
 							<span className="text-white mx-4">Review Blogs</span>
 							<FaReadme
 								size={42}
-								className="text-yellow-500 absolute top-[-16px] right-[-14px] rounded-full p-2 bg-black"
+								className="text-yellow-500 absolute top-[-12px] right-[-8px] md:top-[-16px] md:right-[-14px] rounded-full p-2 bg-black"
 							/>
 						</h2>
 						<BlogCategory blogCategoryData={reviewBlogs} />
 					</section>
-					<section className="">
-						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#83361e] rounded relative">
+					<section className="mb-6">
+						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-center md:text-right uppercase p-2 bg-[#83361e] rounded relative">
 							<span className="text-white mx-4">Technology Blogs</span>
 							<GrTechnology
 								size={42}
-								className="text-yellow-500 absolute top-[-16px] right-[-14px] rounded-full p-2 bg-black"
+								className="text-yellow-500 absolute top-[-12px] right-[-8px] md:top-[-16px] md:right-[-14px] rounded-full p-2 bg-black"
 							/>
 						</h2>
 						<BlogCategory blogCategoryData={technologyBlogs} />

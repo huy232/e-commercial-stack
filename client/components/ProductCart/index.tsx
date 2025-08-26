@@ -136,12 +136,6 @@ const ProductCart: FC<ProductCartProps> = ({
 					>
 						Add to cart
 					</Button>
-					{/* {product.allowVariants && filteredVariants.length === 1 && (
-						<div className="mt-4">
-							<h4 className="font-medium">Selected Variant:</h4>
-							<pre>{JSON.stringify(filteredVariants[0], null, 2)}</pre>
-						</div>
-					)} */}
 				</>
 			)
 		} else addQuantityContent = <div>Product is not available</div>

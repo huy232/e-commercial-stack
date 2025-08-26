@@ -93,7 +93,7 @@ export default async function Product({
 	const relatedProducts = await relatedProductsResponse.json()
 
 	return (
-		<main className="w-full">
+		<main className="w-full xl:w-main">
 			<ProductDetail product={data} relatedProducts={relatedProducts.data} />
 		</main>
 	)

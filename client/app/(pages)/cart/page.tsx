@@ -39,7 +39,7 @@ export default async function Cart(props: Props) {
 		coupon = couponData
 	}
 	return (
-		<main className="w-full lg:w-main">
+		<main className="w-full xl:w-main">
 			<h1 className="font-bold text-right font-bebasNeue text-2xl mx-2">
 				<span className="mr-1 text-main">User</span>
 				<span className="">cart</span>

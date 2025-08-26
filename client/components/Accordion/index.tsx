@@ -28,7 +28,7 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
 				)}
 				onClick={() => setIsOpen(!isOpen)}
 			>
-				<span className="font-semibold">{title}</span>
+				<span className="font-semibold text-left">{title}</span>
 				<motion.div
 					animate={{ rotate: isOpen ? 180 : 0 }}
 					transition={{ duration: 0.3 }}

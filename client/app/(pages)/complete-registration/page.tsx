@@ -53,7 +53,7 @@ export default async function CompleteRegistration(props: Props) {
 	const verifyResponse = await response.json()
 	if (!verifyResponse.success) {
 		return (
-			<div className="w-main">
+			<div className="w-full xl:w-main">
 				<div className="flex flex-col gap-2 items-center">
 					<span className="text-rose-500 italic">
 						{verifyResponse.message
@@ -72,7 +72,7 @@ export default async function CompleteRegistration(props: Props) {
 		)
 	}
 	return (
-		<div className="w-main">
+		<div className="w-full xl:w-main">
 			<div className="flex flex-col gap-2 items-center">
 				<span className="text-teal-500 italic">
 					Successfully verifying your account

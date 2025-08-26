@@ -18,22 +18,13 @@ const Header: FC = () => {
 	if (!mounted) return null
 
 	return (
-		<div className="w-full lg:w-main h-[110px] py-[35px] flex justify-between font-inter">
+		<div className="w-full xl:w-main h-[110px] py-[35px] flex justify-between font-inter">
 			<Logo />
 			<div className="flex items-center lg:text-[0.6rem] xl:text-[0.8rem]">
 				<HeaderInform />
 				<SidebarCart />
 				<Notify user={user} notifications={notifications} />
-				{/* {isAuthenticated && user ? ( */}
 				<User user={user} />
-				{/* ) : (
-					<Button
-						className="bg-black/20 rounded w-[100px] flex justify-center items-center p-1 mx-2"
-						disabled
-					>
-						<AiOutlineLoading className="animate-spin h-[20px] w-[20px]" />
-					</Button>
-				)} */}
 			</div>
 		</div>
 	)

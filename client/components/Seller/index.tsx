@@ -1,6 +1,6 @@
 "use client"
 import { FC, useMemo, useState, useCallback, useEffect } from "react"
-import { CustomImage } from "@/components"
+import { Button, CustomImage } from "@/components"
 import { ProductExtraType, ProductType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
@@ -50,13 +50,13 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 		<div className="flex flex-col my-2 sm:my-4">
 			<div className="flex flex-row gap-2 mb-4 max-sm:mx-auto md:ml-2">
 				{tabs.map((tab) => (
-					<button
+					<Button
 						onClick={() => fetchProductsComponent({ sort: tab.sort }, tab.id)}
 						key={tab.id}
 						className={titleClass(tab.id)}
 					>
 						{tab.name}
-					</button>
+					</Button>
 				))}
 			</div>
 			<CustomSlider products={products} supportHover />

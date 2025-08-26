@@ -74,7 +74,8 @@ const Pagination: FC<PaginationProps> = ({
 				breakLabel="..."
 				nextLabel={
 					<>
-						<span>Next</span> <FaChevronRight className="mt-[2px]" />
+						<span className="hidden lg:block">Next</span>{" "}
+						<FaChevronRight className="mt-[2px]" />
 					</>
 				}
 				onPageChange={handlePageChange}
@@ -83,7 +84,7 @@ const Pagination: FC<PaginationProps> = ({
 				previousLabel={
 					<>
 						<FaChevronLeft className="mt-[2px]" />
-						<span>Previous</span>
+						<span className="hidden lg:block">Previous</span>
 					</>
 				}
 				marginPagesDisplayed={1}

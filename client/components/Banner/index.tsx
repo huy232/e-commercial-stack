@@ -22,7 +22,7 @@ const Banner: FC = () => {
 			description:
 				"Explore the latest smartphones with cutting-edge technology, vibrant displays, and powerful performance. Perfect for staying connected and capturing every moment!",
 			url: "products?category=Smartphone",
-			color: "text-blue-500", // Example Tailwind color
+			color: "text-blue-500",
 		},
 		{
 			heading: "Tablet",
@@ -86,7 +86,7 @@ const Banner: FC = () => {
 										className="text-white rounded p-1 mt-2 relative flex items-center group justify-self-start"
 										href={URL + `/${arrayBanner[index].url}`}
 									>
-										<span className="fold-bold relative flex items-center h-full w-full rounded bg-white px-2 py-1 text-sm md:text-base font-bold text-black transition-all duration-300 bg-gradient-to-r group-hover:from-pink-500 group-hover:to-orange-500 group-hover:via-red-500 bg-size-200 bg-pos-0 hover:bg-pos-100 hover:text-white">
+										<span className="fold-bold relative flex items-center rounded bg-white px-2 py-1 text-sm md:text-base font-bold text-black transition-all duration-300 bg-gradient-to-r group-hover:from-pink-500 group-hover:to-orange-500 group-hover:via-red-500 bg-size-200 bg-pos-0 hover:bg-pos-100 hover:text-white">
 											Shop now
 											<FaShoppingBag
 												className="ml-1 group-hover:animate-tada"

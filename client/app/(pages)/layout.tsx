@@ -43,7 +43,7 @@ export default function RootLayout({
 							<Navbar />
 							<Toast />
 							<ChatBox />
-							<div className="w-full lg:w-main flex-grow">{children}</div>
+							<div className="w-full xl:w-main flex-grow">{children}</div>
 							<Footer />
 						</AuthProvider>
 					</ReduxProvider>

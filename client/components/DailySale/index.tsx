@@ -68,7 +68,7 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 	}
 
 	return (
-		<div className="w-full lg:w-1/3">
+		<div className="w-full md:w-1/3">
 			<h3 className="flex items-center justify-center gap-2 flex-col">
 				<span className="text-3xl font-black leading-snug text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-pink-600 to-purple-600 flex items-center justify-center uppercase font-bebasNeue -skew-y-6">
 					You might like?!

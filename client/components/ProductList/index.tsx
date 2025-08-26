@@ -56,11 +56,11 @@ const ProductList: FC<ProductsProps> = ({
 
 	return (
 		<>
-			<div className="w-main border p-4 flex justify-center items-center mx-auto flex-col">
-				<div className="w-full relative">
+			<div className="w-full xl:w-main border p-4 flex justify-center items-center mx-auto flex-col">
+				<div className="w-full relative mx-1 md:mx-2 lg:mx-4">
 					<SearchBar />
 				</div>
-				<div className="w-full bg-[#242424] rounded mt-2">
+				<div className="w-full bg-[#242424] rounded mt-2 mx-1 md:mx-2 lg:mx-4">
 					<button
 						onClick={() => {
 							setEnableFilter(!enableFilter)
@@ -125,7 +125,7 @@ const ProductList: FC<ProductsProps> = ({
 			</div>
 			{products && (
 				<>
-					<div className="gap-4 grid grid-cols-2 lg:grid-cols-3 justify-items-center">
+					<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
 						{products.map((product) => (
 							<ProductCard key={product._id} product={product} enableOptions />
 						))}

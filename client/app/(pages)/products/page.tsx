@@ -68,10 +68,9 @@ export default async function Products(props: Props) {
 	const categories = await categoriesResponse.json()
 
 	return (
-		<main className="w-full">
-			<div className="w-main justify-center items-center mx-auto">
+		<main className="w-full xl:w-main">
+			<div className="justify-center items-center mx-auto">
 				<h2 className="uppercase font-semibold">{category}</h2>
-				{/* <Breadcrumb breadcrumbs={breadcrumbs} allowTitle={false} /> */}
 			</div>
 			<ProductList
 				searchParams={searchParams}

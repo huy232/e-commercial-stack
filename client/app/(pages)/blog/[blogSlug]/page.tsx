@@ -143,7 +143,7 @@ export default async function Blog(props: Props) {
 	)
 
 	return (
-		<main className="w-main">
+		<main className="w-full xl:w-main">
 			<nav className="text-sm my-2 text-gray-600">
 				<Link href="/blog" className="hover:underline text-blue-600">
 					Blog

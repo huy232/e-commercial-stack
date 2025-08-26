@@ -59,6 +59,7 @@ const OrderComponent = () => {
 			fetchUserOrder(page)
 		}
 	}, [mounted, user, page])
+
 	if (loading && !mounted) {
 		return null
 	}

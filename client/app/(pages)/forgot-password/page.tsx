@@ -23,7 +23,7 @@ const ForgotPasswordForm = dynamic(
 
 export default function ForgotPassword() {
 	return (
-		<main className="w-main">
+		<main className="w-full xl:w-main">
 			<h2>Forgot your password?</h2>
 			<ForgotPasswordForm />
 		</main>

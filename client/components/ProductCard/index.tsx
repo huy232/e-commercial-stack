@@ -55,13 +55,13 @@ const ProductCard: FC<ProductProps> = ({
 				{enableTitle && (
 					<Link
 						href={`/products/${product.slug}`}
-						className="line-clamp-2 h-[60px] font-bold hover-effect hover:opacity-70 duration-300 ease-in-out hover:underline"
+						className="h-[54px] xl:h-[60px] font-bold hover-effect hover:opacity-70 duration-300 ease-in-out hover:underline"
 					>
-						{product.title}
+						<p className="line-clamp-2">{product.title}</p>
 					</Link>
 				)}
 				{enableStars && (
-					<span className="flex h-4">
+					<span className="flex h-4 mt-0.5">
 						{renderStarFromNumber(product.totalRatings)}
 					</span>
 				)}

@@ -4,18 +4,21 @@ import Accordion from "../Accordion"
 
 export default function FAQs() {
 	return (
-		<main className="w-main">
+		<main className="w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 mx-auto">
+			{/* Heading */}
 			<motion.h2
 				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
+				whileInView={{ opacity: 1, y: 0 }}
+				viewport={{ once: true, amount: 0.3 }}
 				transition={{ duration: 0.8, ease: "easeOut" }}
-				className="font-extrabold text-2xl text-right font-bebasNeue"
+				className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center md:text-right font-bebasNeue"
 			>
 				<span>Frequently asked</span>
 				<span className="text-red-500 underline mx-1">questions</span>
 			</motion.h2>
 
-			<div className="mx-auto my-4 space-y-4">
+			{/* FAQ List */}
+			<div className="my-6 space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6">
 				<Accordion title="1. How do I place an order?">
 					Simply browse our products, add items to your cart, and proceed to
 					checkout. You’ll receive an order confirmation via email.

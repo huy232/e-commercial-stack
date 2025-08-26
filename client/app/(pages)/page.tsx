@@ -18,7 +18,6 @@ import {
 	SaleList,
 } from "@/components"
 import { API, WEB_URL } from "@/constant"
-import { BannerLeft, BannerRight } from "@/assets/images"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -54,18 +53,22 @@ export default async function Home() {
 		method: "GET",
 		cache: "no-cache",
 	})
+
+	const queryInitialProducts = new URLSearchParams({
+		category: "smartphone",
+	}).toString()
 	const initialProductsAPI = await fetch(
-		WEB_URL + `/api/product?` + new URLSearchParams({ sort: "-sold" }),
+		API + `/product/get-all-product?${queryInitialProducts}`,
 		{ method: "GET", cache: "no-cache" }
 	)
+
+	const queryFeatureProducts = new URLSearchParams({
+		limit: "10",
+		page: "1",
+		sort: "-totalRatings",
+	}).toString()
 	const featureProductsAPI = await fetch(
-		WEB_URL +
-			`/api/product?` +
-			new URLSearchParams({
-				limit: "10",
-				page: "1",
-				sort: `-totalRatings`,
-			}),
+		API + `/product/get-all-product?${queryFeatureProducts}`,
 		{ method: "GET", cache: "no-cache" }
 	)
 
@@ -87,7 +90,7 @@ export default async function Home() {
 					<Seller initialProducts={initialProducts.data} />
 					<SaleList saleList={saleList} />
 				</div>
-				<div className="w-full flex flex-col lg:flex-row gap-4 mt-2 items-center">
+				<div className="w-full flex flex-col md:flex-row gap-4 mt-2 items-center">
 					<DailySale dailySale={dailyDeal} />
 					<Promotion />
 				</div>

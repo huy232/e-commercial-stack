@@ -38,13 +38,13 @@ const NewsBlog = ({ blogData }: { blogData: BlogData }) => {
 					<CustomImage
 						src={firstBlog.image}
 						alt={firstBlog.title}
-						className="object-fill rounded mb-4 right-0"
+						className="object-fill rounded mb-4 right-0 w-full md:w-auto h-[160px] lg:h-[280px] mx-auto lg:ml-4 lg:mr-auto"
 						width={280}
 						height={160}
 					/>
-					<h2 className="text-2xl font-bold mb-2">{firstBlog.title}</h2>
+					<h2 className="text-2xl font-bold mb-2 mx-4">{firstBlog.title}</h2>
 				</Link>
-				<div className="text-gray-700 text-base mb-2 line-clamp-4">
+				<div className="text-gray-700 text-base mb-2 line-clamp-4 mx-1">
 					<InnerHTML html={sanitizeHTML(firstBlog.description)} />
 				</div>
 				<Link
@@ -60,13 +60,13 @@ const NewsBlog = ({ blogData }: { blogData: BlogData }) => {
 				{restBlogs.map((blog: PopulatedBlog) => (
 					<div
 						key={blog._id}
-						className="flex bg-white rounded shadow overflow-hidden group mb-2 flex-row hover:shadow-xl transition-shadow duration-300"
+						className="flex bg-white rounded shadow overflow-hidden group mb-2 flex-col lg:flex-row hover:shadow-xl transition-shadow duration-300"
 					>
 						<Link href={`/blog/${blog.slug}`} className="flex-shrink-0">
 							<CustomImage
 								src={blog.image}
 								alt={blog.title}
-								className="w-[280px] h-[160px] object-cover group-hover:opacity-70 transition-all duration-300 mx-4"
+								className="w-[280px] h-[160px] object-cover group-hover:opacity-70 transition-all duration-300 mx-auto lg:mx-4"
 								fill
 							/>
 						</Link>

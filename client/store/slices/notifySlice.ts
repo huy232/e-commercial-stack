@@ -53,6 +53,11 @@ const notificationsSlice = createSlice({
 				state.loading = true
 			})
 			.addCase(fetchNotifications.fulfilled, (state, action) => {
+				if (action.payload.status === "fail") {
+					state.loading = false
+					return
+				}
+
 				const { notifications, currentPage, totalPages, unreadCount } =
 					action.payload.data
 

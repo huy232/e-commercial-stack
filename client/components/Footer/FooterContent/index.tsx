@@ -8,7 +8,7 @@ const FooterContent = () => {
 
 	return (
 		<div className="w-full bg-black/90 text-white text-xs py-4">
-			<div className="lg:w-main mx-auto grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-y-4 lg:grid-cols-4 *:mx-2 *:py-2">
+			<div className="xl:w-main mx-auto grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-y-4 lg:grid-cols-4 *:mx-2 *:py-2">
 				<div className="flex flex-col">
 					<h3 className={headingClassName}>About us</h3>
 					<div className="mx-4">

@@ -99,7 +99,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 	}
 	return (
 		<>
-			<section className="w-full lg:w-main flex flex-col max-sm:items-center bg-gray-100">
+			<section className="w-full xl:w-main flex flex-col max-sm:items-center">
 				<Breadcrumb
 					breadcrumbs={breadcrumbs}
 					productTitle={product.title}
@@ -112,7 +112,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 				</div>
 				<div className="lg:w-2/5 flex flex-col mx-2">
 					<div className="flex flex-col gap-2">
-						<h2 className="order-2 text-lg font-semibold font-anton line-clamp-2">
+						<h2 className="max-sm:text-center max-sm:line-clamp-none max-sm:text-2xl order-2 text-lg font-semibold font-anton line-clamp-2">
 							{product.title}
 						</h2>
 						<span className="order-3 flex items-center justify-between">
@@ -125,7 +125,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 						{discountValidate(product) ? (
 							<div className="order-1 bg-[#84CC16] w-full px-2 py-2 rounded leading-3 flex flex-col">
 								<div className="flex items-center gap-1">
-									<span className="text-white text-lg font-bold">
+									<span className="text-white max-sm:text-base text-lg font-bold">
 										{formatPrice(product.discount.productPrice)}
 									</span>
 									<span className="md:block line-through text-gray-500 text-[10px]">
@@ -163,7 +163,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 						/>
 					</div>
 				</div>
-				<div className="lg:w-1/5 grid gap-1">
+				<div className="lg:w-1/5 grid gap-1 max-sm:my-2 max-sm:mx-auto">
 					{productExtraInformation.map((extra) => (
 						<ProductExtraInfo
 							key={extra.id}
@@ -174,14 +174,11 @@ const ProductDetail: FC<ProductDetailProps> = ({
 					))}
 				</div>
 			</section>
-			<div className="w-full lg:w-main m-auto mt-2 lg:mt-4">
+			<div className="w-full xl:w-main m-auto mt-2 lg:mt-4">
 				<div
 					ref={descriptionRef}
 					className={clsx(
-						"mb-2 px-1 transition-all ease-in-out duration-500 overflow-hidden"
-						// !extendDescription
-						// 	? "max-h-[150px]"
-						// 	: `max-h-[${descriptionHeight}px]`
+						"mb-2 px-1 transition-all ease-in-out duration-500 overflow-hidden mx-2"
 					)}
 					dangerouslySetInnerHTML={{ __html: product.description }}
 					style={{
@@ -214,11 +211,11 @@ const ProductDetail: FC<ProductDetailProps> = ({
 				<ProductInformation product={product} updateReviews={updateReviews} />
 			</div>
 			{relatedProducts && (
-				<div>
-					<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">
+				<div className="w-full xl:w-main m-auto my-4">
+					<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main mx-2 mt-4 font-bebasNeue max-sm:text-center">
 						Other products you may like
 					</h3>
-					<div className="w-full lg:w-main m-auto">
+					<div className="w-full xl:w-main m-auto">
 						<CustomSlider
 							products={relatedProducts}
 							supportHover

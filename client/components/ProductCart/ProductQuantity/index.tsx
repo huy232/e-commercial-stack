@@ -47,7 +47,7 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 	}, [quantity, quantityLimit, setQuantity])
 
 	return (
-		<div className="flex gap-2 items-center mt-2">
+		<div className="max-sm:mx-auto flex gap-2 items-center my-2">
 			{allowQuantity && (
 				<>
 					<span className="font-semibold">Quantity</span>
