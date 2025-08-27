@@ -29,6 +29,7 @@ const LoginForm: FC = () => {
 	const handleLogin: SubmitHandler<LoginFormData> = async (data) => {
 		const { email, password } = data
 		const hashPassword = await passwordHashingClient(password)
+		console.log("Client hash:", hashPassword)
 		try {
 			// const response = await login(email, hashPassword)
 			const response = await dispatch(
