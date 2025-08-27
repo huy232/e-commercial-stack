@@ -182,7 +182,7 @@ class UserController {
 			Validators.validateLogin.forEach((validation) => validation.run(req))
 			Validators.runValidation(req, res, async () => {
 				let { email, password } = req.body
-
+				console.log("Server expected hash:", password)
 				if (!email || !password) {
 					res.status(400).json({
 						success: false,
