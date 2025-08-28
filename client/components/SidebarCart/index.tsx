@@ -5,21 +5,13 @@ import { selectAuthUser, selectIsUserLoading } from "@/store/slices/authSlice"
 import { useClickOutside } from "@/hooks"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import {
-	AppDispatch,
-	Cart,
-	ICart,
-	VariantProperties,
-	VariantType,
-} from "@/types"
+import { AppDispatch, Cart, VariantType } from "@/types"
 import { Button, CustomImage } from "@/components"
 import { useRouter } from "next/navigation"
-import { WEB_URL } from "@/constant"
 import {
 	handleDeleteCart,
 	handleGetUserCart,
 	handleUpdateCart,
-	handleUserBulkCart,
 } from "@/store/actions"
 import Link from "next/link"
 import { formatPrice, handleCalculatePrice, path } from "@/utils"
@@ -37,10 +29,8 @@ const SidebarCart = () => {
 	const cart = useSelector<RootState, Cart[] | null>(selectCart)
 	const loadingCart = useSelector(selectCartLoading)
 	const loadingUser = useSelector(selectIsUserLoading)
-	const user = useSelector(selectAuthUser)
 	const sidebarCartRef = useRef<HTMLDivElement>(null)
 	const [open, setOpen] = useState(false)
-	const [message, setMessage] = useState<string>("")
 	const [error, setError] = useState<string>("")
 
 	useClickOutside(sidebarCartRef, (event) => {

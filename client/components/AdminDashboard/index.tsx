@@ -1,12 +1,13 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { CustomImage, OrdersChart } from "@/components"
+import { CustomImage, OrdersChart, Skeleton } from "@/components"
 import { API, BASE_SERVER_URL } from "@/constant"
 import io, { Socket } from "socket.io-client"
 import { OrderType } from "@/types"
 import { formatPrice } from "@/utils"
 import { FaCartArrowDown, LuPackageCheck } from "@/assets/icons"
+import { motion } from "framer-motion"
 
 interface MonthlyOrderData {
 	month: number
@@ -180,7 +181,7 @@ export default function AdminDashboard() {
 				socket.off("userCountUpdated")
 				socket.off("newestOrdersUpdated")
 				socket.disconnect()
-				socket = null // Ensure no duplicate connections are created
+				socket = null
 			}
 		}
 	}, [])
@@ -189,15 +190,19 @@ export default function AdminDashboard() {
 	const productLabels = productDistributionData.map((item) => item._id)
 	const productData = productDistributionData.map((item) => item.count)
 
+	console.log(allYearOrders)
+
 	return (
 		<div className="w-full">
 			<h2 className="text-3xl uppercase text-right font-bebasNeue font-bold mr-4">
 				Admin dashboard
 			</h2>
-			<div className="grid grid-cols-3 mx-4 gap-4">
+
+			<div className="grid grid-cols-1 md:grid-cols-3 mx-4 gap-4">
+				{/* Orders Chart */}
 				<div className="flex flex-col">
 					{loadingCount ? (
-						<p>Loading Order Count Data...</p>
+						<Skeleton className="w-full h-[300px]" />
 					) : (
 						<OrdersChart
 							datasets={[
@@ -209,12 +214,11 @@ export default function AdminDashboard() {
 							]}
 							chartTitle="Orders Per Month (Last 12 Months)"
 							chartType="line"
-							className=""
 						/>
 					)}
 
 					{loadingSum ? (
-						<p>Loading Order Sum Data...</p>
+						<Skeleton className="w-full h-[300px] mt-4" />
 					) : (
 						<OrdersChart
 							datasets={[
@@ -226,94 +230,116 @@ export default function AdminDashboard() {
 							]}
 							chartTitle="Total Order Value Per Month (Last 12 Months)"
 							chartType="bar"
-							className=""
 						/>
 					)}
 				</div>
+
+				{/* Product Distribution */}
 				<div>
 					{loadingDistribution ? (
-						<p>Loading Product Distribution...</p>
-					) : (
-						<OrdersChart
-							datasets={[
-								{
-									label: "Product Distribution",
-									color: [
-										"rgb(255, 99, 132)",
-										"rgb(54, 162, 235)",
-										"rgb(255, 205, 86)",
-										"rgb(75, 192, 192)",
-										"rgb(153, 102, 255)",
-										"rgb(201, 203, 207)",
-									],
-									data: productData, // Use distribution data for pie chart
-								},
-							]}
-							labels={productLabels} // Set category labels for the pie chart
-							chartTitle="Product Distribution"
-							chartType="pie" // Pie chart type
-							// className="w-[320px] h-[320px]"
-						/>
-					)}
-					<h3 className="font-anton text-base font-semibold text-center mt-4">
-						Product distribution sold
-					</h3>
-					<div className="grid grid-cols-3 gap-3 mt-2">
-						{ordersCategory.map((categoryOrder, index) => (
-							<div key={index} className="text-center bg-black/50 rounded p-1">
-								<span className="font-inter italic text-xs font-semibold uppercase">
-									{categoryOrder.title}
-								</span>
-								<span className="flex items-center gap-2 justify-center">
-									<span className="flex flex-row items-center gap-1 mr-2">
-										<span className="text-sm">{categoryOrder.totalSold}</span>
-										<span className="text-sm">
-											<LuPackageCheck />
-										</span>
-									</span>
-								</span>
+						<>
+							<Skeleton className="w-full h-[300px]" />
+							<Skeleton className="w-1/2 h-6 mx-auto mt-4" />
+							<div className="grid grid-cols-3 gap-3 mt-2">
+								{Array.from({ length: 6 }).map((_, i) => (
+									<Skeleton key={i} className="h-12 w-full" />
+								))}
 							</div>
-						))}
-					</div>
+						</>
+					) : (
+						<>
+							<OrdersChart
+								datasets={[
+									{
+										label: "Product Distribution",
+										color: [
+											"rgb(255, 99, 132)",
+											"rgb(54, 162, 235)",
+											"rgb(255, 205, 86)",
+											"rgb(75, 192, 192)",
+											"rgb(153, 102, 255)",
+											"rgb(201, 203, 207)",
+										],
+										data: productData,
+									},
+								]}
+								labels={productLabels}
+								chartTitle="Product Distribution"
+								chartType="pie"
+							/>
+							<h3 className="font-anton text-2xl lg:text-xl font-semibold text-center mt-4">
+								Product distribution sold
+							</h3>
+							<div className="grid grid-cols-3 gap-3 mt-2">
+								{ordersCategory.map((categoryOrder, index) => (
+									<div
+										key={index}
+										className="text-center bg-black/50 rounded p-1"
+									>
+										<span className="font-inter italic text-xs font-semibold uppercase">
+											{categoryOrder.title}
+										</span>
+										<span className="flex items-center gap-2 justify-center">
+											<span className="flex flex-row items-center gap-1 mr-2">
+												<span className="text-sm">
+													{categoryOrder.totalSold}
+												</span>
+											</span>
+										</span>
+									</div>
+								))}
+							</div>
+						</>
+					)}
 				</div>
+
+				{/* Newest Orders */}
 				<div className="p-4">
-					<h2 className="font-anton text-base font-bold mb-4 uppercase text-left">
+					<h2 className="font-anton text-2xl lg:text-xl font-bold mb-4 uppercase text-center md:text-left">
 						Newest Orders
 					</h2>
 					<div className="space-y-4">
-						{loadingNewestOrders ? (
-							<span>Loading newest orders</span>
-						) : (
-							newestOrders.map((order, index) => (
-								<div
-									key={order._id}
-									// className="p-4 bg-white shadow-lg rounded-lg transition-transform transform duration-500 ease-in-out opacity-0 animate-fade-in-up"
-								>
-									<div className="flex flex-col">
-										<div className="flex flex-row items-center space-x-4">
-											<CustomImage
-												src={order.products[0].product.thumbnail}
-												alt={order.products[0].product.title}
-												fill
-												className="object-contain rounded w-[60px] h-[60px]"
-											/>
-											<h3 className="text-base font-semibold line-clamp-2">
-												{order.products[0].product.title}
-											</h3>
-										</div>
-										<div className="flex flex-col">
-											<p className="text-base font-semibold text-green-500">
-												{formatPrice(order.total)}
-											</p>
-											<p className="text-xs text-gray-500 inline-flex gap-0.5 italic">
-												Ordered by: <span>{order.orderBy.firstName}</span>
-												<span>{order.orderBy.lastName}</span>
-											</p>
+						{loadingNewestOrders
+							? Array.from({ length: 4 }).map((_, i) => (
+									<div key={i} className="flex items-center space-x-4">
+										<Skeleton className="w-[60px] h-[60px]" />
+										<div className="flex-1 space-y-2">
+											<Skeleton className="w-3/4 h-4" />
+											<Skeleton className="w-1/2 h-3" />
 										</div>
 									</div>
-								</div>
-							))
-						)}
+							  ))
+							: newestOrders.map((order) => (
+									<motion.div
+										key={order._id}
+										initial={{ opacity: 0, y: 10 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.5 }}
+									>
+										<div className="flex flex-col mx-auto">
+											<div className="flex flex-row items-center space-x-4">
+												<CustomImage
+													src={order.products[0].product.thumbnail}
+													alt={order.products[0].product.title}
+													fill
+													className="object-contain rounded w-[120px] h-[120px] md:w-[80px] md:h-[80px] lg:w-[80px] lg:h-[80px] xl:w-[60px] xl:h-[60px]"
+												/>
+												<h3 className="text-base font-semibold line-clamp-2">
+													{order.products[0].product.title}
+												</h3>
+											</div>
+											<div className="flex flex-col">
+												<p className="text-base font-semibold text-green-500">
+													{formatPrice(order.total)}
+												</p>
+												<p className="text-xs text-gray-500 inline-flex gap-0.5 italic">
+													Ordered by: <span>{order.orderBy.firstName}</span>
+													<span>{order.orderBy.lastName}</span>
+												</p>
+											</div>
+										</div>
+									</motion.div>
+							  ))}
 					</div>
 				</div>
 			</div>

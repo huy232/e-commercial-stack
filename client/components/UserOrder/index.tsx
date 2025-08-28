@@ -50,7 +50,7 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 				return (
 					<div
 						key={item._id}
-						className="bg-gray-800 p-3 my-3 rounded-lg shadow-md"
+						className="bg-gray-800 p-3 my-3 rounded-lg shadow-md mx-2"
 					>
 						<div className="my-1">
 							<div className="flex justify-between items-center">
@@ -97,8 +97,11 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 						</div>
 						<div className="grid grid-cols-2 gap-2 bg-white rounded-lg p-2 shadow-heavy">
 							{item.products.map((product) => (
-								<div className="flex flex-row gap-2" key={product.product._id}>
-									<div className="relative flex items-center">
+								<div
+									className="flex flex-col md:flex-row gap-2 items-center"
+									key={product.product._id}
+								>
+									<div className="relative flex items-center w-[120px] h-[120px]">
 										<CustomImage
 											src={product.product.thumbnail}
 											alt={product.product.title}
@@ -110,7 +113,7 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 										</span>
 									</div>
 									<div className="py-1 px-2">
-										<h4 className="w-[160px] line-clamp-2 text-sm text-gray-900 font-semibold relative">
+										<h4 className="w-[160px] h-[54px] line-clamp-2 text-sm text-gray-900 font-semibold relative">
 											{product.product.title}
 										</h4>
 										<div className="flex flex-col">

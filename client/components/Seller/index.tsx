@@ -1,10 +1,10 @@
 "use client"
 import { FC, useMemo, useState, useCallback, useEffect } from "react"
-import { Button, CustomImage } from "@/components"
-import { ProductExtraType, ProductType } from "@/types/product"
+import { Button } from "@/components"
+import { ProductExtraType } from "@/types/product"
 import { CustomSlider } from "@/components"
 import clsx from "clsx"
-import { WEB_URL } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 
 interface SellerProps {
 	initialProducts: ProductExtraType[] | []
@@ -28,7 +28,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 		async (sort: {}, tabId: number) => {
 			try {
 				const response = await fetch(
-					WEB_URL + `/api/product?` + new URLSearchParams(sort),
+					API + `/product/get-all-product?` + new URLSearchParams(sort),
 					{ method: "GET", cache: "no-cache" }
 				)
 				const data = await response.json()
@@ -46,18 +46,22 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 			`rounded border-2 border-transparent p-1 hover:border-rose-500 hover-effect font-bebasNeue`,
 			titleId === id && "bg-red-500"
 		)
+
 	return (
 		<div className="flex flex-col my-2 sm:my-4">
-			<div className="flex flex-row gap-2 mb-4 max-sm:mx-auto md:ml-2">
-				{tabs.map((tab) => (
-					<Button
-						onClick={() => fetchProductsComponent({ sort: tab.sort }, tab.id)}
-						key={tab.id}
-						className={titleClass(tab.id)}
-					>
-						{tab.name}
-					</Button>
-				))}
+			<div className="flex flex-row gap-2 mb-4 max-sm:mx-auto ml-2">
+				{tabs.map((tab) => {
+					const { id, name, sort } = tab
+					return (
+						<Button
+							onClick={() => fetchProductsComponent({ sort: sort }, id)}
+							key={id}
+							className={titleClass(tab.id)}
+						>
+							{name}
+						</Button>
+					)
+				})}
 			</div>
 			<CustomSlider products={products} supportHover />
 		</div>

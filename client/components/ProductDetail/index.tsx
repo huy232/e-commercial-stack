@@ -97,6 +97,9 @@ const ProductDetail: FC<ProductDetailProps> = ({
 			)
 		}
 	}
+
+	console.log(product)
+
 	return (
 		<>
 			<section className="w-full xl:w-main flex flex-col max-sm:items-center">

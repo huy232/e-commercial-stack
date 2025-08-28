@@ -8,7 +8,16 @@ export async function authorizeMiddleware(request: NextRequest) {
 	let accessTokenCookie = request.cookies.get("accessToken")
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const checkUserResponse = await fetch(API + "/user/check-auth", {
+		// const checkUserResponse = await fetch(API + "/user/check-auth", {
+		// 	method: "GET",
+		// 	headers: {
+		// 		"Content-Type": "application/json",
+		// 		Cookie: cookieHeader || "",
+		// 	},
+		// 	credentials: "include",
+		// })
+
+		const checkUserResponse = await fetch(WEB_URL + "/api/user/check-auth", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -16,6 +25,7 @@ export async function authorizeMiddleware(request: NextRequest) {
 			},
 			credentials: "include",
 		})
+
 		const response = await checkUserResponse.json()
 		if (!response.success) {
 			return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
@@ -34,7 +44,16 @@ export async function loginMiddleware(request: NextRequest) {
 
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const checkUserResponse = await fetch(API + "/user/check-auth", {
+		// const checkUserResponse = await fetch(API + "/user/check-auth", {
+		// 	method: "GET",
+		// 	headers: {
+		// 		"Content-Type": "application/json",
+		// 		Cookie: cookieHeader || "",
+		// 	},
+		// 	credentials: "include",
+		// })
+
+		const checkUserResponse = await fetch(WEB_URL + "/api/user/check-auth", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -69,9 +88,6 @@ export async function adminMiddleware(request: NextRequest) {
 			credentials: "include",
 		})
 		const adminResponse = await checkAdminResponse.json()
-		// if (!response.success || !adminResponse.success) {
-		// 	return NextResponse.redirect(`${URL}${path.LOGIN}`)
-		// }
 		if (!adminResponse.success) {
 			return NextResponse.redirect(`${WEB_URL}${path.LOGIN}`)
 		}

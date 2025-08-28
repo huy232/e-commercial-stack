@@ -200,7 +200,6 @@ const Notification = ({ user, notifications }: UserProps) => {
 								</div>
 							)}
 						</div>
-						{/* Fixed "Mark all as read" Button */}
 						{notifications.notifications.length > 0 && (
 							<div className="p-2 border-t border-gray-200 bg-white sticky bottom-0">
 								<button

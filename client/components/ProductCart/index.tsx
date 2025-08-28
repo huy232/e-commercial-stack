@@ -28,6 +28,15 @@ const ProductCart: FC<ProductCartProps> = ({
 	setQuantity,
 	quantity,
 }) => {
+	const optionClass = (isSelected: boolean, isOutOfStock: boolean) =>
+		clsx(
+			"uppercase px-3 py-1 rounded border text-sm font-medium transition-all hover:border-rose-500 hover:bg-rose-500 hover:text-white",
+			isSelected ? "border-rose-500 bg-rose-500" : "border-gray-300 bg-white",
+			isOutOfStock
+				? "opacity-50 cursor-not-allowed line-through"
+				: "hover:bg-gray-100 cursor-pointer"
+		)
+
 	const variantType = useMemo(() => {
 		if (product.allowVariants && product.variants) {
 			return Array.from(new Set(product.variants[0].variant.map((v) => v.type)))
@@ -146,25 +155,38 @@ const ProductCart: FC<ProductCartProps> = ({
 			{variants.length > 0 && (
 				<div className="grid auto-cols-[minmax(0,_2fr)] gap-2">
 					{variantList.map((variant, index) => (
-						<div key={index} className="flex gap-2">
-							<label htmlFor="" className="font-semibold capitalize">
-								{variant.type}
-							</label>
-							{variant.values.map((variantValue) => (
-								<Button
-									key={variantValue}
-									className={clsx(
-										`border px-1 py-0.5 rounded`,
-										selectedValues[variant.type] === variantValue &&
-											"bg-blue-500 text-white"
-									)}
-									onClick={() =>
-										handleSelect(variant.type as string, variantValue)
-									}
-								>
-									{variantValue}
-								</Button>
-							))}
+						<div key={index} className="flex gap-2 items-center">
+							<label className="font-semibold capitalize">{variant.type}</label>
+							{variant.values.map((value) => {
+								const variantMatch = product.variants?.find((v) =>
+									v.variant.some(
+										(vv) =>
+											vv.type.toLowerCase() === variant.type.toLowerCase() &&
+											vv.value.toLowerCase() === value.toLowerCase()
+									)
+								)
+
+								const isOutOfStock = variantMatch
+									? variantMatch.stock === 0
+									: false
+								const isSelected = selectedValues[variant.type] === value
+
+								return (
+									<button
+										key={value}
+										disabled={isOutOfStock}
+										onClick={() =>
+											!isOutOfStock && handleSelect(variant.type, value)
+										}
+										className={optionClass(isSelected, isOutOfStock)}
+									>
+										{value}
+										{isOutOfStock && (
+											<span className="ml-1 text-xs text-gray-500">(Out)</span>
+										)}
+									</button>
+								)
+							})}
 						</div>
 					))}
 				</div>

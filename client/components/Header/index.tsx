@@ -13,7 +13,7 @@ const Header: FC = () => {
 	const mounted = useMounted()
 	const user = useSelector(selectAuthUser)
 	const isAuthenticated = useSelector(selectIsAuthenticated)
-	const notifications = useSelector(selectNotifyState)
+	// const notifications = useSelector(selectNotifyState)
 
 	if (!mounted) return null
 
@@ -23,7 +23,7 @@ const Header: FC = () => {
 			<div className="flex items-center lg:text-[0.6rem] xl:text-[0.8rem]">
 				<HeaderInform />
 				<SidebarCart />
-				<Notify user={user} notifications={notifications} />
+				{/* <Notify user={user} notifications={notifications} /> */}
 				<User user={user} />
 			</div>
 		</div>

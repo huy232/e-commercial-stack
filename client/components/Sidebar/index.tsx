@@ -65,7 +65,7 @@ const Sidebar: FC<SidebarProps> = ({ categories }) => {
 								key={category._id}
 								href={`/products?category=${category.slug}`}
 								className={sidebarClass}
-								onClick={() => setIsOpen(false)} // close on select
+								onClick={() => setIsOpen(false)}
 							>
 								{category.title}
 							</Link>

@@ -27,7 +27,7 @@ const BrandProduct: FC<BrandProductProps> = ({ brandProduct }) => {
 					<h3 className="text-xl lg:text-2xl font-bold rounded inline-block mb-2 font-anton uppercase text-center w-full">
 						{brandProduct.brand.title}
 					</h3>
-					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4 lg:gap-8 xl:gap-12 place-self-center">
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4 lg:gap-8 xl:gap-12 place-self-center">
 						{brandProduct.products.map((product) => (
 							<div key={product._id}>
 								<ProductCard product={product} enableOptions={true} />

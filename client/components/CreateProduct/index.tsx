@@ -216,51 +216,42 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			)}
 			<form
 				onSubmit={handleSubmitProduct}
-				className="w-full grid grid-cols-2 gap-4"
+				className="w-full flex flex-col lg:grid lg:grid-cols-2 gap-6"
 			>
-				<div className="bg-neutral-400 bg-opacity-50 rounded py-1 px-3 mt-2 mb-6 inline-block h-fit">
-					<div className="flex gap-2 mb-2">
+				{/* Left Section - Product Info */}
+				<div className="bg-white shadow-md rounded-2xl p-4 flex flex-col gap-4">
+					{/* Name, Price, Quantity */}
+					<div className="flex flex-col gap-4">
 						<InputField
 							label="Name"
 							name="productName"
 							register={register}
 							required="Product name is required"
-							errorMessage={
-								errors.productName &&
-								(errors.productName.message?.toString() ||
-									"Please enter a valid product name.")
-							}
-							inputAdditionalClass="w-full"
+							errorMessage={errors.productName?.message?.toString()}
 						/>
+						<div className="flex flex-col sm:flex-row gap-4">
+							<InputField
+								label="Price"
+								name="price"
+								register={register}
+								required="Price is required"
+								validateType="onlyNumbers"
+								errorMessage={errors.price?.message?.toString()}
+							/>
+							<InputField
+								label="Quantity"
+								name="quantity"
+								register={register}
+								required="Quantity is required"
+								validateType="onlyNumbers"
+								errorMessage={errors.quantity?.message?.toString()}
+								disabled={allowVariants}
+							/>
+						</div>
 					</div>
-					<div className="flex gap-2 mb-2">
-						<InputField
-							label="Price"
-							name="price"
-							register={register}
-							required="Price is required"
-							validateType={"onlyNumbers"}
-							errorMessage={
-								errors.price &&
-								(errors.price.message?.toString() ||
-									"Please enter a valid price")
-							}
-						/>
-						<InputField
-							label="Quantity"
-							name="quantity"
-							register={register}
-							required="Quantity is required"
-							validateType={"onlyNumbers"}
-							errorMessage={
-								errors.quantity &&
-								(errors.quantity.message?.toString() ||
-									"Please enter a valid quantity.")
-							}
-							disabled={allowVariants}
-						/>
-					</div>
-					<div className="flex gap-2 mb-2">
+
+					{/* Category + Brand */}
+					<div className="flex flex-col sm:flex-row gap-4">
 						<Select
 							label="Category"
 							name="category"
@@ -271,7 +262,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 							getLabel={selectLabelGetterTitle}
 							onChange={handleCategoryChange}
 						/>
-						{selectedCategoryData && selectedCategoryData.brand && (
+						{selectedCategoryData?.brand && (
 							<BrandSelect
 								name="brand"
 								label="Brand"
@@ -281,8 +272,9 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 							/>
 						)}
 					</div>
-					{selectedCategoryData.option &&
-					selectedCategoryData.option.length > 0 ? (
+
+					{/* Variants */}
+					{selectedCategoryData?.option?.length > 0 ? (
 						<Checkbox
 							label="Allow variants"
 							name="allowVariants"
@@ -290,7 +282,9 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 							onChange={handleAllowVariantsChange}
 						/>
 					) : (
-						<div>Currently supported no variant</div>
+						<div className="text-sm text-gray-500">
+							Currently no variant supported
+						</div>
 					)}
 					{allowVariants && selectedCategory && (
 						<VariantOptions
@@ -300,7 +294,9 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 							categories={categories}
 						/>
 					)}
-					<div className="w-full px-2">
+
+					{/* Editor */}
+					<div className="w-full">
 						<EditorPreviewContainer
 							ref={editorPreviewRef}
 							initialContent={descriptionRef.current}
@@ -310,51 +306,59 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						/>
 					</div>
 				</div>
-				<div className="px-4">
-					<h3 className="font-semibold">Thumbnail preview</h3>
-					{thumbnail && (
-						<div className="flex items-center">
+
+				{/* Right Section - Images & Controls */}
+				<div className="bg-white shadow-md rounded-2xl p-4 flex flex-col gap-6">
+					{/* Thumbnail */}
+					<div>
+						<h3 className="font-semibold mb-2">Thumbnail</h3>
+						{thumbnail && (
 							<ImagePreview
 								images={[thumbnail]}
 								onDelete={handleDeleteThumbnail}
 							/>
-						</div>
-					)}
-					<ImageUpload onUpload={handleThumbnailUpload} />
+						)}
+						<ImageUpload onUpload={handleThumbnailUpload} />
+					</div>
 
-					<h3 className="font-semibold mt-4">Product images</h3>
-					{productImages.length > 0 && (
-						<div className="lg:w-full overflow-y-auto flex flex-wrap max-h-[320px]">
-							<ImagePreview
-								images={productImages}
-								onDelete={handleDeleteProductImage}
-							/>
-						</div>
-					)}
-					<ImageUpload multiple onUpload={handleProductImagesUpload} />
-				</div>
-				<div className="flex flex-col items-end gap-2">
-					<Checkbox
-						label="Public right away?"
-						name="public"
-						checked={publicProduct}
-						onChange={handlePublicProduct}
-					/>
-					{thumbnailError && (
-						<span className="text-red-500">{thumbnailError}</span>
-					)}
-					{productImagesError && (
-						<span className="text-red-500">{productImagesError}</span>
-					)}
-					{descriptionError && (
-						<span className="text-red-500">{descriptionError}</span>
-					)}
-					<Button
-						type="submit"
-						className="w-fit bg-rose-500 p-1 hover:bg-opacity-70 hover:brightness-125 duration-300 ease-in-out rounded"
-					>
-						Create product
-					</Button>
+					{/* Product Images */}
+					<div>
+						<h3 className="font-semibold mb-2">Product Images</h3>
+						{productImages.length > 0 && (
+							<div className="overflow-y-auto flex flex-wrap gap-2 max-h-[320px]">
+								<ImagePreview
+									images={productImages}
+									onDelete={handleDeleteProductImage}
+								/>
+							</div>
+						)}
+						<ImageUpload multiple onUpload={handleProductImagesUpload} />
+					</div>
+
+					{/* Options */}
+					<div className="flex flex-col gap-2">
+						<Checkbox
+							label="Public right away?"
+							name="public"
+							checked={publicProduct}
+							onChange={handlePublicProduct}
+						/>
+						{thumbnailError && (
+							<span className="text-red-500">{thumbnailError}</span>
+						)}
+						{productImagesError && (
+							<span className="text-red-500">{productImagesError}</span>
+						)}
+						{descriptionError && (
+							<span className="text-red-500">{descriptionError}</span>
+						)}
+						<Button
+							type="submit"
+							className="bg-rose-500 text-white py-2 rounded-lg hover:bg-rose-600 transition"
+						>
+							Create Product
+						</Button>
+					</div>
 				</div>
 			</form>
 		</>

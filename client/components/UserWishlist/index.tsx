@@ -46,7 +46,7 @@ const UserWishlist: FC<UserOrderProps> = ({ user, userWishlist }) => {
 	}
 
 	return (
-		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
 			{userWishlist.map((wishlistItem: { product_id: ProductExtraType }) => {
 				const product = wishlistItem.product_id
 

@@ -40,27 +40,6 @@ export async function GET(request: NextRequest) {
 	}
 }
 
-// export const updateUser = async (
-// 	userId: string,
-// 	requestBody: UpdateUser
-// ): Promise<ApiUsersResponse<UpdateUser>> => {
-// 	try {
-// 		const response = await fetch(`${API}/user/user-update/${userId}`, {
-// 			method: "PUT",
-// 			credentials: "include",
-// 			headers: {
-// 				"Content-Type": "application/json",
-// 			},
-// 			body: JSON.stringify(requestBody),
-// 		})
-
-// 		const responseData: ApiUsersResponse<UpdateUser> = await response.json()
-// 		return responseData
-// 	} catch (error) {
-// 		throw error
-// 	}
-// }
-
 export async function PUT(request: NextRequest) {
 	try {
 		const cookieArray = request.cookies.getAll()

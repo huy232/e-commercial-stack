@@ -5,6 +5,7 @@ import clsx from "clsx"
 import { anton, bebasNeue, inter, poppins } from "@/utils"
 import "../globals.css"
 import { AuthProvider, ReduxProvider } from "@/context"
+import { GoogleOAuthProvider } from "@react-oauth/google"
 
 export const metadata: Metadata = {
 	title: "Create Next App",
@@ -27,15 +28,19 @@ export default function AdminLayout({
 	return (
 		<html lang="en">
 			<body className={bodyClassName}>
-				<ReduxProvider>
-					<AuthProvider>
-						<Toast />
-						<div className="flex flex-grow w-full">
-							<AdminSidebar />
-							{children}
-						</div>
-					</AuthProvider>
-				</ReduxProvider>
+				<GoogleOAuthProvider
+					clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+				>
+					<ReduxProvider>
+						<AuthProvider>
+							<Toast />
+							<div className="flex flex-grow w-full">
+								<AdminSidebar />
+								{children}
+							</div>
+						</AuthProvider>
+					</ReduxProvider>
+				</GoogleOAuthProvider>
 			</body>
 		</html>
 	)

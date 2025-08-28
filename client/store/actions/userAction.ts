@@ -12,7 +12,19 @@ export const handleUserLogin = createAsyncThunk(
 	"auth/handleUserLogin",
 	async ({ email, password }: { email: string; password: string }) => {
 		try {
-			const loginResponse = await fetch(API + "/user/login", {
+			// const loginResponse = await fetch(API + "/user/login", {
+			// 	method: "POST",
+			// 	credentials: "include",
+			// 	headers: {
+			// 		"Content-Type": "application/json",
+			// 	},
+			// 	body: JSON.stringify({
+			// 		email,
+			// 		password,
+			// 	}),
+			// })
+
+			const loginResponse = await fetch("api/user/login", {
 				method: "POST",
 				credentials: "include",
 				headers: {
@@ -37,7 +49,15 @@ export const checkAuthentication = createAsyncThunk<boolean, void>(
 	"auth/checkAuthentication",
 	async () => {
 		try {
-			const response = await fetch(API + `/user/check-auth`, {
+			// const response = await fetch(API + `/user/check-auth`, {
+			// 	method: "GET",
+			// 	credentials: "include",
+			// 	headers: {
+			// 		"Content-Type": "application/json",
+			// 	},
+			// })
+
+			const response = await fetch(`api/user/check-auth`, {
 				method: "GET",
 				credentials: "include",
 				headers: {
@@ -185,7 +205,7 @@ export const getInformUserWishlist = createAsyncThunk(
 			const responseData = await response.json()
 			return responseData
 		} catch (error) {
-			showToast("Failed to get wishlist", "error")
+			showToast("Failed to get wishlist information", "error")
 			throw error
 		}
 	}

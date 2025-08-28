@@ -158,8 +158,8 @@ const ProfileInformation = () => {
 	)
 
 	return (
-		<div className="flex w-full">
-			<div className="flex flex-col items-center w-1/5">
+		<div className="flex flex-col md:flex-row w-full">
+			<div className="flex flex-col items-center lg:w-[120px] w-full">
 				<div
 					className="relative h-[80px] w-[80px] rounded-full overflow-hidden group cursor-pointer"
 					onClick={() => document.getElementById("avatar-input")?.click()}
@@ -217,18 +217,19 @@ const ProfileInformation = () => {
 					<span className="text-xs">{moment(user.createdAt).fromNow()}</span>
 				</div>
 			</div>
-			<form onSubmit={handleSubmitProfile} className="w-4/5">
-				<div>
-					<InputForm
-						register={register}
-						errorMessage={errors as { [key: string]: CustomFieldError }}
-						id="email"
-						defaultValue={user.email}
-						label="Email"
-						disabled={true}
-						className="cursor-not-allowed select-none"
-					/>
-				</div>
+			<form
+				onSubmit={handleSubmitProfile}
+				className="w-full md:w-[220px] lg:w-[330px] xl:w-[440px] p-4"
+			>
+				<InputForm
+					register={register}
+					errorMessage={errors as { [key: string]: CustomFieldError }}
+					id="email"
+					defaultValue={user.email}
+					label="Email"
+					disabled={true}
+					className="cursor-not-allowed select-none"
+				/>
 				<InputForm
 					register={register}
 					errorMessage={errors as { [key: string]: CustomFieldError }}

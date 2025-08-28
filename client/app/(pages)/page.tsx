@@ -55,10 +55,19 @@ export default async function Home() {
 	})
 
 	const queryInitialProducts = new URLSearchParams({
-		category: "smartphone",
+		sort: "-sold",
 	}).toString()
 	const initialProductsAPI = await fetch(
 		API + `/product/get-all-product?${queryInitialProducts}`,
+		{ method: "GET", cache: "no-cache" }
+	)
+
+	const querySuggestionProducts = new URLSearchParams({
+		category: "-smartphone",
+	}).toString()
+
+	const querySuggestionProductsAPI = await fetch(
+		API + `/product/get-all-product?${querySuggestionProducts}`,
 		{ method: "GET", cache: "no-cache" }
 	)
 
@@ -77,6 +86,7 @@ export default async function Home() {
 	const dailyDeal = await dailyDealAPI.json()
 	const brandProduct = await brandAPI.json()
 	const initialProducts = await initialProductsAPI.json()
+	const suggestionProducts = await querySuggestionProductsAPI.json()
 	const featureProducts = await featureProductsAPI.json()
 
 	return (
@@ -105,7 +115,7 @@ export default async function Home() {
 				<FeatureProducts featureProducts={featureProducts.data} />
 			</div>
 			<div className="my-4">
-				<NewArrivals initialProducts={initialProducts.data} />
+				<NewArrivals initialProducts={suggestionProducts.data} />
 			</div>
 			<div className="my-4">
 				<ProductCategory productCategory={productCategories.data} />

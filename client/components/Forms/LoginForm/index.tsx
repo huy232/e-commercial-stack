@@ -29,9 +29,7 @@ const LoginForm: FC = () => {
 	const handleLogin: SubmitHandler<LoginFormData> = async (data) => {
 		const { email, password } = data
 		const hashPassword = await passwordHashingClient(password)
-		console.log("Client hash:", hashPassword)
 		try {
-			// const response = await login(email, hashPassword)
 			const response = await dispatch(
 				handleUserLogin({ email, password: hashPassword })
 			)
@@ -40,7 +38,6 @@ const LoginForm: FC = () => {
 					response.message || "An error occurred while login"
 				setErrorMessage(responseErrorMessage)
 			} else {
-				// await dispatch(loginSuccess(response.userData))
 				router.push("/")
 			}
 		} catch (error) {
@@ -48,43 +45,41 @@ const LoginForm: FC = () => {
 		}
 	}
 	return (
-		<>
-			<form
-				id="hook-form"
-				className="flex flex-col justify-center items-center"
-				onSubmit={handleSubmit(handleLogin)}
+		<form
+			id="hook-form"
+			className="flex flex-col justify-center items-center"
+			onSubmit={handleSubmit(handleLogin)}
+		>
+			<InputField
+				label="Email"
+				name="email"
+				type="text"
+				register={register}
+				required={"Email is required"}
+				errorMessage={errors.email?.message}
+				pattern={/^\S+@\S+$/i}
+			/>
+			<InputField
+				label="Password"
+				name="password"
+				type="password"
+				minLength={6}
+				register={register}
+				required={"Password is required"}
+				togglePassword
+				errorMessage={errors.password?.message}
+			/>
+			<Button
+				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded py-1 px-4 mt-4 group hover:text-white flex items-center justify-center gap-0.5"
+				type="submit"
+				form="hook-form"
 			>
-				<InputField
-					label="Email"
-					name="email"
-					type="text"
-					register={register}
-					required={"Email is required"}
-					errorMessage={errors.email?.message}
-					pattern={/^\S+@\S+$/i}
-				/>
-				<InputField
-					label="Password"
-					name="password"
-					type="password"
-					minLength={6}
-					register={register}
-					required={"Password is required"}
-					togglePassword
-					errorMessage={errors.password?.message}
-				/>
-				<Button
-					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded py-1 px-4 mt-4 group hover:text-white flex items-center justify-center gap-0.5"
-					type="submit"
-					form="hook-form"
-				>
-					<span>Login</span> <CiLogin size={20} />
-				</Button>
-				{errorMessage && (
-					<p className="text-main text-center hover-effect">{errorMessage}</p>
-				)}
-			</form>
-		</>
+				<span>Login</span> <CiLogin size={20} />
+			</Button>
+			{errorMessage && (
+				<p className="text-main text-center hover-effect">{errorMessage}</p>
+			)}
+		</form>
 	)
 }
 

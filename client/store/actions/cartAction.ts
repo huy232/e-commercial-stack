@@ -11,7 +11,16 @@ export const handleGetUserCart = createAsyncThunk(
 	"cart/handleGetUserCart",
 	async () => {
 		try {
-			const response = await fetch(API + `/cart/`, {
+			// const response = await fetch(API + `/cart/`, {
+			// 	method: "GET",
+			// 	credentials: "include",
+			// 	headers: {
+			// 		"Content-Type": "application/json",
+			// 	},
+			// 	cache: "no-cache",
+			// })
+
+			const response = await fetch(`api/cart/`, {
 				method: "GET",
 				credentials: "include",
 				headers: {
@@ -27,7 +36,7 @@ export const handleGetUserCart = createAsyncThunk(
 			const responseData = await response.json()
 			return responseData
 		} catch (error) {
-			console.error("Error fetching cart:", error) // <-- Check if there's an error
+			console.error("Error fetching cart:", error)
 			throw error
 		}
 	}

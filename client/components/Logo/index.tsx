@@ -5,7 +5,7 @@ const Logo = () => {
 	return (
 		<Link
 			href={path.HOME}
-			className="text-[28px] sm:text-[42px] md:text-[36px] lg:text-[24px] uppercase font-black group flex items-center mx-2 font-anton"
+			className="text-[24px] sm:text-[42px] md:text-[36px] lg:text-[24px] uppercase font-black group flex items-center mx-2 font-anton"
 		>
 			<div className="flex-col sm:flex-row group-hover:text-main hover-effect flex leading-none">
 				<span className="block">
