@@ -24,7 +24,7 @@ export const handleUserLogin = createAsyncThunk(
 			// 	}),
 			// })
 
-			const loginResponse = await fetch("api/user/login", {
+			const loginResponse = await fetch(`/api/user/login`, {
 				method: "POST",
 				credentials: "include",
 				headers: {
@@ -57,7 +57,7 @@ export const checkAuthentication = createAsyncThunk<boolean, void>(
 			// 	},
 			// })
 
-			const response = await fetch(`api/user/check-auth`, {
+			const response = await fetch(`/api/user/check-auth`, {
 				method: "GET",
 				credentials: "include",
 				headers: {
@@ -78,7 +78,7 @@ export const checkIsAdmin = createAsyncThunk<boolean, void>(
 	"auth/checkIsAdmin",
 	async () => {
 		try {
-			const response = await fetch(API + `/user/check-admin`, {
+			const response = await fetch(`/api/user/check-admin`, {
 				method: "GET",
 				credentials: "include",
 			})
@@ -141,7 +141,7 @@ export const handleUserWishlist = createAsyncThunk(
 	"auth/handleWishlist",
 	async (product_id: string) => {
 		try {
-			const response = await fetch(API + `/wishlist/`, {
+			const response = await fetch(`/api/wishlist/`, {
 				method: "POST",
 				credentials: "include",
 				headers: {
@@ -167,7 +167,7 @@ export const getUserWishlist = createAsyncThunk(
 	"auth/getUserWishlist",
 	async () => {
 		try {
-			const response = await fetch(API + `/wishlist/`, {
+			const response = await fetch(`/api/wishlist/`, {
 				method: "GET",
 				credentials: "include",
 				headers: {
@@ -191,7 +191,7 @@ export const getInformUserWishlist = createAsyncThunk(
 	"auth/getInformUserWishlist",
 	async () => {
 		try {
-			const response = await fetch(API + `/wishlist/user`, {
+			const response = await fetch(`/api/wishlist/user`, {
 				method: "GET",
 				credentials: "include",
 				headers: {

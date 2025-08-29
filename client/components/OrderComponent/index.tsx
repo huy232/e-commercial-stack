@@ -5,7 +5,7 @@ import { useMounted } from "@/hooks"
 import { selectAuthUser } from "@/store/slices/authSlice"
 import { ProfileUser } from "@/types"
 import { path } from "@/utils"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import { API } from "@/constant"
@@ -21,19 +21,20 @@ interface UserOrderProps {
 const OrderComponent = () => {
 	const router = useRouter()
 	const mounted = useMounted()
+	const searchParams = useSearchParams()
+	const page = Number(searchParams.get("page") || 1)
+
 	const user: ProfileUser = useSelector(selectAuthUser)
 	const [userOrder, setUserOrder] = useState<UserOrderProps | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string>("")
-	const [page, setPage] = useState(1)
 	const [totalPages, setTotalPages] = useState(1)
-	const [hasNextPage, setHasNextPage] = useState(false)
 	const limit = 3
 	const fetchUserOrder = async (page: number) => {
 		try {
 			setLoading(true)
 			const userOrderResponse = await fetch(
-				`${API}/order?page=${page}&limit=${limit}`,
+				`/api/order?page=${page}&limit=${limit}`,
 				{
 					method: "GET",
 					cache: "no-cache",
@@ -45,7 +46,6 @@ const OrderComponent = () => {
 			}
 			const data = await userOrderResponse.json()
 			setUserOrder(data)
-			setHasNextPage(data.hasNextPage)
 			setTotalPages(data.totalPages)
 		} catch (error) {
 			setError("Something went wrong while fetching")

@@ -1,33 +1,35 @@
 import { API } from "@/constant"
 import { NextRequest, NextResponse } from "next/server"
 
-export async function POST(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
 	try {
-		const body = await request.json()
-		const { token } = body
-		const url = new URL(`${API}/user/complete-registration`)
-		url.searchParams.append("token", token)
-
-		const response = await fetch(url.toString(), {
-			method: "POST",
+		const response = await fetch(API + `/cart/wipe-cart`, {
+			method: "delete",
 			credentials: "include",
 			headers: {
 				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
 			},
+			cache: "no-cache",
 		})
+
+		if (!response.ok) {
+			throw new Error(`Error: ${response.status}`)
+		}
 		const data = await response.json()
 		return new Response(JSON.stringify(data), {
 			status: response.status,
 			headers: {
 				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
 			},
 		})
 	} catch (error) {
-		console.error("Error verify user:", error)
+		console.error("Error while wiping cart:", error)
 		return NextResponse.json(
 			{
 				success: false,
-				message: "Error verify user",
+				message: "Error while wiping cart due to server",
 			},
 			{ status: 500 }
 		)

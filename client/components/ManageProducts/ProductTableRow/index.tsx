@@ -36,7 +36,7 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 	const handleRemoveProduct = async (product_id: string, index: number) => {
 		setLoadingRemove((prevState) => [...prevState, index.toString()])
 		try {
-			await fetch(WEB_URL + "/api/product/delete-product/" + product_id, {
+			await fetch(WEB_URL + `/api/product/delete-product/` + product_id, {
 				method: "DELETE",
 				credentials: "include",
 			})

@@ -40,8 +40,8 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 			}
 			const hashPassword = await passwordHashingClient(confirmPassword)
 			// const response = await resetPassword(hashPassword, token)
-			const response = await fetch(WEB_URL + "/api/user/reset-password", {
-				method: "POST",
+			const response = await fetch(`/api/user/reset-password`, {
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},

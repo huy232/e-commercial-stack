@@ -34,7 +34,7 @@ const User = ({ user }: UserProps) => {
 
 	const requestLogout = async () => {
 		try {
-			const response = await fetch(API + `/user/logout`, {
+			const response = await fetch(`/api/user/logout`, {
 				method: "POST",
 				credentials: "include",
 				headers: {

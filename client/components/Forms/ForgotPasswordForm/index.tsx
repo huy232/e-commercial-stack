@@ -18,10 +18,11 @@ const ForgotPasswordForm = () => {
 	const handleForgotPassword = useCallback(async (data: any) => {
 		try {
 			const { email } = data
-			const response = await fetch(WEB_URL + `/api/user/forgot-password`, {
+			const response = await fetch(`/api/user/forgot-password`, {
 				method: "POST",
 				body: JSON.stringify({ email }),
 				headers: { "Content-Type": "application/json" },
+				credentials: "include",
 			})
 			const forgotPasswordResponse = await response.json()
 

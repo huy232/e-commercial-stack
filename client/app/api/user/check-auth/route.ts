@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
 			status: response.status,
 			headers: {
 				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
 			},
 		})
 	} catch (error) {

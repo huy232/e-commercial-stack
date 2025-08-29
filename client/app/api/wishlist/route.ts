@@ -21,3 +21,26 @@ export async function GET(request: NextRequest) {
 		throw error
 	}
 }
+
+export async function POST(request: NextRequest) {
+	try {
+		const { product_id } = await request.json()
+		const response = await fetch(API + `/wishlist/`, {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
+			},
+			cache: "no-cache",
+			body: JSON.stringify({ product_id: product_id }),
+		})
+		if (!response.ok) {
+			throw new Error(`Error: ${response.status}`)
+		}
+		const responseData = await response.json()
+		return NextResponse.json(responseData, { status: response.status })
+	} catch (error) {
+		throw error
+	}
+}

@@ -58,7 +58,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 			}
 			try {
 				const updateUserInformationResponse = await fetch(
-					`${API}/user/user-update/${editedUser._id}`,
+					`/api/user/user-update/${editedUser._id}`,
 					{
 						method: "PUT",
 						credentials: "include",
@@ -79,7 +79,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 	})
 
 	const handleDeleteUser = async (_id: string) => {
-		const deleteUserResponse = await fetch(WEB_URL + "/api/admin", {
+		const deleteUserResponse = await fetch("/api/user/delete-user", {
 			method: "DELETE",
 			credentials: "include",
 			body: JSON.stringify({ _id }),

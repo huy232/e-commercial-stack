@@ -17,7 +17,7 @@ export async function authorizeMiddleware(request: NextRequest) {
 		// 	credentials: "include",
 		// })
 
-		const checkUserResponse = await fetch(WEB_URL + "/api/user/check-auth", {
+		const checkUserResponse = await fetch(WEB_URL + `/api/user/check-auth`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -53,7 +53,7 @@ export async function loginMiddleware(request: NextRequest) {
 		// 	credentials: "include",
 		// })
 
-		const checkUserResponse = await fetch(WEB_URL + "/api/user/check-auth", {
+		const checkUserResponse = await fetch(WEB_URL + `/api/user/check-auth`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -79,7 +79,7 @@ export async function adminMiddleware(request: NextRequest) {
 	let accessTokenCookie = request.cookies.get("accessToken")
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const checkAdminResponse = await fetch(API + "/user/check-admin", {
+		const checkAdminResponse = await fetch("/api/user/check-admin", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",

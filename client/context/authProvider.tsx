@@ -38,7 +38,7 @@ export default function AuthProvider({
 					// 	credentials: "include",
 					// })
 
-					const userRes = await fetch(`api/user/current`, {
+					const userRes = await fetch(`/api/user/current`, {
 						method: "GET",
 						credentials: "include",
 					})
@@ -56,12 +56,12 @@ export default function AuthProvider({
 		fetchData()
 	}, [dispatch])
 
-	// useEffect(() => {
-	// 	if (isAuthenticated) {
-	// 		dispatch(getUserWishlist())
-	// 		dispatch(fetchNotifications({ page: 1, type: "all" }))
-	// 	}
-	// }, [isAuthenticated, dispatch])
+	useEffect(() => {
+		if (isAuthenticated) {
+			dispatch(getUserWishlist())
+			dispatch(fetchNotifications({ page: 1, type: "all" }))
+		}
+	}, [isAuthenticated, dispatch])
 
 	useEffect(() => {
 		if (!isAuthenticated || !user?._id) return

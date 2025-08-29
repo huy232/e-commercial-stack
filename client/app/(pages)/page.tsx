@@ -63,7 +63,7 @@ export default async function Home() {
 	)
 
 	const querySuggestionProducts = new URLSearchParams({
-		category: "-smartphone",
+		category: "smartphone",
 	}).toString()
 
 	const querySuggestionProductsAPI = await fetch(

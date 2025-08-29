@@ -10,8 +10,8 @@ export const fetchNotifications = createAsyncThunk(
 	) => {
 		try {
 			const url = type
-				? `${API}/notification?page=${page}&type=${type}`
-				: `${API}/notification?page=${page}`
+				? `/api/notification?page=${page}&type=${type}`
+				: `/api/notification?page=${page}`
 
 			const response = await fetch(url, {
 				credentials: "include",
@@ -27,9 +27,9 @@ export const fetchNotifications = createAsyncThunk(
 
 export const markAllNotificationsAsRead = createAsyncThunk(
 	"notify/markAllAsRead",
-	async () => {
+	async (_, { rejectWithValue }) => {
 		try {
-			const response = await fetch(API + `/notification/mark-all-as-read`, {
+			const response = await fetch(`/api/notification/mark-all-as-read`, {
 				method: "PUT",
 				credentials: "include",
 				headers: {
@@ -42,8 +42,10 @@ export const markAllNotificationsAsRead = createAsyncThunk(
 			}
 			const responseData = await response.json()
 			return responseData
-		} catch (error) {
-			throw error
+		} catch (error: any) {
+			return rejectWithValue(
+				error.message || "Failed to mark notifications as read"
+			)
 		}
 	}
 )

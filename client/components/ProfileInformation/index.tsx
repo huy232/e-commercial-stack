@@ -113,7 +113,7 @@ const ProfileInformation = () => {
 				}
 				setLoading(true)
 
-				const updateUserResponse = await fetch(API + "/user/user-update", {
+				const updateUserResponse = await fetch(`/api/user/user-update`, {
 					method: "PUT",
 					credentials: "include",
 					body: formData,
@@ -121,7 +121,7 @@ const ProfileInformation = () => {
 				const updateUser = await updateUserResponse.json()
 
 				if (updateUser.success) {
-					const currentUserResponse = await fetch(`${API}/user/current`, {
+					const currentUserResponse = await fetch(`/api/user/current`, {
 						method: "GET",
 						credentials: "include",
 						headers: {

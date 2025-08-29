@@ -28,7 +28,7 @@ const SignUpForm = () => {
 		const { firstName, lastName, email, password } = data
 		const hashPassword = await passwordHashingClient(password)
 
-		const registerResponse = await fetch(API + "/user/register", {
+		const registerResponse = await fetch(`/api/user/register`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -46,6 +46,7 @@ const SignUpForm = () => {
 			setShowSignUpComplete(true)
 		} else {
 			setErrorsField(response.errors || [])
+			setErrorMessage(response.message || "An error occurred during sign up.")
 		}
 	})
 

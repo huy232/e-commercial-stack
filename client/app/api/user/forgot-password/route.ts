@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
 			credentials: "include",
 			headers: {
 				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
 			},
 			body: JSON.stringify({ email }),
 		})
@@ -19,6 +20,7 @@ export async function POST(request: NextRequest) {
 			status: response.status,
 			headers: {
 				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
 			},
 		})
 	} catch (error) {

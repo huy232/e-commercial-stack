@@ -15,7 +15,7 @@ const VerifyAccount: FC = () => {
 			const handleVerifyAccount = async () => {
 				const tokenValue = Array.isArray(token) ? token[0] : token
 				try {
-					const response = await fetch(WEB_URL + "/api/user/verify", {
+					const response = await fetch(`/api/user/complete-registration`, {
 						method: "POST",
 						body: tokenValue,
 					})
@@ -37,7 +37,7 @@ const VerifyAccount: FC = () => {
 		}
 	}, [searchParams])
 	return (
-		<div className="w-main">
+		<div className="w-full xl:w-main">
 			{errorMessage && (
 				<div className="flex flex-col gap-2 items-center">
 					<span className="text-rose-500 italic">{errorMessage}</span>

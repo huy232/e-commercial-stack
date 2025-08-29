@@ -28,8 +28,12 @@ const WishlistComponent = () => {
 		try {
 			setLoading(true)
 			const res = await fetch(
-				`${API}/wishlist/user?page=${page}&limit=${LIMIT}`,
-				{ method: "GET", cache: "no-cache", credentials: "include" }
+				`/api/wishlist/user?page=${page}&limit=${LIMIT}`,
+				{
+					method: "GET",
+					cache: "no-cache",
+					credentials: "include",
+				}
 			)
 
 			if (!res.ok) throw new Error("Failed to fetch user wishlist")

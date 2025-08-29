@@ -30,13 +30,10 @@ const ManageUserList: FC = () => {
 				// Convert object to URL parameters
 				const queryString = new URLSearchParams(queryParams).toString()
 
-				const response = await fetch(
-					`${API}/user/get-all-users?${queryString}`,
-					{
-						method: "GET",
-						credentials: "include",
-					}
-				)
+				const response = await fetch(`/api/user/get-all-users?${queryString}`, {
+					method: "GET",
+					credentials: "include",
+				})
 				const userResponse = await response.json()
 
 				if (userResponse.success) {

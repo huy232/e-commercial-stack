@@ -20,7 +20,7 @@ export const handleGetUserCart = createAsyncThunk(
 			// 	cache: "no-cache",
 			// })
 
-			const response = await fetch(`api/cart/`, {
+			const response = await fetch(`/api/cart/`, {
 				method: "GET",
 				credentials: "include",
 				headers: {
@@ -46,7 +46,7 @@ export const handleCreateUserCart = createAsyncThunk(
 	"cart/handleCreateUserCart",
 	async (userCart: UserCartType) => {
 		try {
-			const response = await fetch(API + `/cart/`, {
+			const response = await fetch(`/api/cart/`, {
 				method: "POST",
 				credentials: "include",
 				headers: {
@@ -70,7 +70,7 @@ export const handleUpdateCart = createAsyncThunk(
 	"cart/handleUpdateCart",
 	async (userCart: UserCartType[]) => {
 		try {
-			const response = await fetch(API + `/cart/`, {
+			const response = await fetch(`/api/cart/`, {
 				method: "PUT",
 				credentials: "include",
 				headers: {
@@ -94,7 +94,7 @@ export const handleDeleteCart = createAsyncThunk(
 	"cart/handleDeleteCart",
 	async (cartItem: DeleteCartI) => {
 		try {
-			const response = await fetch(API + `/cart/`, {
+			const response = await fetch(`/api/cart/`, {
 				method: "DELETE",
 				credentials: "include",
 				headers: {
@@ -118,7 +118,7 @@ export const handleWipeCart = createAsyncThunk(
 	"cart/handleWipeCart",
 	async () => {
 		try {
-			const response = await fetch(API + `/cart/wipe-cart`, {
+			const response = await fetch(`/api/cart/wipe-cart`, {
 				method: "DELETE",
 				credentials: "include",
 				headers: {
