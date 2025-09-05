@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { ProductDetail } from "@/components"
 import type { Metadata } from "next"
 
@@ -70,7 +70,7 @@ export default async function Product({
 	const { productSlug } = params
 
 	const productResponse = await fetch(
-		`${API}/product/get-product/${productSlug}`,
+		WEB_URL + `/api/product/get-product/${productSlug}`,
 		{ method: "GET", cache: "no-cache" }
 	)
 	const product = await productResponse.json()
@@ -83,7 +83,8 @@ export default async function Product({
 	const { category } = data
 
 	const relatedProductsResponse = await fetch(
-		`${API}/product/get-all-product?` +
+		WEB_URL +
+			`/api/product/get-all-product?` +
 			new URLSearchParams({
 				category: category.slug || "",
 				limit: "10",

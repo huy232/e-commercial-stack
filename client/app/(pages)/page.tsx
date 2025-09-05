@@ -37,28 +37,32 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
-	const productCategoryAPI = await fetch(API + `/product-category`, {
+	const productCategoryAPI = await fetch(WEB_URL + `/api/product-category`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
-	const saleListAPI = await fetch(API + `/product/products-on-sale`, {
+	const saleListAPI = await fetch(WEB_URL + `/api/product/products-on-sale`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
-	const dailyDealAPI = await fetch(API + `/product/daily-product`, {
+	const dailyDealAPI = await fetch(WEB_URL + `/api/product/daily-product`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
-	const brandAPI = await fetch(API + "/product/product-brand", {
+	const brandAPI = await fetch(WEB_URL + `/api/product/product-brand`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
 
 	const queryInitialProducts = new URLSearchParams({
 		sort: "-sold",
 	}).toString()
 	const initialProductsAPI = await fetch(
-		API + `/product/get-all-product?${queryInitialProducts}`,
+		WEB_URL + `/api/product/get-all-product?${queryInitialProducts}`,
 		{ method: "GET", cache: "no-cache" }
 	)
 
@@ -67,7 +71,7 @@ export default async function Home() {
 	}).toString()
 
 	const querySuggestionProductsAPI = await fetch(
-		API + `/product/get-all-product?${querySuggestionProducts}`,
+		WEB_URL + `/api/product/get-all-product?${querySuggestionProducts}`,
 		{ method: "GET", cache: "no-cache" }
 	)
 
@@ -77,7 +81,7 @@ export default async function Home() {
 		sort: "-totalRatings",
 	}).toString()
 	const featureProductsAPI = await fetch(
-		API + `/product/get-all-product?${queryFeatureProducts}`,
+		WEB_URL + `/api/product/get-all-product?${queryFeatureProducts}`,
 		{ method: "GET", cache: "no-cache" }
 	)
 

@@ -277,7 +277,7 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 
 		try {
 			const updateProductResponse = await fetch(
-				`${API}/product/update-product/${productResponse.data._id}`,
+				`/api/product/update/${productResponse.data._id}`,
 				{
 					method: "PUT",
 					body: formData,

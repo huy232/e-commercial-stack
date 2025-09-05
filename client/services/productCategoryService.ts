@@ -5,8 +5,10 @@ export const getProductCategories = async (): Promise<
 	ApiResponse<ProductCategory[]>
 > => {
 	try {
-		const response = await fetch(`${API}/product-category`, {
+		const response = await fetch(`/api/product-category`, {
 			method: "GET",
+			credentials: "include",
+			cache: "no-cache",
 		})
 		if (!response.ok) {
 			throw new Error(

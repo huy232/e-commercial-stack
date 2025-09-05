@@ -31,7 +31,7 @@ const ManageProducts: FC = () => {
 			const queryString = new URLSearchParams(queryParams).toString()
 
 			const fetchProductResponse = await fetch(
-				`${API}/product/get-all-product?${queryString}`,
+				`/api/product/get-all-product?${queryString}`,
 				{ method: "GET" }
 			)
 			const data = await fetchProductResponse.json()

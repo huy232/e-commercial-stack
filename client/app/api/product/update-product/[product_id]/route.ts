@@ -1,45 +1,28 @@
 import { API } from "@/constant"
 import { NextRequest, NextResponse } from "next/server"
 
-type Params = {
-	product_id: string
-}
-
-export async function PUT(request: NextRequest, context: { params: Params }) {
+export async function PUT(
+	req: NextRequest,
+	{ params }: { params: { product_id: string } }
+) {
 	try {
-		const { product_id } = context.params
-		const body = await request.json()
-		const cookieArray = request.cookies.getAll()
-		const cookieString = cookieArray
-			.map((cookie) => `${cookie.name}=${cookie.value}`)
-			.join("; ")
+		const formData = await req.formData()
 
-		const response = await fetch(
-			`${API}/product/update-product/${product_id}`,
+		const res = await fetch(
+			`${API}/product/update-product/${params.product_id}`,
 			{
-				method: "POST",
-				cache: "no-cache",
-				headers: {
-					Cookie: cookieString,
-				},
+				method: "PUT",
+				body: formData,
 				credentials: "include",
-				body: JSON.stringify(body),
 			}
 		)
-		const data = await response.json()
-		return new Response(JSON.stringify(data), {
-			status: response.status,
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
+
+		const data = await res.json()
+
+		return NextResponse.json(data, { status: res.status })
 	} catch (error) {
-		console.error("Error updating product:", error)
 		return NextResponse.json(
-			{
-				success: false,
-				message: "Error updating product",
-			},
+			{ success: false, message: "Failed to update product" },
 			{ status: 500 }
 		)
 	}

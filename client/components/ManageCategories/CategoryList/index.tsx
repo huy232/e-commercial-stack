@@ -37,7 +37,7 @@ const CategoryList: FC<CategoryListProps> = ({
 		setCurrentPage(Number(page))
 
 		const brandListResponse = await fetch(
-			API + `/product-category?page=${page}&limit=${itemsPerPage}`,
+			`/api/product-category?page=${page}&limit=${itemsPerPage}`,
 			{
 				method: "GET",
 				credentials: "include",
@@ -65,15 +65,12 @@ const CategoryList: FC<CategoryListProps> = ({
 			`Are you sure you want to delete ${selectedCategories.length} categories?`
 		)
 		if (confirmDelete) {
-			const deleteResponse = await fetch(
-				API + "/product-category/bulk-delete",
-				{
-					method: "DELETE",
-					body: JSON.stringify({ ids: selectedCategories }),
-					credentials: "include",
-					headers: { "Content-Type": "application/json" },
-				}
-			)
+			const deleteResponse = await fetch("/api/product-category/bulk-delete", {
+				method: "DELETE",
+				body: JSON.stringify({ categoryIds: selectedCategories }),
+				credentials: "include",
+				headers: { "Content-Type": "application/json" },
+			})
 			const result = await deleteResponse.json()
 			if (result.success) {
 				setSelectedCategories([])
@@ -112,7 +109,7 @@ const CategoryList: FC<CategoryListProps> = ({
 			}
 
 			const response = await fetch(
-				API + `/product-category/${categoryToDelete._id}`,
+				`/api/product-category/${categoryToDelete._id}`,
 				{
 					method: "DELETE",
 					credentials: "include",

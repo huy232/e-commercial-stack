@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { WEB_URL } from "@/constant"
 import BlogFormWrapper from "@/components/Forms/BlogFormWrapper"
 
 export const metadata = {
@@ -28,23 +28,27 @@ export default async function AdminCreateBlog({
 	const queryString = new URLSearchParams(normalizedParams).toString()
 
 	const productRes = await fetch(
-		API + `/product/get-all-product?${queryString}`,
-		{ cache: "no-cache" }
+		WEB_URL + `/api/product/get-all-product?${queryString}`,
+		{ method: "GET", cache: "no-cache", credentials: "include" }
 	)
 	if (!productRes.ok) {
 		throw new Error("Failed to fetch products")
 	}
 	const products = await productRes.json()
-	const productCategoriesRes = await fetch(API + `/product-category`, {
+	const productCategoriesRes = await fetch(WEB_URL + `/api/product-category`, {
+		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
 	if (!productCategoriesRes.ok) {
 		throw new Error("Failed to fetch categories")
 	}
 	const productCategories = await productCategoriesRes.json()
 
-	const blogCategoryRes = await fetch(API + `/blog-category`, {
+	const blogCategoryRes = await fetch(WEB_URL + `/api/blog-category`, {
+		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
 	if (!blogCategoryRes.ok) {
 		throw new Error("Failed to fetch blog categories")

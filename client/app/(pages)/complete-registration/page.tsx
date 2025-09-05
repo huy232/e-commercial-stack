@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { Metadata } from "next"
 import Link from "next/link"
 
@@ -42,7 +42,7 @@ export default async function CompleteRegistration(props: Props) {
 	}
 
 	const response = await fetch(
-		API + `/user/complete-registration?token=${token}`,
+		WEB_URL + `/user/complete-registration?token=${token}`,
 		{
 			method: "POST",
 			headers: {

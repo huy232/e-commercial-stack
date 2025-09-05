@@ -67,7 +67,7 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 	}
 
 	const handleUpdateOrders = async () => {
-		const response = await fetch(API + "/order/update-orders", {
+		const response = await fetch("/api/order/update-orders", {
 			body: JSON.stringify(modifiedOrders),
 			credentials: "include",
 			method: "PUT",

@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { Metadata } from "next"
 import dynamic from "next/dynamic"
 
@@ -53,16 +53,18 @@ export default async function Products(props: Props) {
 	const queryString = new URLSearchParams(normalizedParams).toString()
 
 	const productsResponse = await fetch(
-		API + `/product/get-all-product?${queryString}`,
+		WEB_URL + `/api/product/get-all-product?${queryString}`,
 		{
 			method: "GET",
 			cache: "no-cache",
+			credentials: "include",
 		}
 	)
 
-	const categoriesResponse = await fetch(API + `/product-category`, {
+	const categoriesResponse = await fetch(WEB_URL + `/api/product-category`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
 	const products = await productsResponse.json()
 	const categories = await categoriesResponse.json()

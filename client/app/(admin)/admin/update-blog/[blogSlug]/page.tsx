@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { WEB_URL } from "@/constant"
 import BlogFormWrapper from "@/components/Forms/BlogFormWrapper"
 import { notFound } from "next/navigation"
 
@@ -38,22 +38,22 @@ export default async function AdminUpdateBlog(props: Props) {
 
 	const [productsRes, categoriesRes, blogRes, blogCategoriesRes] =
 		await Promise.all([
-			fetch(API + `/product/get-all-product?${queryString}`, {
+			fetch(WEB_URL + `/api/product/get-all-product?${queryString}`, {
 				cache: "no-cache",
 				method: "GET",
 				credentials: "include",
 			}),
-			fetch(API + `/product-category`, {
+			fetch(WEB_URL + `/api/product-category`, {
 				cache: "no-cache",
 				method: "GET",
 				credentials: "include",
 			}),
-			fetch(API + `/blog/one-blog-by-slug/${blogSlug}`, {
+			fetch(WEB_URL + `/api/blog/one-blog-by-slug/${blogSlug}`, {
 				cache: "no-cache",
 				method: "GET",
 				credentials: "include",
 			}),
-			fetch(API + `/blog-category`, {
+			fetch(WEB_URL + `/api/blog-category`, {
 				cache: "no-cache",
 				method: "GET",
 				credentials: "include",

@@ -1,5 +1,5 @@
 import { UpdateProduct } from "@/components"
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 
 type Props = {
 	params: {
@@ -18,15 +18,17 @@ export const metadata = {
 export default async function AdminUpdateProduct(props: Props) {
 	const { productSlug } = props.params
 	const productResponse = await fetch(
-		API + `/product/get-product/` + productSlug,
+		WEB_URL + `/api/product/get-product/${productSlug}`,
 		{
 			method: "GET",
 			cache: "no-cache",
+			credentials: "include",
 		}
 	)
-	const categoryResponse = await fetch(API + "/product-category", {
+	const categoryResponse = await fetch(WEB_URL + `/api/product-category`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
 
 	const product = await productResponse.json()

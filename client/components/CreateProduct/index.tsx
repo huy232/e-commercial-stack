@@ -163,7 +163,7 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 
 		setLoading(true)
 
-		const createProductResponse = await fetch(API + "/product/create-product", {
+		const createProductResponse = await fetch("/api/product/create", {
 			method: "POST",
 			body: formData,
 			credentials: "include",

@@ -3,15 +3,17 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
 	try {
-		const { search } = new URL(request.url)
-
-		const response = await fetch(`${API}/user/get-all-users${search}`, {
-			method: "GET",
-			credentials: "include",
-			headers: {
-				cookie: request.headers.get("cookie") || "",
-			},
-		})
+		const query = request.nextUrl.searchParams
+		const response = await fetch(
+			`${API}/user/get-all-users${query ? `?${query}` : ""}`,
+			{
+				method: "GET",
+				credentials: "include",
+				headers: {
+					cookie: request.headers.get("cookie") || "",
+				},
+			}
+		)
 
 		const data = await response.json()
 		return NextResponse.json(data, { status: response.status })

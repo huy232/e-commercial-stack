@@ -21,15 +21,15 @@ const GoogleAuth = () => {
 				if (!userInfo.sub) throw new Error("Invalid Google response")
 
 				// Send Google user data to backend for verification & JWT generation
-				const res = await fetch("http://localhost:5000/api/auth/google-login", {
+				const res = await fetch("/api/auth/google-login", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					credentials: "include",
 					body: JSON.stringify({
 						googleId: userInfo.sub,
 						email: userInfo.email,
-						firstName: userInfo.given_name, // First name
-						lastName: userInfo.family_name, // Last name
+						firstName: userInfo.given_name,
+						lastName: userInfo.family_name,
 					}),
 				})
 

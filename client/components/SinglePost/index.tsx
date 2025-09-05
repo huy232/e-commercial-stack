@@ -54,17 +54,14 @@ const SingleBlog = ({ blogPostData }: SingleBlogProps) => {
 			return
 		}
 		try {
-			const res = await fetch(
-				API + `/blog/blog-like/${blogPostData.data._id}`,
-				{
-					method: "PUT",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ action: type }),
-				}
-			)
+			const res = await fetch(`/api/blog/blog-like/${blogPostData.data._id}`, {
+				method: "PUT",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ action: type }),
+			})
 			const result = await res.json()
 			if (result.success) {
 				setLikes(result.data.likes)

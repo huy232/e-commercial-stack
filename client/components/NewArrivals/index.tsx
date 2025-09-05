@@ -29,7 +29,7 @@ const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 		async (sort: {}, tabId: number) => {
 			try {
 				const response = await fetch(
-					API + `/product/get-all-product?` + new URLSearchParams(sort),
+					`/api/product/get-all-product?` + new URLSearchParams(sort),
 					{ method: "GET" }
 				)
 				const data = await response.json()

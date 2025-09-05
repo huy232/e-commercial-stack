@@ -63,7 +63,7 @@ const CategoryForm: FC = () => {
 			}
 		}
 
-		const productCategoryResponse = await fetch(API + "/product-category", {
+		const productCategoryResponse = await fetch("/api/product-category", {
 			method: "POST",
 			body: JSON.stringify({
 				title: data.category,

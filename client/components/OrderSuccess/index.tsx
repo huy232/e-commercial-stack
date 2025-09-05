@@ -12,7 +12,7 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 		const fetchUserBill = async () => {
 			try {
 				const billResponse = await fetch(
-					API + `/order/specific-order?orderId=${orderId}`,
+					`/api/order/specific-order?orderId=${orderId}`,
 					{ credentials: "include", method: "GET" }
 				)
 				const bill = await billResponse.json()

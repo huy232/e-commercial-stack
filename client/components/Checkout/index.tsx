@@ -70,7 +70,7 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 
 	useEffect(() => {
 		const createPaymentIntent = async () => {
-			const response = await fetch(API + "/order/create-payment-intent", {
+			const response = await fetch("/api/order/create-payment-intent", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

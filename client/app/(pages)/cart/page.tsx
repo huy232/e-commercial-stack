@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { Metadata } from "next"
 import dynamic from "next/dynamic"
 
@@ -30,7 +30,7 @@ export default async function Cart(props: Props) {
 	let coupon = null
 
 	if (discount) {
-		const couponResponse = await fetch(API + `/coupon/` + discount, {
+		const couponResponse = await fetch(WEB_URL + `/api/coupon/` + discount, {
 			method: "GET",
 			cache: "no-cache",
 		})

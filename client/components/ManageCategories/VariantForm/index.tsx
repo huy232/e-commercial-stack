@@ -99,7 +99,7 @@ const VariantForm: FC<VariantFormProps> = ({ categories }) => {
 
 		try {
 			const updateCategoryOption = await fetch(
-				API + `/product-category/option/${selectedCategory._id}`,
+				`/api/product-category/option/${selectedCategory._id}`,
 				{
 					method: "PUT",
 					credentials: "include",

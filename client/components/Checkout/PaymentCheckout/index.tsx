@@ -44,7 +44,7 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 				"Content-Type": "application/json",
 			}
 
-			const response = await fetch(API + "/order/create-checkout-session", {
+			const response = await fetch("/api/order/create-checkout-session", {
 				method: "POST",
 				headers,
 				body: JSON.stringify(body),

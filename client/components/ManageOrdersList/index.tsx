@@ -5,7 +5,7 @@ import { Pagination } from "@/components"
 import { useSearchParams } from "next/navigation"
 import SearchOrders from "./SearchOrders"
 import OrdersTableRow from "./OrdersTableRow"
-import { API } from "@/constant"
+import { WEB_URL } from "@/constant"
 
 const ManageProducts: FC = () => {
 	const [ordersList, setOrdersList] = useState<OrderType[]>([])
@@ -28,10 +28,14 @@ const ManageProducts: FC = () => {
 
 			const queryString = new URLSearchParams(queryParams).toString()
 			const fetchOrdersResponse = await fetch(
-				API + `/order/get-orders?${queryString}`,
+				WEB_URL + `/api/order/get-orders?${queryString}`,
 				{ method: "GET", credentials: "include" }
 			)
 			const data = await fetchOrdersResponse.json()
+
+			console.log("Fetched orders data:")
+			console.log(data)
+
 			setOrdersList(data.data)
 			setTotalPages(data.totalPages)
 		} catch (error) {

@@ -101,7 +101,7 @@ const EditCategoryModal: FC<EditCategoryModalProps> = ({
 		}
 
 		const response = await fetch(
-			`${API}/product-category/${selectedCategory._id}`,
+			`/api/product-category/${selectedCategory._id}`,
 			{
 				method: "PUT",
 				credentials: "include",

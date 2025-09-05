@@ -47,7 +47,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 			}
 			try {
 				const updatedAt = Date.now()
-				const ratingResponse = await fetch(WEB_URL + "/api/product/rating", {
+				const ratingResponse = await fetch("/api/product/rating-product", {
 					method: "PUT",
 					cache: "no-cache",
 					credentials: "include",

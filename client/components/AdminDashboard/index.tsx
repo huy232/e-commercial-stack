@@ -41,7 +41,7 @@ export default function AdminDashboard() {
 	// Fetch order count by month
 	const fetchOrderCountByMonth = async () => {
 		try {
-			const response = await fetch(`${API}/order/monthly`, {
+			const response = await fetch(`/api/order/monthly`, {
 				method: "GET",
 				credentials: "include",
 				cache: "no-cache",
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
 	// Fetch total order sum by month
 	const fetchOrderSumByMonth = async () => {
 		try {
-			const response = await fetch(`${API}/order/monthly-price`, {
+			const response = await fetch(`/api/order/monthly-price`, {
 				method: "GET",
 				credentials: "include",
 				cache: "no-cache",
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
 	const fetchNewestOrders = async () => {
 		try {
 			setLoadingNewestOrders(true)
-			const response = await fetch(`${API}/order/newest-order`, {
+			const response = await fetch(`/api/order/newest-order`, {
 				method: "GET",
 				credentials: "include",
 				cache: "no-cache",
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
 
 	const fetchOrdersCategory = async () => {
 		try {
-			const response = await fetch(`${API}/order/orders-category`, {
+			const response = await fetch(`/api/order/orders-category`, {
 				method: "GET",
 				credentials: "include",
 				cache: "no-cache",
@@ -136,7 +136,7 @@ export default function AdminDashboard() {
 
 	const fetchAllYearSaleOrders = async () => {
 		try {
-			const response = await fetch(`${API}/order/all-year-orders`, {
+			const response = await fetch(`/api/order/all-year-orders`, {
 				method: "GET",
 				credentials: "include",
 				cache: "no-cache",

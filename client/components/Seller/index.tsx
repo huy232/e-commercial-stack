@@ -28,7 +28,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 		async (sort: {}, tabId: number) => {
 			try {
 				const response = await fetch(
-					API + `/product/get-all-product?` + new URLSearchParams(sort),
+					`/api/product/get-all-product?` + new URLSearchParams(sort),
 					{ method: "GET", cache: "no-cache" }
 				)
 				const data = await response.json()

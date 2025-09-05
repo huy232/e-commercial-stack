@@ -38,7 +38,7 @@ const ManageBlogs = ({ initialSearchParams }: ManageBlogsProps) => {
 	const fetchBlogs = useCallback(async () => {
 		setLoading(true)
 		const query = buildQueryString()
-		const res = await fetch(API + `/blog?${query}`, {
+		const res = await fetch(`/api/blog?${query}`, {
 			credentials: "include",
 			cache: "no-cache",
 		})
@@ -60,7 +60,7 @@ const ManageBlogs = ({ initialSearchParams }: ManageBlogsProps) => {
 		if (!blogToDelete) return
 		setLoading(true)
 
-		const response = await fetch(API + `/blog/${blogToDelete}`, {
+		const response = await fetch(`/api/blog/${blogToDelete}`, {
 			method: "DELETE",
 			credentials: "include",
 		})

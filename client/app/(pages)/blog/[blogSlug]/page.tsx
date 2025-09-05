@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { CustomImage } from "@/components"
 import InnerHTML from "dangerously-set-html-content"
 import { FaBoltLightning, FaReadme, GrTechnology } from "@/assets/icons"
@@ -42,7 +42,7 @@ export async function generateMetadata({
 		.join("; ")
 
 	// Fetch blog data
-	const blogPost = await fetch(`${API}/blog/get-blog/${blogSlug}`, {
+	const blogPost = await fetch(WEB_URL + `/api/blog/get-blog/${blogSlug}`, {
 		method: "GET",
 		headers: {
 			Cookie: cookieHeader,
@@ -110,20 +110,23 @@ export default async function Blog(props: Props) {
 		.filter(Boolean) // remove empty strings
 		.join("; ")
 
-	const blogPost = await fetch(API + `/blog/get-blog/${singleBlogSlug}`, {
-		method: "GET",
-		credentials: "include",
-		headers: {
-			Cookie: cookieHeader,
-		},
-		cache: "no-cache",
-	})
+	const blogPost = await fetch(
+		WEB_URL + `/api/blog/get-blog/${singleBlogSlug}`,
+		{
+			method: "GET",
+			credentials: "include",
+			headers: {
+				Cookie: cookieHeader,
+			},
+			cache: "no-cache",
+		}
+	)
 
 	const blogPostData = await blogPost.json()
 
 	const getBlogsByCategory = async (categorySlug: string, limit = 5) => {
 		const res = await fetch(
-			API + `/blog/blog-category/${categorySlug}?limit=${limit}`,
+			WEB_URL + `/api/blog/blog-category/${categorySlug}?limit=${limit}`,
 			{
 				method: "GET",
 				credentials: "include",

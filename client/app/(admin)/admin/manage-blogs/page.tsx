@@ -1,5 +1,4 @@
 import { ManageBlogs } from "@/components"
-import { API } from "@/constant"
 
 type Props = {
 	params: { blogSlug: string }

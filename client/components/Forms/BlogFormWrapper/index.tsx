@@ -37,8 +37,7 @@ export default function BlogFormWrapper({
 		setIsLoading(true)
 
 		try {
-			const endpoint =
-				mode === "create" ? `${API}/blog` : `${API}/blog/${blogId}`
+			const endpoint = mode === "create" ? `/api/blog` : `/api/blog/${blogId}`
 			const method = mode === "create" ? "POST" : "PUT"
 
 			const res = await fetch(endpoint, {

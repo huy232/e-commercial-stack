@@ -1,5 +1,5 @@
 import { showToast } from "@/components"
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 export interface UserCartType {
@@ -119,7 +119,7 @@ export const handleApplyCoupon = createAsyncThunk(
 	"auth/handleApplyCoupon",
 	async (couponCode) => {
 		try {
-			const response = await fetch(API + `/coupon`, {
+			const response = await fetch(`/api/coupon`, {
 				method: "GET",
 				credentials: "include",
 				headers: { "Content-Type": "application/json" },

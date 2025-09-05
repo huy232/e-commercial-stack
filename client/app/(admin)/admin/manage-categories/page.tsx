@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic"
 
-import { API } from "@/constant"
+import { WEB_URL } from "@/constant"
 import dynamicImport from "next/dynamic"
 
 export const metadata = {
@@ -18,13 +18,15 @@ const ManageCategories = dynamicImport(
 )
 
 export default async function AdminManageCategories() {
-	const brandResponse = await fetch(API + "/brand", {
+	const brandResponse = await fetch(WEB_URL + `/api/brand`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
-	const categoryResponse = await fetch(API + "/product-category", {
+	const categoryResponse = await fetch(WEB_URL + `/api/product-category`, {
 		method: "GET",
 		cache: "no-cache",
+		credentials: "include",
 	})
 	const { data: brandData } = await brandResponse.json()
 	const { data: categoriesData } = await categoryResponse.json()

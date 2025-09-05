@@ -15,10 +15,13 @@ const VerifyAccount: FC = () => {
 			const handleVerifyAccount = async () => {
 				const tokenValue = Array.isArray(token) ? token[0] : token
 				try {
-					const response = await fetch(`/api/user/complete-registration`, {
-						method: "POST",
-						body: tokenValue,
-					})
+					const response = await fetch(
+						WEB_URL + `/api/user/complete-registration`,
+						{
+							method: "POST",
+							body: tokenValue,
+						}
+					)
 					const verifyResponse = await response.json()
 					if (verifyResponse.success && verifyResponse.message) {
 						setSuccessVerify(verifyResponse.message)

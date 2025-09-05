@@ -79,7 +79,7 @@ export async function adminMiddleware(request: NextRequest) {
 	let accessTokenCookie = request.cookies.get("accessToken")
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		const checkAdminResponse = await fetch("/api/user/check-admin", {
+		const checkAdminResponse = await fetch(WEB_URL + "/api/user/check-admin", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",

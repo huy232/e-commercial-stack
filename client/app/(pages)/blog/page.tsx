@@ -1,4 +1,4 @@
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 import { FaBoltLightning, FaReadme, GrTechnology } from "@/assets/icons"
 import { Metadata } from "next"
 import dynamic from "next/dynamic"
@@ -64,14 +64,14 @@ export default async function Blogs(props: Props) {
 	)
 	const queryString = new URLSearchParams(normalizedParams).toString()
 
-	const res = await fetch(API + `/blog?${queryString}`, {
+	const res = await fetch(WEB_URL + `/api/blog?${queryString}`, {
 		method: "GET",
 		credentials: "include",
 		cache: "no-cache",
 	})
 	const blogData = await res.json()
 
-	const highestViewBlogs = await fetch(API + "/blog/highest-view", {
+	const highestViewBlogs = await fetch(WEB_URL + `/api/blog/highest-view`, {
 		method: "GET",
 		credentials: "include",
 		cache: "no-cache",
@@ -80,7 +80,7 @@ export default async function Blogs(props: Props) {
 
 	const getBlogsByCategory = async (categorySlug: string, limit = 5) => {
 		const res = await fetch(
-			`${API}/blog/blog-category/${categorySlug}?limit=${limit}`,
+			WEB_URL + `/api/blog/blog-category/${categorySlug}?limit=${limit}`,
 			{
 				method: "GET",
 				credentials: "include",

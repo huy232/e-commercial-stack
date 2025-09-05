@@ -13,7 +13,7 @@ import {
 import Link from "next/link"
 import { MdOutlineSubdirectoryArrowLeft } from "react-icons/md"
 import moment from "moment"
-import { API } from "@/constant"
+import { API, WEB_URL } from "@/constant"
 
 interface DailySaleProps {
 	dailySale: {
@@ -37,7 +37,7 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 	const fetchDealDaily = useCallback(async () => {
 		try {
 			setLoading(true)
-			const response = await fetch(API + "/product/daily-product", {
+			const response = await fetch(WEB_URL + `/api/product/daily-product`, {
 				method: "GET",
 				cache: "no-cache",
 			})

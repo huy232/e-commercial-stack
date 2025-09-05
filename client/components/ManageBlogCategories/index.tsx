@@ -32,7 +32,7 @@ const ManageBlogCategories: FC = () => {
 
 	const handleSubmitBrand = handleSubmit(async (data) => {
 		clearErrors("blogCategory") // Clear any previous errors before making a new request
-		const blogCategoryResponse = await fetch(API + "/blog-category", {
+		const blogCategoryResponse = await fetch("/api/blog-category", {
 			method: "POST",
 			body: JSON.stringify({ title: data.blogCategory }),
 			credentials: "include",
@@ -57,7 +57,7 @@ const ManageBlogCategories: FC = () => {
 	useEffect(() => {
 		const fetchBlogCategories = async () => {
 			setLoading(true)
-			const blogCategoriesResponse = await fetch(API + "/blog-category", {
+			const blogCategoriesResponse = await fetch("/api/blog-category", {
 				method: "GET",
 				credentials: "include",
 			})
