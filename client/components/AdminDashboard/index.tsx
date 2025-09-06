@@ -89,7 +89,7 @@ export default function AdminDashboard() {
 	// Fetch product distribution data
 	const fetchProductDistribution = async () => {
 		try {
-			const response = await fetch(`${API}/product/product-distribution`, {
+			const response = await fetch(`/api/product/product-distribution`, {
 				method: "GET",
 				credentials: "include",
 				cache: "no-cache",
