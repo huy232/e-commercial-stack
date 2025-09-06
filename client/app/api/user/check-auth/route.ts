@@ -13,20 +13,11 @@ export async function GET(request: NextRequest) {
 		})
 
 		const data = await response.json()
-		return new Response(JSON.stringify(data), {
-			status: response.status,
-			headers: {
-				"Content-Type": "application/json",
-				cookie: request.headers.get("cookie") || "",
-			},
-		})
+		return NextResponse.json(data, { status: response.status })
 	} catch (error) {
 		console.error("Error checking authentication:", error)
 		return NextResponse.json(
-			{
-				success: false,
-				message: "Error while check auth due to server",
-			},
+			{ success: false, message: "Error while check auth due to server" },
 			{ status: 500 }
 		)
 	}
