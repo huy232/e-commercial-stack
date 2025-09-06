@@ -190,8 +190,6 @@ export default function AdminDashboard() {
 	const productLabels = productDistributionData.map((item) => item._id)
 	const productData = productDistributionData.map((item) => item.count)
 
-	console.log(allYearOrders)
-
 	return (
 		<div className="w-full">
 			<h2 className="text-3xl uppercase text-right font-bebasNeue font-bold mr-4">

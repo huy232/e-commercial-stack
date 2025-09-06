@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
-				cookies: req.headers.get("cookie") || "",
+				cookie: req.headers.get("cookie") || "",
 			},
 			cache: "no-cache",
 		})
