@@ -53,7 +53,7 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 						className="bg-gray-800 p-3 my-3 rounded-lg shadow-md mx-2"
 					>
 						<div className="my-1">
-							<div className="flex justify-between items-center">
+							<div className="md:flex md:justify-between items-center">
 								<span
 									className={clsx(
 										"font-semibold rounded flex items-center gap-1",
@@ -95,11 +95,13 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 								Total: {formatPrice(item.total)}
 							</p>
 						</div>
-						<div className="grid grid-cols-2 gap-2 bg-white rounded-lg p-2 shadow-heavy">
-							{item.products.map((product) => (
+						<div className="grid sm:grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-lg p-2 shadow-heavy">
+							{item.products.map((product, index) => (
 								<div
-									className="flex flex-col md:flex-row gap-2 items-center"
-									key={product.product._id}
+									className="flex flex-col md:flex-row gap-2 max-sm:border-b-2 max-sm:border-black/20 pb-2 max-sm:last:border-b-0 hover:shadow-lg transition-shadow duration-300 justify-center items-center"
+									key={`${product.product._id}-${
+										product.variant?._id || index
+									}`}
 								>
 									<div className="relative flex items-center w-[120px] h-[120px]">
 										<CustomImage

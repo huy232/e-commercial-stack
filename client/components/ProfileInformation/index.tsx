@@ -17,7 +17,7 @@ import { FaFileUpload } from "@/assets/icons"
 import { API } from "@/constant"
 import { useRouter } from "next/navigation"
 import { useMounted } from "@/hooks"
-import { path } from "@/utils"
+import { LoadingSpinner, path } from "@/utils"
 import { WEB_URL } from "@/constant"
 interface CustomFieldError extends FieldError {
 	message: string
@@ -76,8 +76,20 @@ const ProfileInformation = () => {
 		}
 	}, [user, reset])
 
-	if (!mounted || !user) {
-		return null
+	if (!mounted) {
+		return (
+			<div className="flex items-center justify-center w-full h-[300px]">
+				<LoadingSpinner />
+			</div>
+		)
+	}
+
+	if (!user) {
+		return (
+			<div className="flex items-center justify-center w-full h-[300px]">
+				<p className="text-gray-600">No user data found</p>
+			</div>
+		)
 	}
 
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {

@@ -110,12 +110,11 @@ const InputField: React.FC<InputFieldProps> = ({
 					disabled={disabled}
 					readOnly={readOnly}
 					className={clsx(
-						"w-full", // Ensure full width
-						togglePassword && "pr-10", // Add right padding only if togglePassword is enabled
+						"w-full",
+						togglePassword && "pr-10",
 						inputClass(inputAdditionalClass)
 					)}
 					type={togglePassword ? (passwordVisible ? "text" : "password") : type}
-					value={value === null ? "" : value?.toString()}
 					{...register(name, {
 						required,
 						pattern: validateType
@@ -130,7 +129,13 @@ const InputField: React.FC<InputFieldProps> = ({
 						onChange: formatInput,
 					})}
 					placeholder={placeholder}
-					autoComplete="true"
+					autoComplete={
+						type === "password"
+							? "current-password"
+							: name === "email"
+							? "email"
+							: "on"
+					}
 					onBlur={formatInput}
 				/>
 				{togglePassword && (

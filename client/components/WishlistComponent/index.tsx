@@ -1,14 +1,14 @@
 "use client"
-import React from "react"
-import { Button, Pagination, UserWishlist } from "@/components"
+import React, { useEffect, useState } from "react"
+import { Pagination, UserWishlist } from "@/components"
 import { useMounted } from "@/hooks"
 import { selectAuthUser } from "@/store/slices/authSlice"
 import { ProfileUser } from "@/types"
-import { path } from "@/utils"
+import { LoadingSpinner, path } from "@/utils"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useSelector } from "react-redux"
-import { useEffect, useState } from "react"
 import { API, WEB_URL } from "@/constant"
+
 const WishlistComponent = () => {
 	const LIMIT = 6
 	const mounted = useMounted()
@@ -52,24 +52,33 @@ const WishlistComponent = () => {
 		}
 	}
 
+	// redirect if not logged in
 	useEffect(() => {
-		if (mounted && !user) router.push(`${WEB_URL}/${path.LOGIN}`)
+		if (mounted && !user) {
+			router.push(`${WEB_URL}/${path.LOGIN}`)
+		}
 	}, [mounted, user, router])
 
+	// fetch wishlist
 	useEffect(() => {
 		if (!mounted || !user) return
 		const page = Number(searchParams.get("page") ?? 1)
 		fetchUserWishlist(page)
 	}, [mounted, user, searchParams])
 
-	if (!mounted || loading || !wishlistData) return <div>Loading...</div>
+	if (!mounted) return null
+
+	if (loading) return <LoadingSpinner />
+
+	if (!wishlistData) {
+		return <div className="text-center text-gray-500">No wishlist found.</div>
+	}
 
 	const { wishlist, totalPages } = wishlistData
 
 	return (
-		<div className="w-full">
+		<div className="w-full flex flex-col h-full justify-between">
 			<UserWishlist user={user} userWishlist={wishlist} />
-
 			<Pagination totalPages={totalPages} showPageInput />
 		</div>
 	)

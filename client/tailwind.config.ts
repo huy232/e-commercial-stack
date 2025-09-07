@@ -13,6 +13,11 @@ const config: Config = {
 				heavy:
 					"rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px",
 			},
+			animationDelay: {
+				"0": "0s",
+				"150": "0.15s",
+				"300": "0.3s",
+			},
 			fontFamily: {
 				poppins: ["var(--font-poppins)", ...fontFamily.sans],
 				anton: ["var(--font-anton)", ...fontFamily.sans],
@@ -82,6 +87,10 @@ const config: Config = {
 						transform: "scale3d(1, 1, 1)",
 					},
 				},
+				bounceDot: {
+					"0%, 80%, 100%": { transform: "scale(0)" },
+					"40%": { transform: "scale(1)" },
+				},
 			},
 			animation: {
 				"slide-up":
@@ -92,6 +101,7 @@ const config: Config = {
 				marquee: "marquee 25s linear infinite",
 				marquee2: "marquee2 25s linear infinite",
 				tada: "tada 1s ease-in-out 0.25s 1",
+				bounceDot: "bounceDot 1.4s infinite ease-in-out both",
 			},
 			listStyleType: {
 				none: "none",

@@ -53,22 +53,26 @@ const notificationsSlice = createSlice({
 				state.loading = true
 			})
 			.addCase(fetchNotifications.fulfilled, (state, action) => {
-				if (action.payload.status === "fail") {
+				if (action.payload.status === "fail" || !action.payload.data) {
 					state.loading = false
 					return
 				}
 
-				const { notifications, currentPage, totalPages, unreadCount } =
-					action.payload.data
+				const {
+					notifications = [],
+					currentPage = 1,
+					totalPages = 1,
+					unreadCount = 0,
+				} = action.payload.data
 
 				if (currentPage === 1) {
 					state.notifications = notifications
 				} else {
-					state.notifications.push(...notifications) // Append next page
+					state.notifications.push(...notifications)
 				}
 
 				state.currentPage = currentPage
-				state.hasNextPage = currentPage < totalPages // If last page, set hasMore false
+				state.hasNextPage = currentPage < totalPages
 				state.unreadCount = unreadCount
 				state.loading = false
 			})
@@ -81,7 +85,7 @@ const notificationsSlice = createSlice({
 				state.loading = true
 			})
 			.addCase(markAllNotificationsAsRead.fulfilled, (state, action) => {
-				state.notifications = action.payload.data
+				state.notifications = action.payload?.data || []
 				state.loading = false
 			})
 			.addCase(markAllNotificationsAsRead.rejected, (state) => {
