@@ -53,23 +53,22 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ product }) => {
 	}
 
 	return (
-		<div className="w-full h-full lg:h-[70vh] lg:w-[70vw] flex flex-col lg:flex-row">
-			{/* <Button
-				className="absolute top-0 right-0 hover:opacity-80 duration-300 ease-linear"
-				onClick={onClose}
-			>
-				<IoIosCloseCircle size={24} />
-			</Button> */}
-			<div className="w-full lg:w-3/5">
+		<div className="w-full h-full flex flex-col lg:flex-row gap-4">
+			{/* Image section */}
+			<div className="w-full lg:w-3/5 flex-shrink-0">
 				<ProductSlider images={product.images} />
 			</div>
-			<div className="w-full lg:w-2/5 h-full overflow-y-auto">
+
+			{/* Info section */}
+			<div className="w-full lg:w-2/5 h-full overflow-y-auto px-2">
 				<h2 className="line-clamp-2 text-xl font-bold font-bebasNeue">
 					{product.title}
 				</h2>
+
 				<span className="flex">
 					{renderStarFromNumber(product.totalRatings)}
 				</span>
+
 				{discountValidate(product) ? (
 					<div className="flex flex-col">
 						<span className="line-through text-gray-500 text-xs">
@@ -85,13 +84,16 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ product }) => {
 						{formatPrice(product.price)}
 					</span>
 				)}
+
 				<span className="text-xs block">Available: {product.quantity}</span>
 				<span className="text-xs block">Sold: 100</span>
+
 				<span
 					className="line-clamp-2 lg:line-clamp-5 text-sm"
 					dangerouslySetInnerHTML={{ __html: product.description }}
 				/>
-				<div className="flex flex-col gap-4">
+
+				<div className="flex flex-col gap-4 mt-3">
 					<ProductCart
 						variants={product.variants}
 						handleProductDetail={handleProductDetail}

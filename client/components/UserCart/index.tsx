@@ -309,12 +309,24 @@ const UserCart = ({ discount, coupon }: UserCartProps) => {
 					}}
 					disabled={isLoading}
 					loading={isLoading}
+					aria-label="Update cart"
+					role="button"
+					tabIndex={0}
+					data-testid="update-cart-button"
+					id="update-cart-button"
 				>
 					Update cart
 				</Button>
 				<Button
 					className="inline py-2 lg:py-3 lg:px-6 rounded-md bg-rose-500 text-gray-50 before:border-rose-500 hover-effect mx-4 my-1 lg:my-2"
 					onClick={() => handleCartWipe()}
+					disabled={isLoading}
+					loading={isLoading}
+					aria-label="Empty the cart"
+					role="button"
+					tabIndex={0}
+					data-testid="empty-cart-button"
+					id="empty-cart-button"
 				>
 					Empty the cart
 				</Button>
@@ -343,6 +355,11 @@ const UserCart = ({ discount, coupon }: UserCartProps) => {
 							className="inline py-3 px-6 rounded-md bg-rose-500 text-gray-50 before:border-rose-500 hover-effect"
 							disabled={isLoading}
 							loading={isLoading}
+							aria-label="Apply coupon"
+							role="button"
+							tabIndex={0}
+							data-testid="apply-coupon-button"
+							id="apply-coupon-button"
 						>
 							Apply coupon
 						</Button>
@@ -386,6 +403,11 @@ const UserCart = ({ discount, coupon }: UserCartProps) => {
 							className="w-full hover-effect"
 							loading={isLoading}
 							disabled={isLoading}
+							aria-label="Proceed to checkout"
+							role="button"
+							tabIndex={0}
+							data-testid="proceed-to-checkout-button"
+							id="proceed-to-checkout-button"
 						>
 							<Link
 								className="w-full block py-3 text-center bg-rose-500 text-gray-50 rounded-md font-medium"

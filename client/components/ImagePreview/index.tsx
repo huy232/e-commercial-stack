@@ -36,13 +36,18 @@ const ImagePreview: FC<ImagePreviewProps> = ({
 					className="object-cover"
 				/>
 				{!disabled && (
-					<button
+					<Button
 						type="button"
 						className={imageClass}
 						onClick={() => handleDeleteImage(index)}
+						aria-label={`Delete image ${index + 1}`}
+						role="button"
+						tabIndex={0}
+						data-testid={`delete-image-button-${index + 1}`}
+						id={`delete-image-button-${index + 1}`}
 					>
 						<MdDelete size={20} color="#FF0000" />
-					</button>
+					</Button>
 				)}
 			</div>
 		)

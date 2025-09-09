@@ -57,6 +57,14 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 							onClick={() => fetchProductsComponent({ sort: sort }, id)}
 							key={id}
 							className={titleClass(tab.id)}
+							aria-pressed={titleId === id}
+							aria-label={`View ${name} products`}
+							role="button"
+							tabIndex={0}
+							data-testid={`tab-${name.replace(" ", "-").toLowerCase()}-button`}
+							id={`tab-${name.replace(" ", "-").toLowerCase()}-button`}
+							disabled={titleId === id}
+							loading={titleId === id}
 						>
 							{name}
 						</Button>

@@ -2,6 +2,7 @@
 import { FC, useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Button } from "@/components"
 import { CiSearch } from "@/assets/icons"
 
 const SearchBar: FC = () => {
@@ -49,12 +50,20 @@ const SearchBar: FC = () => {
 			>
 				Search for product...
 			</label>
-			<button
+			<Button
 				className="absolute top-0 left-0 font-bold border-0 z-10 h-full pl-[4px]"
 				type="submit"
+				aria-label="Search for product"
+				role="button"
+				tabIndex={0}
+				data-testid="search-button"
+				id="search-button"
+				disabled={!!errors.search}
+				title={errors.search ? errors.search.message?.toString() : "Search"}
+				loading={!!errors.search}
 			>
 				<CiSearch />
-			</button>
+			</Button>
 		</form>
 	)
 }

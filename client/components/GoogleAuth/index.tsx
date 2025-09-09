@@ -6,6 +6,7 @@ import { useGoogleLogin } from "@react-oauth/google"
 import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
+import { Button } from "@/components"
 
 const GoogleAuth = () => {
 	const dispatch = useDispatch<AppDispatch>()
@@ -52,16 +53,21 @@ const GoogleAuth = () => {
 	})
 
 	return (
-		<button
+		<Button
 			onClick={() => handleGoogleLogin()}
 			className="group flex items-center gap-1 px-4 py-2 border-red-500 border-2 rounded-md hover:bg-red-600 duration-300 ease-in-out"
+			aria-label="Login with Google"
+			role="button"
+			tabIndex={0}
+			data-testid="google-login-button"
+			id="google-login-button"
 		>
 			<FcGoogle size={24} />
 			<span className="text-black group-hover:text-white">
 				Login with{" "}
 				<span className="group-hover:font-bold group-hover:italic">Google</span>
 			</span>
-		</button>
+		</Button>
 	)
 }
 

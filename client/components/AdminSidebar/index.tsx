@@ -73,6 +73,11 @@ const AdminSidebar = () => {
 					setToggleMenu(!toggleMenu)
 				}}
 				className="absolute ml-1 mt-1 bg-[#808080] rounded shadow-xl p-1 inline-block w-fit h-fit hover:opacity-80 hover:brightness-105 hover:bg-rose-500 hover:scale-110 duration-300 ease-in-out"
+				type="button"
+				aria-label="Toggle Menu"
+				aria-expanded={toggleMenu}
+				aria-controls="admin-sidebar"
+				id="admin-sidebar"
 			>
 				<IoMenu className="text-white" size={24} />
 			</Button>
@@ -96,6 +101,8 @@ const AdminSidebar = () => {
 					<Button
 						className="relative z-50 text-white group w-[40px] h-[40px] flex items-center justify-center"
 						onClick={() => setToggleMenu(false)}
+						type="button"
+						aria-label="Close Menu"
 					>
 						<FaAngleDoubleLeft
 							className="absolute opacity-100 group-hover:opacity-0 transition-all duration-500 ease-in-out bg-black/50 rounded p-1 scale-100 group-hover:scale-0"
@@ -124,16 +131,21 @@ const AdminSidebar = () => {
 							)}
 							{option.type === adminDashboardStatus.PARENT && (
 								<div className="py-1 mx-2 md:mx-4 lg:mx-8">
-									<button
+									<Button
 										className={`px-4 py-2 flex flex-col gap-2 text-gray-200 hover:bg-black/60 text-sm w-full rounded duration-300 ease-linear`}
 										onClick={() => handleShowTab(option)}
+										type="button"
+										aria-expanded={activeParentMenus.includes(option.id)}
+										aria-controls={`submenu-${option.id}`}
+										aria-label={`Toggle ${option.text} submenu`}
+										id={`submenu-${option.id}`}
 									>
 										<div className="flex items-center gap-2">
 											<span>{option.icon}</span>
 											<span>{option.text}</span>
 											<FaArrowDownShortWide />
 										</div>
-									</button>
+									</Button>
 									{activeParentMenus.includes(option.id) &&
 										option.subMenu?.map((sub) => (
 											<Link

@@ -52,7 +52,16 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 				<>
 					<span className="font-semibold">Quantity</span>
 					<div className="flex items-center">
-						<Button className="border-r border-black" onClick={handleDecrement}>
+						<Button
+							className="border-r border-black"
+							onClick={handleDecrement}
+							aria-label="Decrease quantity"
+							role="button"
+							tabIndex={0}
+							data-testid="decrease-quantity-button"
+							id="decrease-quantity-button"
+							disabled={quantity <= 1}
+						>
 							-
 						</Button>
 						<input
@@ -61,7 +70,16 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 							value={quantity}
 							onChange={handleChange}
 						/>
-						<Button className="border-l border-black" onClick={handleIncrement}>
+						<Button
+							className="border-l border-black"
+							onClick={handleIncrement}
+							disabled={quantity >= quantityLimit}
+							aria-label="Increase quantity"
+							role="button"
+							tabIndex={0}
+							data-testid="increase-quantity-button"
+							id="increase-quantity-button"
+						>
 							+
 						</Button>
 					</div>

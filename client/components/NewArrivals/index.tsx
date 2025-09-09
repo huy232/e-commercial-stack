@@ -1,7 +1,7 @@
 "use client"
 import { FC, useCallback, useMemo, useState } from "react"
 import { ProductExtraType, ProductType } from "@/types/product"
-import { CustomSlider } from "@/components"
+import { Button, CustomSlider } from "@/components"
 import clsx from "clsx"
 import { ApiProductResponse } from "@/types"
 import { API } from "@/constant"
@@ -56,15 +56,20 @@ const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 				</h2>
 				<div className="mx-auto md:ml-auto md:mr-0 flex gap-4 text-xs font-anton mb-2">
 					{tabs.map((tab) => (
-						<button
+						<Button
 							onClick={() =>
 								fetchProductsComponent({ category: tab.category }, tab.id)
 							}
 							key={tab.id}
 							className={titleClass(tab.id)}
+							aria-label={`Show ${tab.name} products`}
+							role="button"
+							tabIndex={0}
+							data-testid={`tab-button-${tab.id}`}
+							id={`tab-button-${tab.id}`}
 						>
 							{tab.name}
-						</button>
+						</Button>
 					))}
 				</div>
 			</div>

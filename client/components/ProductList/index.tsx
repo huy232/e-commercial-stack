@@ -8,6 +8,7 @@ import {
 import { FC, useState, useEffect } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import {
+	Button,
 	FilterBar,
 	InputSelect,
 	Pagination,
@@ -61,7 +62,7 @@ const ProductList: FC<ProductsProps> = ({
 					<SearchBar />
 				</div>
 				<div className="w-full bg-[#242424] rounded mt-2 mx-1 md:mx-2 lg:mx-4">
-					<button
+					<Button
 						onClick={() => {
 							setEnableFilter(!enableFilter)
 						}}
@@ -69,6 +70,16 @@ const ProductList: FC<ProductsProps> = ({
 							"py-3 text-white w-full flex items-center justify-between hover:opacity-80 hover-effect transition-all shadow-md hover:shadow-lg disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
 						)}
 						type="button"
+						aria-expanded={enableFilter}
+						aria-controls="filter-section"
+						aria-label="Toggle filter section"
+						role="button"
+						tabIndex={0}
+						data-testid="toggle-filter-button"
+						id="toggle-filter-button"
+						disabled={categories.length === 0}
+						title={categories.length === 0 ? "No categories available" : ""}
+						data-cy="toggle-filter-button"
 					>
 						<span className="mx-2 font-bold">Filters</span>
 						{enableFilter ? (
@@ -76,7 +87,7 @@ const ProductList: FC<ProductsProps> = ({
 						) : (
 							<FaRegSquarePlus className="mx-2" />
 						)}
-					</button>
+					</Button>
 					<div
 						className={clsx(
 							"items-center transition-all group-focus:visible group-focus:opacity-100 group-focus:duration-3000 mx-2 overflow-hidden",

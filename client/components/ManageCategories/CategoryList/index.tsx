@@ -180,12 +180,22 @@ const CategoryList: FC<CategoryListProps> = ({
 						<Button
 							onClick={() => setShowModal(false)}
 							className="bg-gray-300 text-black px-4 py-2 rounded hover:opacity-80"
+							aria-label="Cancel category deletion"
+							role="button"
+							tabIndex={0}
+							data-testid="cancel-delete-category-button"
+							id="cancel-delete-category-button"
 						>
 							Cancel
 						</Button>
 						<Button
 							onClick={handleConfirmDelete}
 							className="bg-red-500 text-white px-4 py-2 rounded hover:opacity-80"
+							aria-label="Confirm category deletion"
+							role="button"
+							tabIndex={0}
+							data-testid="confirm-delete-category-button"
+							id="confirm-delete-category-button"
 						>
 							Delete
 						</Button>
@@ -222,6 +232,12 @@ const CategoryList: FC<CategoryListProps> = ({
 								<Button
 									onClick={() => handleEditCategory(category)}
 									className="mx-2 group duration-300 transition-all hover:opacity-80 hover:brightness-110 bg-black/30 rounded p-1 flex flex-row items-center ease-in-out"
+									title="Edit category"
+									aria-label="Edit category"
+									role="button"
+									tabIndex={0}
+									data-testid={`edit-category-button-${category._id}`}
+									id={`edit-category-button-${category._id}`}
 								>
 									<span className="mr-0.5">Edit</span>{" "}
 									<IoMdSettings
@@ -236,6 +252,10 @@ const CategoryList: FC<CategoryListProps> = ({
 									aria-label="Delete category"
 									disabled={selectedCategories.includes(category._id)}
 									aria-disabled={selectedCategories.includes(category._id)}
+									role="button"
+									tabIndex={0}
+									data-testid={`delete-category-button-${category._id}`}
+									id={`delete-category-button-${category._id}`}
 								>
 									<FaTrashAlt />
 								</Button>
@@ -271,6 +291,11 @@ const CategoryList: FC<CategoryListProps> = ({
 						className={clsx(
 							"bg-green-500/80 rounded p-1 hover:opacity-80 hover:brightness-125 duration-300 ease-in-out border-2 border-transparent hover:bg-transparent hover:border-green-bg-green-500/80"
 						)}
+						aria-label="Delete selected categories"
+						role="button"
+						tabIndex={0}
+						data-testid="delete-selected-categories-button"
+						id="delete-selected-categories-button"
 					>
 						Delete Selected
 					</Button>
@@ -278,6 +303,11 @@ const CategoryList: FC<CategoryListProps> = ({
 						onClick={handleCancelSelection}
 						disabled={selectedCategories.length === 0}
 						className="bg-rose-500 rounded p-1 hover:opacity-80 hover:brightness-125 duration-300 ease-in-out border-2 border-transparent hover:bg-transparent hover:border-rose-500"
+						aria-label="Cancel category selection"
+						role="button"
+						tabIndex={0}
+						data-testid="cancel-selection-button"
+						id="cancel-selection-button"
 					>
 						Cancel
 					</Button>

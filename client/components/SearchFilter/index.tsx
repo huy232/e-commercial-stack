@@ -1,9 +1,10 @@
 "use client"
 import { FC, useCallback } from "react"
 import { FaSearch } from "@/assets/icons"
-import { InputField } from "@/components"
+import { Button, InputField } from "@/components"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { motion } from "framer-motion"
 
 interface SearchFilterProps {
 	title?: string
@@ -11,7 +12,7 @@ interface SearchFilterProps {
 		label: string
 		name: string
 		type: "text" | "select"
-		options?: { label: string; value: string }[] // For select fields
+		options?: { label: string; value: string }[]
 	}[]
 }
 
@@ -26,19 +27,12 @@ const SearchFilter: FC<SearchFilterProps> = ({ title, fields }) => {
 			try {
 				const params = new URLSearchParams(searchParams)
 
-				// Ensure search field is always included
-				if (data.search) {
-					params.set("search", data.search)
-				} else {
-					params.delete("search")
-				}
+				if (data.search) params.set("search", data.search)
+				else params.delete("search")
 
 				fields.forEach(({ name }) => {
-					if (data[name]) {
-						params.set(name, data[name])
-					} else {
-						params.delete(name)
-					}
+					if (data[name]) params.set(name, data[name])
+					else params.delete(name)
 				})
 
 				params.set("page", "1")
@@ -49,32 +43,56 @@ const SearchFilter: FC<SearchFilterProps> = ({ title, fields }) => {
 	)
 
 	return (
-		<form className="w-full" onSubmit={handleSubmit(handleSearch)}>
-			<div className="flex flex-col justify-center gap-2 items-center p-2 bg-gray-400/60 rounded min-w-[320px] max-w-[640px] mx-auto mb-2">
-				{title && <h2 className="text-lg font-semibold">{title}</h2>}
-				<div className="w-full flex flex-col gap-2">
-					<div className="flex items-center gap-2">
-						<InputField
-							label="Search"
-							name="search"
-							register={register}
-							inputAdditionalClass="flex-1"
-							labelClassName="w-[80px]"
-						/>
-						<button
-							type="submit"
-							className="border-2 border-main hover:bg-main text-white bg-red-500 p-1 rounded-lg transition-all hover:shadow-md"
-						>
-							<FaSearch size={18} className="w-4 h-4" />
-						</button>
-					</div>
+		<motion.form
+			initial={{ opacity: 0, y: -15 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.4, ease: "easeOut" }}
+			className="w-full"
+			onSubmit={handleSubmit(handleSearch)}
+		>
+			<div className="flex flex-col gap-4 items-center p-4 bg-white/90 dark:bg-gray-800 shadow-lg rounded-2xl min-w-[220px] max-w-3xl mx-auto mb-4">
+				{title && (
+					<h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+						{title}
+					</h2>
+				)}
 
-					{/* Render additional fields dynamically */}
+				{/* Search bar */}
+				{/* Search bar */}
+				<div className="w-full flex flex-row items-center gap-2">
+					<InputField
+						label="Search"
+						name="search"
+						register={register}
+						inputAdditionalClass="flex-1 min-w-0 rounded-lg border-gray-300 focus:border-main focus:ring focus:ring-main/30 transition-all"
+						labelClassName="hidden"
+					/>
+					<Button
+						type="submit"
+						className="flex items-center justify-center gap-2 border border-main bg-main text-white px-3 py-2 rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 whitespace-nowrap"
+						aria-label="Search for products"
+						role="button"
+						tabIndex={0}
+						data-testid="search-filter-button"
+						id="search-filter-button"
+					>
+						<FaSearch size={16} />
+						<span className="hidden sm:inline">Search</span>
+					</Button>
+				</div>
+
+				{/* Extra filters */}
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.2 }}
+					className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full"
+				>
 					{fields.map(({ label, name, type, options }) => (
-						<div key={name} className="flex gap-2">
+						<div key={name} className="flex flex-col gap-1">
 							<label
 								htmlFor={name}
-								className="text-md font-medium mr-1 w-[80px]"
+								className="text-sm font-medium text-gray-700 dark:text-gray-300"
 							>
 								{label}
 							</label>
@@ -82,13 +100,13 @@ const SearchFilter: FC<SearchFilterProps> = ({ title, fields }) => {
 								<input
 									id={name}
 									{...register(name)}
-									className="block w-full pl-3 pr-10 py-1 text-base border-gray-300 focus:outline-none focus:ring-main focus:border-main sm:text-sm rounded-md"
+									className="w-full rounded-lg border-gray-300 focus:border-main focus:ring focus:ring-main/30 text-sm px-3 py-2 transition-all"
 								/>
 							) : type === "select" && options ? (
 								<select
 									id={name}
 									{...register(name)}
-									className="block w-fit pl-3 pr-10 py-1 text-base border-gray-300 focus:outline-none focus:ring-main focus:border-main sm:text-sm rounded-md"
+									className="w-full rounded-lg border-gray-300 focus:border-main focus:ring focus:ring-main/30 text-sm px-3 py-2 transition-all"
 								>
 									{options.map((option) => (
 										<option key={option.value} value={option.value}>
@@ -99,9 +117,9 @@ const SearchFilter: FC<SearchFilterProps> = ({ title, fields }) => {
 							) : null}
 						</div>
 					))}
-				</div>
+				</motion.div>
 			</div>
-		</form>
+		</motion.form>
 	)
 }
 

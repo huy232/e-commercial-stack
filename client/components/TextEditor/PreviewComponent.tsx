@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import CustomImage from "../CustomImage"
+import { Button, CustomImage } from "@/components"
 
 interface PreviewProps {
 	content: string
@@ -37,12 +37,17 @@ const PreviewComponent: React.FC<PreviewProps> = ({
 									className="w-full h-full object-cover rounded border border-gray-300"
 									fill
 								/>
-								<button
+								<Button
 									onClick={() => onRemoveImage(src)}
 									className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
+									aria-label="Remove image"
+									role="button"
+									tabIndex={0}
+									data-testid={`remove-image-${index}-button`}
+									id={`remove-image-${index}-button`}
 								>
 									✖
-								</button>
+								</Button>
 							</div>
 						))}
 					</div>

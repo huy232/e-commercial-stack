@@ -115,13 +115,18 @@ const CategoryForm: FC = () => {
 							className="w-[220px] h-[220px] object-contain mx-auto"
 							fill
 						/>
-						<button
+						<Button
 							type="button"
 							onClick={removeImage}
 							className="absolute top-1 right-1 bg-white text-red-600 border border-red-600 px-2 py-0.5 rounded text-xs hover:bg-red-600 hover:text-white transition-all duration-300 ease-in-out group-hover:opacity-100 opacity-0 z-10"
+							aria-label="Remove selected image"
+							role="button"
+							tabIndex={0}
+							data-testid="remove-selected-image-button"
+							id="remove-selected-image-button"
 						>
 							Remove
-						</button>
+						</Button>
 					</div>
 				)}
 
@@ -129,6 +134,11 @@ const CategoryForm: FC = () => {
 					className="bg-rose-500 p-1 rounded hover:brightness-125 hover:opacity-90 duration-300 ease-in-out text-white hover:bg-transparent hover:border-rose-500 border-[2px] hover:text-black w-fit lg:w-[120px]"
 					type="submit"
 					disabled={uploading}
+					aria-label="Submit new category"
+					role="button"
+					tabIndex={0}
+					data-testid="submit-category-button"
+					id="submit-category-button"
 				>
 					{uploading ? "Uploading..." : "Submit"}
 				</Button>

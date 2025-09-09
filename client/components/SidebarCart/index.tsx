@@ -279,6 +279,11 @@ const SidebarCart = () => {
 											className="rounded p-2 my-1 border-red-500 hover:bg-red-500 hover:text-white hover-effect duration-300 border-2"
 											disabled={loadingCart}
 											loading={loadingCart}
+											aria-label="Update cart"
+											role="button"
+											tabIndex={0}
+											data-testid="update-cart-button"
+											id="update-cart-button"
 										>
 											Update cart
 										</Button>

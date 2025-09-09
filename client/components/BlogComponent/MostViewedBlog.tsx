@@ -1,4 +1,4 @@
-import { CustomImage } from "@/components"
+import { Button, CustomImage } from "@/components"
 import { PopulatedBlog } from "@/types"
 import { formatViews, sanitizeHTML } from "@/utils"
 import Link from "next/link"
@@ -71,9 +71,17 @@ const MostViewedBlog = ({
 				</div>
 				<div className="flex items-center gap-2 text-gray-500 text-xs mt-2">
 					<Link href={`/blog/${first.slug}`}>
-						<button className="p-1 border-2 border-black rounded text-sm hover:bg-black hover:text-white duration-300 ease-in-out font-bold">
+						<Button
+							type="button"
+							className="p-1 border-2 border-black rounded text-sm hover:bg-black hover:text-white duration-300 ease-in-out font-bold"
+							aria-label={`Read more about ${first.title}`}
+							role="link"
+							tabIndex={0}
+							data-testid="read-more-button"
+							id="read-more-button"
+						>
 							Read more
-						</button>
+						</Button>
 					</Link>
 					<span className="flex items-center ml-auto">
 						<AiOutlineLike className="inline mr-1 text-green-500" />

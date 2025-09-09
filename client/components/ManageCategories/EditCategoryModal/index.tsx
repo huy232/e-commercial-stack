@@ -153,16 +153,20 @@ const EditCategoryModal: FC<EditCategoryModalProps> = ({
 									className="w-[220px] h-[220px] object-contain mx-auto"
 									fill
 								/>
-								<button
+								<Button
 									type="button"
 									onClick={removeImage}
 									className="absolute top-1 right-1 text-xs px-2 py-1 bg-white text-red-600 border border-red-600 rounded hover:bg-red-600 hover:text-white duration-300 ease-in-out"
 									disabled={uploading}
 									title="Remove image"
 									aria-label="Remove image"
+									role="button"
+									tabIndex={0}
+									data-testid="remove-image-button"
+									id="remove-image-button"
 								>
 									Remove
-								</button>
+								</Button>
 							</div>
 						)}
 						<div>
@@ -208,12 +212,26 @@ const EditCategoryModal: FC<EditCategoryModalProps> = ({
 						<Button
 							onClick={handleUpdateCategory}
 							className="bg-blue-500 text-white rounded p-1 hover:opacity-80 duration-300 ease-in-out"
+							disabled={uploading}
+							aria-disabled={uploading}
+							aria-label="Update category"
+							role="button"
+							tabIndex={0}
+							data-testid="update-category-button"
+							id="update-category-button"
 						>
 							Update
 						</Button>
 						<Button
 							onClick={closeModal}
 							className="bg-red-500 text-white rounded p-1 hover:opacity-80 duration-300 ease-in-out"
+							disabled={uploading}
+							aria-disabled={uploading}
+							aria-label="Cancel category editing"
+							role="button"
+							tabIndex={0}
+							data-testid="cancel-edit-category-button"
+							id="cancel-edit-category-button"
 						>
 							Cancel
 						</Button>

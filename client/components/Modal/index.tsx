@@ -2,6 +2,7 @@
 import { FC, ReactNode, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import clsx from "clsx"
+import { motion, AnimatePresence } from "framer-motion"
 import { useClickOutside } from "@/hooks"
 import Button from "../Button"
 import { IoIosCloseCircle } from "@/assets/icons"
@@ -21,7 +22,6 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 		} else {
 			document.body.style.overflow = ""
 		}
-
 		return () => {
 			document.body.style.overflow = ""
 		}
@@ -31,40 +31,55 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 		if (onClose) onClose()
 	})
 
-	const overlayClass = clsx("fixed inset-0 bg-black bg-opacity-50 z-40", {
-		hidden: !isOpen,
-	})
-
-	const modalClass = clsx(
-		"fixed inset-0 flex items-center justify-center z-50 w-full h-full",
-		{
-			hidden: !isOpen,
-		}
-	)
-
-	return isOpen
-		? createPortal(
+	return createPortal(
+		<AnimatePresence>
+			{isOpen && (
 				<>
-					<div className={overlayClass}>
-						<div className={modalClass}>
-							<div
-								className="max-h-full bg-white p-4 relative overflow-y-auto"
-								ref={modalRef}
+					{/* Overlay */}
+					<motion.div
+						key="overlay"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="fixed inset-0 bg-black bg-opacity-50 z-40"
+					/>
+
+					{/* Modal container */}
+					<motion.div
+						key="modal"
+						initial={{ opacity: 0, scale: 0.9 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0, scale: 0.9 }}
+						transition={{ duration: 0.25 }}
+						className="fixed inset-0 flex items-center justify-center z-50 w-full h-full"
+					>
+						<div
+							ref={modalRef}
+							className="relative max-h-[90vh] w-[95%] max-w-5xl rounded-xl bg-white shadow-xl p-6 overflow-y-auto"
+						>
+							<Button
+								className="absolute top-2 right-2 hover:opacity-80 duration-200"
+								onClick={onClose}
+								aria-label="Close modal"
+								role="button"
+								tabIndex={0}
+								data-testid="close-modal-button"
+								id="close-modal-button"
 							>
-								<Button
-									className="absolute top-0 right-0 mr-2 mt-2 hover:opacity-80 duration-300 ease-linear z-10"
-									onClick={onClose}
-								>
-									<IoIosCloseCircle size={24} />
-								</Button>
-								{children}
-							</div>
+								<IoIosCloseCircle
+									size={28}
+									className="text-gray-500 hover:text-gray-700"
+								/>
+							</Button>
+							{children}
 						</div>
-					</div>
-				</>,
-				document.body
-		  )
-		: null
+					</motion.div>
+				</>
+			)}
+		</AnimatePresence>,
+		document.body
+	)
 }
 
 export default Modal

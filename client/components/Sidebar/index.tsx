@@ -5,6 +5,7 @@ import Link from "next/link"
 import clsx from "clsx"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { Button } from "@/components"
 
 interface SidebarProps {
 	categories: CategoryType[]
@@ -28,13 +29,20 @@ const Sidebar: FC<SidebarProps> = ({ categories }) => {
 				</h2>
 
 				{/* Mobile toggle */}
-				<button
+				<Button
 					className="lg:hidden px-2 text-sm text-black bg-gray-200 rounded hover:bg-gray-300 flex items-center gap-1"
 					onClick={() => setIsOpen(!isOpen)}
+					aria-expanded={isOpen}
+					aria-controls="category-list"
+					aria-label={isOpen ? "Hide categories" : "Show categories"}
+					role="button"
+					tabIndex={0}
+					data-testid="toggle-category-button"
+					id="toggle-category-button"
 				>
 					{isOpen ? "Hide" : "Show"}{" "}
 					{isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-				</button>
+				</Button>
 			</div>
 
 			{/* Desktop view */}

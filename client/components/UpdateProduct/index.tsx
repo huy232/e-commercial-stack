@@ -553,6 +553,12 @@ const UpdateProduct: FC<UpdateProductProps> = ({
 						disabled={loading}
 						type="submit"
 						className="w-fit bg-green-500 disabled:bg-rose-500 p-1 hover:bg-opacity-70 hover:brightness-125 duration-300 ease-in-out rounded"
+						aria-label="Update product"
+						role="button"
+						tabIndex={0}
+						data-testid="update-product-button"
+						id="update-product-button"
+						loading={loading}
 					>
 						Update product
 					</Button>

@@ -144,6 +144,11 @@ const InputField: React.FC<InputFieldProps> = ({
 						type="button"
 						onClick={togglePasswordVisibility}
 						disabled={disabled}
+						aria-label={passwordVisible ? "Hide password" : "Show password"}
+						role="button"
+						tabIndex={0}
+						data-testid="toggle-password-visibility-button"
+						id="toggle-password-visibility-button"
 					>
 						{passwordVisible ? <BiHide /> : <BiShow />}
 					</Button>

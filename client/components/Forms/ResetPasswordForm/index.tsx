@@ -72,7 +72,14 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				Successfully resetting your password, you can now try to login again
 			</p>
 			<Link href={path.LOGIN}>
-				<Button className="hover-effect border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1">
+				<Button
+					className="hover-effect border-2 border-rose-500 hover:bg-rose-500 hover:text-white rounded p-1"
+					aria-label="Go to Login"
+					role="button"
+					tabIndex={0}
+					data-testid="go-to-login-button"
+					id="go-to-login-button"
+				>
 					Login
 				</Button>
 			</Link>
@@ -107,7 +114,14 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				<div>
 					<p className="text-main text-center hover-effect">{errorMessage}</p>
 					<Link href={path.FORGOT_PASSWORD}>
-						<Button className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white hover-effect p-1 rounded">
+						<Button
+							className="border-2 border-rose-500 hover:bg-rose-500 hover:text-white hover-effect p-1 rounded"
+							aria-label="Try Reset Password Again"
+							role="button"
+							tabIndex={0}
+							data-testid="try-reset-password-again-button"
+							id="try-reset-password-again-button"
+						>
 							Try reset your password again
 						</Button>
 					</Link>
@@ -116,6 +130,11 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 				<Button
 					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"
+					aria-label="Submit Reset Password"
+					role="button"
+					tabIndex={0}
+					data-testid="submit-reset-password-button"
+					id="submit-reset-password-button"
 				>
 					Submit
 				</Button>

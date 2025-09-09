@@ -32,10 +32,6 @@ const ManageProducts: FC = () => {
 				{ method: "GET", credentials: "include" }
 			)
 			const data = await fetchOrdersResponse.json()
-
-			console.log("Fetched orders data:")
-			console.log(data)
-
 			setOrdersList(data.data)
 			setTotalPages(data.totalPages)
 		} catch (error) {

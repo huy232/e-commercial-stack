@@ -84,6 +84,13 @@ const Review: FC<ReviewProps> = ({
 				<Button
 					onClick={handleToggleVote}
 					className="rounded bg-red-500 text-white p-1 hover-effect"
+					aria-label="Review now"
+					role="button"
+					tabIndex={0}
+					data-testid="review-now-button"
+					id="review-now-button"
+					disabled={isVote}
+					loading={isVote}
 				>
 					Review now!
 				</Button>

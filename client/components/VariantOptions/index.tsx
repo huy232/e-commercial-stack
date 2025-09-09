@@ -1,6 +1,6 @@
 "use client"
 import { FC, useState } from "react"
-import { Checkbox, InputField } from "@/components"
+import { Button, Checkbox, InputField } from "@/components"
 import { FieldValues, useForm } from "react-hook-form"
 import { CategoryType } from "@/types"
 import { formatPrice } from "../../utils/formatPrice"
@@ -52,6 +52,7 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 	const categoryOptions: Option[] | undefined = categories.find(
 		(cat: CategoryType) => cat._id === category
 	)?.option
+	const safeCategoryOptions = categoryOptions ?? []
 
 	const createBlankVariant = () => {
 		const newVariant: Variant = {
@@ -169,26 +170,49 @@ const VariantOptions: FC<VariantOptionsProps> = ({
 					))}
 			</div>
 			{checkedOptions.length > 0 && (
-				<button
+				<Button
 					onClick={handleCreateVariant}
 					className="rounded bg-green-500 p-1 m-1 text-xs"
 					type="button"
+					disabled={
+						variantFields.length >=
+						Math.max(
+							...safeCategoryOptions
+								.filter((option) =>
+									checkedOptions
+										.map((opt) => opt.toLowerCase())
+										.includes(option.type.toLowerCase())
+								)
+								.map((option) => option.value.length),
+							0 // default so Math.max doesn’t get -Infinity
+						)
+					}
+					aria-label="Create variant"
+					role="button"
+					tabIndex={0}
+					data-testid="create-variant-button"
+					id="create-variant-button"
 				>
 					Create variant
-				</button>
+				</Button>
 			)}
 			{variantFields.map((variant: Variant, index) => (
 				<div
 					key={index}
 					className="bg-neutral-600 bg-opacity-40 shadow-xl rounded p-2 m-1 relative"
 				>
-					<button
+					<Button
 						className="bg-red-500 hover:opacity-70 hover:brightness-105 duration-300 ease-linear p-0.5 rounded flex flex-row items-center text-black hover:text-white absolute top-1 right-1"
 						type="button"
 						onClick={() => handleDeleteVariant(index)}
+						aria-label="Delete variant"
+						role="button"
+						tabIndex={0}
+						data-testid={`delete-variant-button-${index}`}
+						id={`delete-variant-button-${index}`}
 					>
 						<FaCircleXmark size={22} className="mt-[3px]" />
-					</button>
+					</Button>
 
 					{/* Render Price and Stock Inputs */}
 					<div className="flex flex-col mt-2">

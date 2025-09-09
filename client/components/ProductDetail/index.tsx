@@ -98,8 +98,6 @@ const ProductDetail: FC<ProductDetailProps> = ({
 		}
 	}
 
-	console.log(product)
-
 	return (
 		<>
 			<section className="w-full xl:w-main flex flex-col max-sm:items-center">
@@ -196,6 +194,16 @@ const ProductDetail: FC<ProductDetailProps> = ({
 								setExtendDescription(!extendDescription)
 							}}
 							className="flex items-center gap-1 justify-center bg-red-500 rounded py-1 px-2 text-white hover:opacity-90 duration-300 ease-in-out transition-all group"
+							aria-label={
+								extendDescription
+									? "View less description"
+									: "View more description"
+							}
+							role="button"
+							tabIndex={0}
+							data-testid="toggle-description-button"
+							id="toggle-description-button"
+							disabled={descriptionHeight !== null && descriptionHeight <= 150}
 						>
 							{extendDescription ? (
 								<>

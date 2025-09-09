@@ -112,6 +112,11 @@ const ManageBlogCategories: FC = () => {
 					<Button
 						type="submit"
 						className="bg-rose-500 p-1 rounded hover:brightness-125 hover:opacity-90 duration-300 ease-in-out text-white hover:bg-transparent hover:border-rose-500 border-transparent border-[2px] hover:text-black w-[120px] mx-2"
+						aria-label="Submit new blog category"
+						role="button"
+						tabIndex={0}
+						data-testid="submit-blog-category-button"
+						id="submit-blog-category-button"
 					>
 						Submit
 					</Button>

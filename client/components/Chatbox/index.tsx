@@ -5,6 +5,7 @@ import { selectAuthUser } from "@/store/slices/authSlice"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { io, Socket } from "socket.io-client"
+import { Button } from "@/components"
 
 const socketServerURL =
 	process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"
@@ -202,12 +203,14 @@ const ChatBox = () => {
 	if (!chatStarted) {
 		if (isInitialMinimized) {
 			return (
-				<button
+				<Button
 					onClick={() => setIsInitialMinimized(false)}
 					className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-full shadow-md z-20"
+					type="button"
+					aria-label="Start Chat"
 				>
 					Need help?
-				</button>
+				</Button>
 			)
 		}
 
@@ -215,12 +218,14 @@ const ChatBox = () => {
 			<div className="fixed bottom-4 right-4 bg-white p-4 rounded shadow-md z-20 w-60">
 				<div className="flex justify-between items-center mb-2">
 					<p className="font-medium">Need help?</p>
-					<button
+					<Button
 						onClick={() => setIsInitialMinimized(true)}
 						className="text-sm text-gray-500"
+						type="button"
+						aria-label="Close Chat"
 					>
 						×
-					</button>
+					</Button>
 				</div>
 				<input
 					className="w-full border px-2 py-1 rounded mb-2"
@@ -229,12 +234,14 @@ const ChatBox = () => {
 					value={guestNameInput}
 					onChange={(e) => setGuestNameInput(e.target.value)}
 				/>
-				<button
+				<Button
 					onClick={startChat}
 					className="bg-blue-600 text-white w-full px-4 py-2 rounded"
+					type="button"
+					aria-label="Start Chat"
 				>
 					Start Chat
-				</button>
+				</Button>
 			</div>
 		)
 	}
@@ -243,9 +250,14 @@ const ChatBox = () => {
 		<div className="fixed bottom-4 right-4 w-80 bg-white shadow-lg rounded-lg z-20 overflow-hidden">
 			<div className="bg-blue-600 text-white p-2 flex justify-between items-center">
 				<span>Chat with Admin</span>
-				<button onClick={handleToggleMinimize} className="text-sm">
+				<Button
+					onClick={handleToggleMinimize}
+					className="text-sm"
+					type="button"
+					aria-label={isMinimized ? "Open Chat" : "Minimize Chat"}
+				>
 					{isMinimized ? "Open" : "Minimize"}
-				</button>
+				</Button>
 			</div>
 
 			{/* Notification badge */}
@@ -282,12 +294,15 @@ const ChatBox = () => {
 							onKeyDown={(e) => e.key === "Enter" && sendMessage()}
 							placeholder="Type a message..."
 						/>
-						<button
+						<Button
 							className="bg-blue-600 text-white px-3 rounded"
 							onClick={sendMessage}
+							type="button"
+							disabled={!inputMessage.trim()}
+							aria-label="Send Message"
 						>
 							Send
-						</button>
+						</Button>
 					</div>
 				</>
 			)}

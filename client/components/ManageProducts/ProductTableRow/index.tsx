@@ -6,6 +6,7 @@ import {
 	CustomImage,
 	LoadingSpinner,
 	SortableTableHeader,
+	Button,
 } from "@/components"
 import { WEB_URL, productHeaders, sortableProductFields } from "@/constant"
 import moment from "moment"
@@ -13,7 +14,6 @@ import clsx from "clsx"
 import { MdDelete, MdEdit } from "@/assets/icons"
 import Link from "next/link"
 import { formatPrice } from "@/utils"
-import { size } from "@floating-ui/react"
 
 interface ProductTableRowProps {
 	productList: ProductExtraType[] | []
@@ -63,12 +63,10 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 						key={product._id}
 						className="flex flex-col lg:table-row text-sm my-4"
 					>
-						<td className={tdClass(`hidden lg:table-cell text-center`)}>
-							{index + 1}
-						</td>
+						<td className={tdClass(`hidden lg:table-cell`)}>{index + 1}</td>
 						<td className={tdClass(``)}>
-							<div className="flex flex-row gap-2 items-center">
-								<div className="block m-auto">
+							<div className="flex flex-row gap-2">
+								<div className="block relative w-[80px] h-[80px] md:w-[120px] md:h-[120px] lg:w-[80px] lg:h-[80px] flex-shrink-0">
 									<CustomImage
 										src={product.thumbnail}
 										fill
@@ -123,16 +121,16 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 						>
 							<div className="w-[120px] line-clamp-2">{product.title}</div>
 						</td>
-						<td className={tdClass(`hidden lg:table-cell text-xs text-center`)}>
+						<td className={tdClass(`hidden lg:table-cell text-xs`)}>
 							{product.category.title}
 						</td>
-						<td className={tdClass(`hidden lg:table-cell text-xs text-center`)}>
+						<td className={tdClass(`hidden lg:table-cell text-xs`)}>
 							{product.brand.title}
 						</td>
-						<td className={tdClass(`hidden lg:table-cell text-xs text-center`)}>
+						<td className={tdClass(`hidden lg:table-cell text-xs`)}>
 							{formatPrice(product.price)}
 						</td>
-						<td className={tdClass(`hidden lg:table-cell text-xs text-center`)}>
+						<td className={tdClass(`hidden lg:table-cell text-xs`)}>
 							<Checkbox
 								// type="checkbox"
 								checked={
@@ -144,14 +142,14 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 								size={4}
 							/>
 						</td>
-						<td className={tdClass(`hidden lg:table-cell text-xs text-center`)}>
+						<td className={tdClass(`hidden lg:table-cell text-xs`)}>
 							{product.quantity}
 						</td>
-						<td className={tdClass(`hidden lg:table-cell text-xs text-center`)}>
+						<td className={tdClass(`hidden lg:table-cell text-xs`)}>
 							{moment(product.createdAt).fromNow()}
 						</td>
-						<td className={tdClass("lg:justify-items-center text-center")}>
-							<div className="flex gap-1 lg:items-center lg:jusitfy-center my-2">
+						<td className={tdClass("lg:justify-items-center")}>
+							<div className="flex gap-1 lg:items-center lg:justify-center my-2">
 								<div className="w-1/2 lg:w-auto md:w-[120px]">
 									<Link
 										href={`/admin/update-product/${product.slug}`}
@@ -162,23 +160,36 @@ const ProductTableRow: FC<ProductTableRowProps> = ({
 									</Link>
 								</div>
 								{loadingRemove.includes(index.toString()) ? (
-									<button
+									<Button
 										className="w-1/2 h-full lg:w-auto md:w-[120px] flex justify-center"
 										disabled
+										aria-disabled={true}
+										aria-label="Removing product"
+										role="button"
+										tabIndex={0}
+										data-testid={`removing-product-button-${product._id}`}
+										id={`removing-product-button-${product._id}`}
 									>
 										<LoadingSpinner size={22} />
-									</button>
+									</Button>
 								) : (
-									<button
+									<Button
 										className={clsx(
 											buttonClass,
 											"w-1/2 lg:w-auto md:w-[120px] justify-center"
 										)}
 										onClick={() => handleRemoveProduct(product._id, index)}
+										aria-label={`Delete product titled ${product.title}`}
+										disabled={loadingRemove.length > 0}
+										aria-disabled={loadingRemove.length > 0}
+										role="button"
+										tabIndex={0}
+										data-testid={`delete-product-button-${product._id}`}
+										id={`delete-product-button-${product._id}`}
 									>
 										<span className="sm:mr-[2px] lg:hidden">Delete</span>
 										<MdDelete size={22} className="mt-[3px]" />
-									</button>
+									</Button>
 								)}
 							</div>
 						</td>

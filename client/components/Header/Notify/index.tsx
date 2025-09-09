@@ -9,6 +9,7 @@ import {
 } from "@/types"
 import { selectIsAuthenticated } from "@/store/slices/authSlice"
 import { BiSolidBell, BiSolidBellRing } from "@/assets/icons"
+import { Button } from "@/components"
 import clsx from "clsx"
 import Link from "next/link"
 import moment from "moment"
@@ -123,34 +124,49 @@ const Notification = ({ user, notifications }: UserProps) => {
 						)}
 					>
 						<div className="p-2 border-b border-gray-200 flex justify-end items-center text-xs gap-2">
-							<button
+							<Button
 								className={clsx(
 									filter === "all" ? "text-blue-600 font-bold" : "text-gray-600"
 								)}
 								onClick={() => handleFilterChange("all")}
+								aria-label="Show All Notifications"
+								role="button"
+								tabIndex={0}
+								data-testid="show-all-notifications-button"
+								id="show-all-notifications-button"
 							>
 								All
-							</button>
-							<button
+							</Button>
+							<Button
 								className={clsx(
 									filter === "unread"
 										? "text-blue-600 font-bold"
 										: "text-gray-600"
 								)}
 								onClick={() => handleFilterChange("unread")}
+								aria-label="Show Unread Notifications"
+								role="button"
+								tabIndex={0}
+								data-testid="show-unread-notifications-button"
+								id="show-unread-notifications-button"
 							>
 								Unread
-							</button>
-							<button
+							</Button>
+							<Button
 								className={clsx(
 									filter === "read"
 										? "text-blue-600 font-bold"
 										: "text-gray-600"
 								)}
 								onClick={() => handleFilterChange("read")}
+								aria-label="Show Read Notifications"
+								role="button"
+								tabIndex={0}
+								data-testid="show-read-notifications-button"
+								id="show-read-notifications-button"
 							>
 								Read
-							</button>
+							</Button>
 						</div>
 						<div ref={scrollRef} className="max-h-[300px] overflow-y-scroll">
 							{notifications.notifications.length > 0 ? (
@@ -202,12 +218,17 @@ const Notification = ({ user, notifications }: UserProps) => {
 						</div>
 						{notifications.notifications.length > 0 && (
 							<div className="p-2 border-t border-gray-200 bg-white sticky bottom-0">
-								<button
+								<Button
 									onClick={markAllAsRead}
 									className="w-full text-sm font-medium text-blue-600 hover:text-blue-800 transition-all hover:bg-black/30 hover:bg-opacity-50 duration-300 ease-in-out py-1 rounded-md"
+									aria-label="Mark all notifications as read"
+									role="button"
+									tabIndex={0}
+									data-testid="mark-all-as-read-button"
+									id="mark-all-as-read-button"
 								>
 									Mark all as read
-								</button>
+								</Button>
 							</div>
 						)}
 					</div>

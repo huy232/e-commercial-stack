@@ -4,7 +4,7 @@ import { formatViews } from "@/utils"
 import Link from "next/link"
 import React, { useState } from "react"
 import InnerHTML from "dangerously-set-html-content"
-import { CustomImage, Modal } from "@/components"
+import { Button, CustomImage, Modal } from "@/components"
 import { selectAuthUser } from "@/store/slices/authSlice"
 import { useSelector } from "react-redux"
 import { useRouter } from "next/navigation"
@@ -120,24 +120,34 @@ const SingleBlog = ({ blogPostData }: SingleBlogProps) => {
 							<IoEyeSharp />
 							{formatViews(blogPostData.data.numberViews)}
 						</span>
-						<button
+						<Button
 							className={`flex items-center gap-1 ${
 								alreadyLiked ? "text-green-600" : ""
 							}`}
 							onClick={() => handleAction("like")}
+							aria-label="Like this post"
+							role="button"
+							tabIndex={0}
+							data-testid="like-post-button"
+							id="like-post-button"
 						>
 							<AiOutlineLike />
 							{likes}
-						</button>
-						<button
+						</Button>
+						<Button
 							className={`flex items-center gap-1 ${
 								alreadyDisliked ? "text-red-600" : ""
 							}`}
 							onClick={() => handleAction("dislike")}
+							aria-label="Dislike this post"
+							role="button"
+							tabIndex={0}
+							data-testid="dislike-post-button"
+							id="dislike-post-button"
 						>
 							<AiOutlineDislike />
 							{dislikes}
-						</button>
+						</Button>
 					</div>
 				</div>
 			)}
@@ -147,18 +157,28 @@ const SingleBlog = ({ blogPostData }: SingleBlogProps) => {
 					<div className="text-sm text-gray-700 p-4">
 						<p>You need to be logged in to like or dislike.</p>
 						<div className="mt-4 flex justify-end gap-2">
-							<button
+							<Button
 								className="px-4 py-2 bg-gray-200 rounded"
 								onClick={() => setShowModal(false)}
+								aria-label="Continue as guest"
+								role="button"
+								tabIndex={0}
+								data-testid="continue-as-guest-button"
+								id="continue-as-guest-button"
 							>
 								Continue as Guest
-							</button>
-							<button
+							</Button>
+							<Button
 								className="px-4 py-2 bg-blue-600 text-white rounded"
 								onClick={() => router.push("/login")}
+								aria-label="Login to your account"
+								role="button"
+								tabIndex={0}
+								data-testid="login-to-account-button"
+								id="login-to-account-button"
 							>
 								Login
-							</button>
+							</Button>
 						</div>
 					</div>
 				</Modal>

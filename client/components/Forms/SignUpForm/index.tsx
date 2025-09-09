@@ -124,6 +124,11 @@ const SignUpForm = () => {
 				<Button
 					className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 					type="submit"
+					aria-label="Sign up"
+					role="button"
+					tabIndex={0}
+					data-testid="sign-up-button"
+					id="sign-up-button"
 				>
 					Sign up
 				</Button>

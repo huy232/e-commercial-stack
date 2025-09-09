@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import clsx from "clsx"
 import { useState } from "react"
+import { Button } from "@/components"
 import { createPortal } from "react-dom"
 
 const Toolbar = ({ editor }: { editor: Editor }) => {
@@ -46,7 +47,7 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 		<>
 			<div className="flex flex-wrap gap-2 bg-black/30 rounded p-2">
 				{/* Bold */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -56,12 +57,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 						editorClass,
 						editor.isActive("bold") ? "bg-gray-800 text-white" : "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("bold")}
+					aria-label="Toggle bold text"
+					role="button"
+					tabIndex={0}
+					data-testid="bold-text-button"
+					id="bold-text-button"
 				>
 					<Bold className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Italic */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -73,12 +80,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("italic")}
+					aria-label="Toggle italic text"
+					role="button"
+					tabIndex={0}
+					data-testid="italic-text-button"
+					id="italic-text-button"
 				>
 					<Italic className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Underline */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -90,12 +103,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("underline")}
+					aria-label="Toggle underline text"
+					role="button"
+					tabIndex={0}
+					data-testid="underline-text-button"
+					id="underline-text-button"
 				>
 					<UnderlineIcon className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Insert/Edit Link */}
-				<button
+				<Button
 					type="button"
 					onClick={() => {
 						const previousUrl = editor.getAttributes("link").href
@@ -106,21 +125,32 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 						editorClass,
 						editor.isActive("link") ? "bg-gray-800 text-white" : "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("link")}
+					aria-label="Insert or edit link"
+					role="button"
+					tabIndex={0}
+					data-testid="insert-edit-link-button"
+					id="insert-edit-link-button"
 				>
 					<LinkIcon className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Remove Link */}
-				<button
+				<Button
 					type="button"
 					onClick={() => editor.chain().focus().unsetLink().run()}
 					className={clsx(editorClass, "text-gray-600")}
+					aria-label="Remove link"
+					role="button"
+					tabIndex={0}
+					data-testid="remove-link-button"
+					id="remove-link-button"
 				>
 					<Link2Off className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Strikethrough */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -132,12 +162,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("strike")}
+					aria-label="Toggle strikethrough text"
+					role="button"
+					tabIndex={0}
+					data-testid="strikethrough-text-button"
+					id="strikethrough-text-button"
 				>
 					<Strikethrough className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Code Block */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -149,12 +185,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("codeBlock")}
+					aria-label="Toggle code block"
+					role="button"
+					tabIndex={0}
+					data-testid="code-block-button"
+					id="code-block-button"
 				>
 					<Code className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Bullet List */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -166,12 +208,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("bulletList")}
+					aria-label="Toggle bullet list"
+					role="button"
+					tabIndex={0}
+					data-testid="bullet-list-button"
+					id="bullet-list-button"
 				>
 					<List className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Ordered List */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -183,12 +231,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("orderedList")}
+					aria-label="Toggle ordered list"
+					role="button"
+					tabIndex={0}
+					data-testid="ordered-list-button"
+					id="ordered-list-button"
 				>
 					<ListOrdered className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Blockquote */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -200,12 +254,18 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("blockquote")}
+					aria-label="Toggle blockquote"
+					role="button"
+					tabIndex={0}
+					data-testid="blockquote-button"
+					id="blockquote-button"
 				>
 					<Quote className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Heading Level 2 */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
@@ -217,9 +277,15 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 							? "bg-gray-800 text-white"
 							: "text-gray-600"
 					)}
+					aria-pressed={editor.isActive("heading", { level: 2 })}
+					aria-label="Toggle heading level 2"
+					role="button"
+					tabIndex={0}
+					data-testid="heading-level-2-button"
+					id="heading-level-2-button"
 				>
 					<Heading2 className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Image Upload Button */}
 				<input
@@ -237,28 +303,38 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 				</label>
 
 				{/* Undo */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
 						editor.chain().focus().undo().run()
 					}}
 					className={clsx(editorClass, "text-gray-600")}
+					aria-label="Undo last action"
+					role="button"
+					tabIndex={0}
+					data-testid="undo-button"
+					id="undo-button"
 				>
 					<Undo2 className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 
 				{/* Redo */}
-				<button
+				<Button
 					type="button"
 					onClick={(e) => {
 						e.preventDefault()
 						editor.chain().focus().redo().run()
 					}}
 					className={clsx(editorClass, "text-gray-600")}
+					aria-label="Redo last action"
+					role="button"
+					tabIndex={0}
+					data-testid="redo-button"
+					id="redo-button"
 				>
 					<Redo2 className="w-4 h-4 lg:w-5 lg:h-5" />
-				</button>
+				</Button>
 			</div>
 			{isLinkModalOpen &&
 				createPortal(
@@ -273,14 +349,19 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 								className="w-full border rounded px-3 py-2"
 							/>
 							<div className="flex justify-end gap-2">
-								<button
+								<Button
 									type="button"
 									onClick={() => setIsLinkModalOpen(false)}
 									className="px-3 py-1 rounded bg-gray-200"
+									aria-label="Cancel link insertion"
+									role="button"
+									tabIndex={0}
+									data-testid="cancel-link-button"
+									id="cancel-link-button"
 								>
 									Cancel
-								</button>
-								<button
+								</Button>
+								<Button
 									type="button"
 									onClick={() => {
 										if (linkUrl) {
@@ -296,9 +377,15 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 										setIsLinkModalOpen(false)
 									}}
 									className="px-3 py-1 rounded bg-blue-600 text-white"
+									disabled={!linkUrl.trim()}
+									aria-label="Apply link"
+									role="button"
+									tabIndex={0}
+									data-testid="apply-link-button"
+									id="apply-link-button"
 								>
 									Apply
-								</button>
+								</Button>
 							</div>
 						</div>
 					</div>,

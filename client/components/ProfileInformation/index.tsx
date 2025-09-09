@@ -207,12 +207,18 @@ const ProfileInformation = () => {
 					/>
 				</div>
 				{removeAvatar && (
-					<button
+					<Button
 						className="hover-effect rounded border-2 border-red-500 hover:bg-red-500 hover:text-white my-1 p-1"
 						onClick={() => handleRemoveImage()}
+						aria-label="Remove selected avatar"
+						role="button"
+						tabIndex={0}
+						data-testid="remove-avatar-button"
+						id="remove-avatar-button"
+						disabled={loading}
 					>
 						Remove
-					</button>
+					</Button>
 				)}
 				<span>
 					{user.firstName} {user.lastName}
@@ -276,6 +282,11 @@ const ProfileInformation = () => {
 					type="submit"
 					disabled={loading || !(isDirty || isImageChanged)}
 					loading={loading}
+					aria-label="Update profile information"
+					role="button"
+					tabIndex={0}
+					data-testid="update-profile-button"
+					id="update-profile-button"
 				>
 					<span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-full">
 						Update

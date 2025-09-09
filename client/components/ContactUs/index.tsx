@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
+import { Button } from "@/components"
 
 const MapComponent = dynamic(() => import("./MapComponent"), {
 	ssr: false,
@@ -72,12 +73,18 @@ export default function ContactUs() {
 							className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-red-400"
 							rows={4}
 						/>
-						<button
+						<Button
 							type="submit"
 							className="w-full bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition"
+							aria-label="Send Message"
+							role="button"
+							tabIndex={0}
+							disabled={false}
+							data-testid="send-message-button"
+							id="send-message-button"
 						>
 							Send Message
-						</button>
+						</Button>
 					</form>
 				</motion.div>
 

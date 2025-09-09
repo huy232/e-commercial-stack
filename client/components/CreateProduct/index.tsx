@@ -354,7 +354,14 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 						)}
 						<Button
 							type="submit"
-							className="bg-rose-500 text-white py-2 rounded-lg hover:bg-rose-600 transition"
+							className="bg-rose-500 text-white p-2 rounded-lg hover:bg-rose-600 transition f-full md:w-fit"
+							disabled={loading}
+							aria-label="Create Product"
+							role="button"
+							tabIndex={0}
+							data-testid="create-product-button"
+							id="create-product-button"
+							loading={loading}
 						>
 							Create Product
 						</Button>

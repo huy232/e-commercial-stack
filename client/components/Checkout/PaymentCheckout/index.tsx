@@ -71,6 +71,11 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 				disabled={isProcessing || !stripe || !elements}
 				loading={isProcessing}
 				onClick={handleSubmit(makePayment)}
+				aria-label="Submit Payment"
+				role="button"
+				tabIndex={0}
+				data-testid="submit-payment-button"
+				id="submit-payment-button"
 			>
 				Submit
 			</Button>

@@ -1,11 +1,14 @@
 "use client"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import clsx from "clsx"
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import { UserColumnKey, userTableColumns } from "@/constant"
 
 interface SortableTableHeaderProps<T extends string> {
 	headers: { title: string; key: T; align?: "left" | "center" | "right" }[]
-	sortableFields: T[] // Define which fields are sortable
+	sortableFields: T[]
 }
+
 const SortableTableHeader = <T extends string>({
 	headers,
 	sortableFields,
@@ -14,34 +17,23 @@ const SortableTableHeader = <T extends string>({
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
 
-	// Get current sorting state from URL params
 	const sortConfig = {
 		key: (searchParams.get("sort") as T) || null,
 		order: (searchParams.get("order") as "asc" | "desc") || null,
 	}
 
-	// Handle sorting logic
 	const handleSort = (key: T) => {
 		const currentSort = searchParams.get("sort")
 		const currentOrder = searchParams.get("order")
 
 		let newOrder: "asc" | "desc" | undefined
-
 		if (currentSort === key) {
-			if (currentOrder === "asc") {
-				newOrder = "desc"
-			} else if (currentOrder === "desc") {
-				newOrder = undefined // Remove sorting
-			} else {
-				newOrder = "asc"
-			}
-		} else {
-			newOrder = "asc" // Default to ascending if sorting a new column
-		}
+			if (currentOrder === "asc") newOrder = "desc"
+			else if (currentOrder === "desc") newOrder = undefined
+			else newOrder = "asc"
+		} else newOrder = "asc"
 
-		// Construct new query params
 		const params = new URLSearchParams(searchParams.toString())
-
 		if (newOrder) {
 			params.set("sort", key)
 			params.set("order", newOrder)
@@ -49,35 +41,43 @@ const SortableTableHeader = <T extends string>({
 			params.delete("sort")
 			params.delete("order")
 		}
-
-		// Update URL
 		router.push(`${pathname}?${params.toString()}`)
 	}
 
-	// Get sorting icon
 	const getSortIcon = (key: T) => {
-		if (sortConfig.key !== key) return "↕"
-		return sortConfig.order === "asc" ? "↑" : "↓"
+		if (sortConfig.key !== key)
+			return <ChevronsUpDown className="w-3.5 h-3.5 opacity-40" />
+		return sortConfig.order === "asc" ? (
+			<ChevronUp className="w-3.5 h-3.5 text-orange-500" />
+		) : (
+			<ChevronDown className="w-3.5 h-3.5 text-orange-500" />
+		)
 	}
 
 	return (
-		<thead className="hidden lg:table-header-group font-semibold font-mono bg-gray-700 text-sm text-white">
-			<tr>
-				{headers.map(({ title, key, align = "left" }) => (
-					<th
-						key={key}
-						className={clsx(
-							"px-1 py-2 whitespace-nowrap",
-							sortableFields.includes(key) && "cursor-pointer",
-							align === "center" && "text-center",
-							align === "right" && "text-right"
-						)}
-						onClick={() => sortableFields.includes(key) && handleSort(key)}
-					>
-						{title}
-						{sortableFields.includes(key) && <span>{getSortIcon(key)}</span>}
-					</th>
-				))}
+		<thead className="hidden lg:table-header-group">
+			<tr className="bg-gradient-to-r from-gray-800 to-gray-700 text-gray-100 text-xs uppercase tracking-wider shadow-sm">
+				{headers.map(({ title, key, align = "left" }) => {
+					const isSortable = sortableFields.includes(key)
+					return (
+						<th
+							key={key}
+							className={clsx(
+								"px-1 py-2 whitespace-nowrap",
+								sortableFields.includes(key) && "cursor-pointer",
+								align === "center" && "text-center",
+								align === "right" && "text-right",
+								userTableColumns[key as UserColumnKey] || "w-auto"
+							)}
+							onClick={() => isSortable && handleSort(key)}
+						>
+							<div className="flex items-center gap-2">
+								<span className="">{title}</span>
+								<span className="">{isSortable && getSortIcon(key)}</span>
+							</div>
+						</th>
+					)
+				})}
 			</tr>
 		</thead>
 	)

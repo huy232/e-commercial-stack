@@ -2,6 +2,7 @@
 import { FaCircle, FaCircleCheck } from "@/assets/icons"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
+import { Button } from "@/components"
 
 interface FilterRadioProps {
 	options: {
@@ -97,14 +98,21 @@ const FilterRadio: FC<FilterRadioProps> = ({ options, onChange }) => {
 					</label>
 				))}
 			</div>
-			<button
+			<Button
 				className="mt-2 text-xs text-red-500 hover:underline"
 				onClick={() => {
 					resetFilterRadio()
 				}}
+				type="button"
+				disabled={!selectedValue}
+				aria-label="Clear Selection"
+				role="button"
+				tabIndex={0}
+				data-testid="clear-selection-button"
+				id="clear-selection-button"
 			>
 				Clear Selection
-			</button>
+			</Button>
 		</>
 	)
 }

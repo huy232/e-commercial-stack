@@ -87,8 +87,27 @@ const ManageBlogs = ({ initialSearchParams }: ManageBlogsProps) => {
 						Are you sure you want to delete this blog?
 					</p>
 					<div className="flex justify-center gap-4">
-						<Button onClick={() => setShowDeleteModal(false)}>Cancel</Button>
-						<Button className="bg-red-500" onClick={handleDeleteBlog}>
+						<Button
+							type="button"
+							className="bg-gray-300 text-black"
+							onClick={() => setShowDeleteModal(false)}
+							aria-label="Cancel blog deletion"
+							role="button"
+							tabIndex={0}
+							data-testid="cancel-delete-blog-button"
+							id="cancel-delete-blog-button"
+						>
+							Cancel
+						</Button>
+						<Button
+							className="bg-red-500"
+							onClick={handleDeleteBlog}
+							aria-label="Confirm blog deletion"
+							role="button"
+							tabIndex={0}
+							data-testid="confirm-delete-blog-button"
+							id="confirm-delete-blog-button"
+						>
 							Delete
 						</Button>
 					</div>
@@ -140,15 +159,20 @@ const ManageBlogs = ({ initialSearchParams }: ManageBlogsProps) => {
 										>
 											<FaEye />
 										</Link>
-										<button
+										<Button
 											onClick={() => {
 												setBlogToDelete(blog._id)
 												setShowDeleteModal(true)
 											}}
 											className="text-red-600 hover:text-red-800 hover:bg-red-300 rounded p-2"
+											aria-label={`Delete blog titled ${blog.title}`}
+											role="button"
+											tabIndex={0}
+											data-testid={`delete-blog-button-${blog._id}`}
+											id={`delete-blog-button-${blog._id}`}
 										>
 											<FaTrash />
-										</button>
+										</Button>
 									</div>
 								</div>
 							))}

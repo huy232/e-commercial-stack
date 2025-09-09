@@ -185,13 +185,18 @@ const VariantForm: FC<VariantFormProps> = ({ categories }) => {
 								placeholder="Option type"
 								className={inputClass("bg-white")}
 							/>
-							<button
+							<Button
 								className="mt-2 lg:mt-0 ml-auto lg:mx-1 bg-orange-500 rounded p-1 text-sm hover:opacity-70 hover:brightness-105 duration-300 ease-linear w-fit"
 								type="button"
 								onClick={handleAddOption}
+								aria-label="Add new option type"
+								role="button"
+								tabIndex={0}
+								data-testid="add-option-button"
+								id="add-option-button"
 							>
 								Add option
-							</button>
+							</Button>
 						</div>
 						{options.map((option, index) => (
 							<div key={index} className="mt-2 relative">
@@ -200,22 +205,32 @@ const VariantForm: FC<VariantFormProps> = ({ categories }) => {
 										{option.type}
 									</h4>
 									<div className="ml-auto flex items-center gap-2 mx-1">
-										<button
+										<Button
 											className="bg-green-500 hover:opacity-70 hover:brightness-105 duration-300 ease-linear mx-0.5 p-1 rounded flex flex-row items-center justify-center gap-1 text-black w-[90px]"
 											type="button"
 											onClick={() => handleAddValue(index)}
+											aria-label={`Add value to option ${option.type}`}
+											role="button"
+											tabIndex={0}
+											data-testid={`add-value-button-${option.type}`}
+											id={`add-value-button-${option.type}`}
 										>
 											<span className="text-sm">Value</span>
 											<FaRegSquarePlus size={20} className="mt-[3px]" />
-										</button>
-										<button
+										</Button>
+										<Button
 											className="bg-red-500 hover:opacity-70 hover:brightness-105 duration-300 ease-linear mx-0.5 p-1 rounded flex flex-row items-center justify-center gap-1 text-black w-[90px]"
 											type="button"
 											onClick={() => handleRemoveOption(index)}
+											aria-label={`Remove option ${option.type}`}
+											role="button"
+											tabIndex={0}
+											data-testid={`remove-option-button-${option.type}`}
+											id={`remove-option-button-${option.type}`}
 										>
 											<span className="text-sm">Remove</span>
 											<FaCircleXmark size={22} className="mt-[3px]" />
-										</button>
+										</Button>
 									</div>
 								</div>
 								<div className="bg-gray-500/50 shadow-md rounded p-2 mx-4 mt-2">
@@ -234,13 +249,20 @@ const VariantForm: FC<VariantFormProps> = ({ categories }) => {
 												className={inputClass("bg-white")}
 												placeholder={`Value ${valIndex + 1}`}
 											/>
-											<button
+											<Button
 												type="button"
 												onClick={() => handleRemoveValue(index, valIndex)}
 												className="text-red-500 hover:opacity-80 duration-200 ease-linear mx-1 p-1"
+												aria-label={`Remove value ${
+													val || valIndex + 1
+												} from option ${option.type}`}
+												role="button"
+												tabIndex={0}
+												data-testid={`remove-value-button-${option.type}-${valIndex}`}
+												id={`remove-value-button-${option.type}-${valIndex}`}
 											>
 												<FaWindowClose />
-											</button>
+											</Button>
 										</div>
 									))}
 								</div>
@@ -252,6 +274,11 @@ const VariantForm: FC<VariantFormProps> = ({ categories }) => {
 							className="bg-rose-500 p-1 rounded hover:brightness-125 hover:opacity-90 duration-300 ease-in-out text-white hover:bg-transparent hover:border-rose-500 border-transparent border-[2px] hover:text-black w-fit lg:w-[120px] ml-auto mt-2 mx-2"
 							type="button"
 							onClick={handleSubmit}
+							aria-label="Submit category options"
+							role="button"
+							tabIndex={0}
+							data-testid="submit-category-options-button"
+							id="submit-category-options-button"
 						>
 							Submit
 						</Button>

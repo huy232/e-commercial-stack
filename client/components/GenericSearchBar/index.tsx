@@ -4,6 +4,7 @@ import { FC, useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { useRouter, useSearchParams } from "next/navigation"
 import { CiSearch } from "@/assets/icons"
+import { Button } from "@/components"
 
 interface GenericSearchBarProps {
 	searchKey?: string
@@ -62,12 +63,17 @@ const GenericSearchBar: FC<GenericSearchBarProps> = ({
 			>
 				{label}
 			</label>
-			<button
+			<Button
 				type="submit"
 				className="absolute top-0 left-0 z-10 h-full pl-[4px] border-0"
+				aria-label="Search"
+				role="button"
+				tabIndex={0}
+				data-testid="search-button"
+				id="search-button"
 			>
 				<CiSearch />
-			</button>
+			</Button>
 		</div>
 	)
 

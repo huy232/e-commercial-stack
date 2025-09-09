@@ -1,6 +1,7 @@
 "use client"
 import clsx from "clsx"
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
+import { Button } from "@/components"
 import { FC } from "react"
 
 interface SortColumnProps {
@@ -32,15 +33,21 @@ const SortColumn: FC<SortColumnProps> = ({
 	}
 
 	return (
-		<button
+		<Button
 			onClick={handleClick}
 			className={clsx(
 				`text-sm font-semibold px-2 py-1 rounded hover:underline text-left`,
 				isActive ? "text-main" : "text-gray-600"
 			)}
+			aria-pressed={isActive}
+			aria-label={`Sort by ${label} in ${nextOrder} order`}
+			role="button"
+			tabIndex={0}
+			data-testid={`sort-by-${field}-button`}
+			id={`sort-by-${field}-button`}
 		>
 			{label} {isActive ? (currentOrder === "asc" ? "↑" : "↓") : ""}
-		</button>
+		</Button>
 	)
 }
 

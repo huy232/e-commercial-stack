@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
-import { InputField } from "@/components"
+import { Button, InputField } from "@/components"
 import { WEB_URL } from "@/constant"
 
 const ForgotPasswordForm = () => {
@@ -70,12 +70,17 @@ const ForgotPasswordForm = () => {
 				<p className="text-main text-center hover-effect">{errorMessage}</p>
 			)}
 
-			<button
+			<Button
 				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded p-0.5 px-4 my-4"
 				type="submit"
+				aria-label="Submit Forgot Password"
+				role="button"
+				tabIndex={0}
+				data-testid="submit-forgot-password-button"
+				id="submit-forgot-password-button"
 			>
 				Submit
-			</button>
+			</Button>
 		</form>
 	)
 }

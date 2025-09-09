@@ -2,6 +2,8 @@
 import { FaChevronLeft, FaChevronRight } from "@/assets/icons"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useState, FC, useEffect, useCallback } from "react"
+import { Button } from "@/components"
+
 import ReactPaginate from "react-paginate"
 
 interface PaginationProps {
@@ -120,12 +122,17 @@ const Pagination: FC<PaginationProps> = ({
 						max={totalPages}
 					/>
 					<span>of {totalPages}</span>
-					<button
+					<Button
 						type="submit"
 						className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+						aria-label="Go to page"
+						role="button"
+						tabIndex={0}
+						data-testid="go-to-page-button"
+						id="go-to-page-button"
 					>
 						Go
-					</button>
+					</Button>
 				</form>
 			)}
 		</div>

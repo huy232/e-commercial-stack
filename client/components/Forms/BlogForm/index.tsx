@@ -423,14 +423,20 @@ export default function BlogForm({
 							</div>
 							{products && products?.data.length > 0 && (
 								<div className="mt-4 flex items-center gap-2">
-									<button
+									<Button
 										type="button"
 										className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
 										disabled={currentPage <= 1}
 										onClick={() => handlePageChange(currentPage - 1)}
+										aria-label="Previous Page"
+										loading={isLoading}
+										role="button"
+										tabIndex={0}
+										data-testid="previous-page-button"
+										id="previous-page-button"
 									>
 										Previous
-									</button>
+									</Button>
 
 									<span className="text-sm">
 										<select
@@ -449,14 +455,20 @@ export default function BlogForm({
 										of {totalPages}
 									</span>
 
-									<button
+									<Button
 										type="button"
 										className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
 										disabled={currentPage >= totalPages}
 										onClick={() => handlePageChange(currentPage + 1)}
+										aria-label="Next Page"
+										loading={isLoading}
+										role="button"
+										tabIndex={0}
+										data-testid="next-page-button"
+										id="next-page-button"
 									>
 										Next
-									</button>
+									</Button>
 								</div>
 							)}
 						</div>
@@ -485,13 +497,14 @@ export default function BlogForm({
 										<span className="text-sm mt-2 line-clamp-2">
 											{product.title}
 										</span>
-										<button
+										<Button
 											type="button"
 											className="absolute top-1 right-1 text-red-500 hover:text-red-700"
 											onClick={() => handleRelatedProductChange(product._id)}
+											aria-label={`Remove ${product.title}`}
 										>
 											&times;
-										</button>
+										</Button>
 									</div>
 								)
 							})}
@@ -522,6 +535,12 @@ export default function BlogForm({
 					type="submit"
 					className="custom-button w-fit bg-rose-500 p-1 hover:bg-opacity-70 hover:brightness-125 duration-300 ease-in-out rounded"
 					disabled={isLoading || uploading}
+					loading={isLoading || uploading}
+					aria-label="Submit Blog Form"
+					role="button"
+					tabIndex={0}
+					data-testid="submit-blog-form-button"
+					id="submit-blog-form-button"
 				>
 					{isLoading || uploading ? "Processing..." : submitText}
 				</Button>

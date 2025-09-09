@@ -7,7 +7,7 @@ import {
 	ProfileUser,
 } from "@/types"
 import { FC, useState } from "react"
-import { CustomImage, showToast } from "@/components"
+import { Button, CustomImage, showToast } from "@/components"
 import { formatPrice } from "../../utils/formatPrice"
 import { renderStarFromNumber } from "@/utils"
 import Link from "next/link"
@@ -87,9 +87,16 @@ const UserWishlist: FC<UserOrderProps> = ({ user, userWishlist }) => {
 							</p>
 							<p className="text-xs">In stock: {product.quantity}</p>
 							<div className="mt-2">
-								<button
+								<Button
 									onClick={() => handleRemoveWishlist(product._id)}
 									className="text-xs border-red-500 border-2 hover:bg-red-500 duration-300 ease-in-out p-0.5 rounded-md inline-block"
+									disabled={loading}
+									loading={loading}
+									aria-label="Remove from wishlist"
+									role="button"
+									tabIndex={0}
+									data-testid="remove-from-wishlist-button"
+									id="remove-from-wishlist-button"
 								>
 									{loading ? (
 										<span className="animate-spin">
@@ -100,7 +107,7 @@ const UserWishlist: FC<UserOrderProps> = ({ user, userWishlist }) => {
 											<span>Delete</span> <FaTrashAlt />
 										</span>
 									)}
-								</button>
+								</Button>
 							</div>
 						</div>
 					</div>

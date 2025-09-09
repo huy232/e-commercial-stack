@@ -5,7 +5,8 @@ import clsx from "clsx"
 import moment from "moment"
 import { formatPrice } from "@/utils"
 import { API, orderHeaders, sortableOrderFields } from "@/constant"
-import { SortableTableHeader } from "@/components"
+import { SortableTableHeader, Button } from "@/components"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface OrdersTableRowProps {
 	orderList: OrderType[] | []
@@ -83,76 +84,116 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 
 	return (
 		<>
-			<div className="flex justify-end my-4 mx-2 gap-4">
-				{enableEdit && (
-					<button
-						onClick={handleUpdateOrders}
-						className="ml-4 px-4 py-1 bg-green-500 hover:bg-opacity-80 hover:brightness-110 duration-300 ease-in-out rounded"
-					>
-						Update
-					</button>
-				)}
-				<button
-					className={clsx(
-						"rounded px-4 py-1 hover:bg-opacity-80 hover:brightness-110 duration-300 ease-in-out",
-						enableEdit ? "bg-red-500 text-white" : "bg-orange-500 text-white"
+			{/* Top Action Buttons */}
+			<motion.div
+				className="flex justify-end my-4 mx-2 gap-4"
+				initial={{ opacity: 0, y: -10 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3 }}
+			>
+				<AnimatePresence>
+					{enableEdit && (
+						<motion.div
+							key="update-btn"
+							initial={{ opacity: 0, scale: 0.9 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0, scale: 0.9 }}
+							transition={{ duration: 0.2 }}
+						>
+							<Button
+								onClick={handleUpdateOrders}
+								className="ml-4 px-4 py-1 bg-green-500 hover:bg-opacity-80 hover:brightness-110 rounded shadow-sm transition-all"
+								disabled={Object.keys(modifiedOrders).length === 0}
+								aria-disabled={Object.keys(modifiedOrders).length === 0}
+								aria-label="Update modified orders"
+								role="button"
+								tabIndex={0}
+								data-testid="update-orders-button"
+								id="update-orders-button"
+							>
+								Update
+							</Button>
+						</motion.div>
 					)}
-					onClick={() => {
-						if (enableEdit) {
-							setEnableEdit(false)
-							setModifiedOrders({})
-							// Reset statuses back to original orderList values
-							setOrderStatuses(
-								Object.fromEntries(
-									orderList.map((order) => [order._id, order.status])
+				</AnimatePresence>
+
+				<motion.div whileTap={{ scale: 0.9 }}>
+					<Button
+						className={clsx(
+							"rounded px-4 py-1 transition-all duration-200 ease-in-out shadow-sm",
+							enableEdit ? "bg-red-500 text-white" : "bg-orange-500 text-white"
+						)}
+						onClick={() => {
+							if (enableEdit) {
+								setEnableEdit(false)
+								setModifiedOrders({})
+								setOrderStatuses(
+									Object.fromEntries(
+										orderList.map((order) => [order._id, order.status])
+									)
 								)
-							)
-						} else {
-							setEnableEdit(true)
-						}
-					}}
-				>
-					{enableEdit ? "Cancel" : "Edit"}
-				</button>
-			</div>
+							} else {
+								setEnableEdit(true)
+							}
+						}}
+						aria-label={enableEdit ? "Cancel editing orders" : "Edit orders"}
+						disabled={loadingRemove.length > 0}
+						aria-disabled={loadingRemove.length > 0}
+						role="button"
+						tabIndex={0}
+						data-testid="toggle-edit-orders-button"
+						id="toggle-edit-orders-button"
+					>
+						{enableEdit ? "Cancel" : "Edit"}
+					</Button>
+				</motion.div>
+			</motion.div>
+
+			{/* Orders Table */}
 			<table className="table-auto mb-6 text-left w-full">
 				<SortableTableHeader
 					headers={orderHeaders}
 					sortableFields={sortableOrderFields}
 				/>
-				<tbody className="text-left grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1 lg:table-row-group">
+				<tbody className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 lg:table-row-group">
 					{orderList.map((order, index) => (
-						<tr
+						<motion.tr
 							key={order._id}
+							layout
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.25 }}
 							className={clsx(
-								"rounded block w-fit lg:table-row border text-sm mx-auto",
+								"rounded block w-fit lg:table-row border text-sm mx-auto bg-white/60 shadow-sm hover:shadow-md transition-all",
 								{
-									"border-red-500 border-2": modifiedOrders[order._id], // Red border if order is modified
-									"border-transparent border-2": !modifiedOrders[order._id], // Transparent if not modified
+									"border-red-500 border-2": modifiedOrders[order._id],
+									"border-transparent border-2": !modifiedOrders[order._id],
 								}
 							)}
 						>
-							<div className="lg:hidden w-[280px] md:w-[240px] lg:w-[320px] bg-gray-400/40 rounded p-1 mb-1">
-								<span className="line-clamp-1 text-sm font-semibold whitespace-break-spaces">
+							{/* Mobile Card */}
+							<div className="lg:hidden w-[280px] md:w-[240px] lg:w-[320px] bg-gray-50 rounded p-2 mb-1 shadow-sm">
+								<span className="line-clamp-1 text-sm font-semibold">
 									{order._id}
 								</span>
 								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs">Total</dt>
-									<dd className="text-xs bg-gray-600/30 rounded px-1 shadow-md inline w-fit">
+									<dt className="text-xs text-gray-500">Total</dt>
+									<dd className="text-xs font-semibold text-green-600">
 										{formatPrice(order.total)}
 									</dd>
 								</div>
 								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs">Status</dt>
-									<dd className="text-xs bg-gray-600/30 rounded px-1 shadow-md inline w-fit">
+									<dt className="text-xs text-gray-500">Status</dt>
+									<dd>
 										<select
 											name="order-status"
-											value={orderStatuses[order._id]} // Controlled component
+											value={orderStatuses[order._id]}
 											disabled={!enableEdit}
 											onChange={(e) =>
 												handleStatusChange(order._id, e.target.value)
 											}
-											className="bg-transparent focus:outline-none"
+											className="text-xs border rounded px-1 py-0.5 focus:outline-none focus:ring-main transition-all"
 										>
 											{orderStatus.map((status) => (
 												<option key={status} value={status}>
@@ -163,28 +204,27 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 									</dd>
 								</div>
 								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs">Coupon</dt>
-									<dd className="text-xs bg-gray-600/30 rounded px-1 shadow-md inline w-fit">
-										{order.coupon ? order.coupon.name : "None"}
-									</dd>
+									<dt className="text-xs text-gray-500">Coupon</dt>
+									<dd className="text-xs">{order.coupon?.name || "None"}</dd>
 								</div>
 								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs">Created</dt>
+									<dt className="text-xs text-gray-500">Created</dt>
 									<dd className="text-xs italic text-gray-500">
 										{moment(order.createdAt).fromNow()}
 									</dd>
 								</div>
 							</div>
 
-							<td className={tdClass()}>{index + 1}</td>
-							<td className={tdClass("w-[240px]")}>{order._id}</td>
-							<td className={tdClass(`line-clamp-2 w-[120px]`)}>
+							{/* Desktop Table Cells */}
+							<td className="px-2 py-1">{index + 1}</td>
+							<td className="px-2 py-1">{order._id}</td>
+							<td className="px-2 py-1">
 								{order.orderBy.firstName} {order.orderBy.lastName}
 							</td>
-							<td className={tdClass(`text-xs`)}>
+							<td className="px-2 py-1">
 								<select
 									name="order-status"
-									value={orderStatuses[order._id]} // Controlled component
+									value={orderStatuses[order._id]}
 									disabled={!enableEdit}
 									onChange={(e) =>
 										handleStatusChange(order._id, e.target.value)
@@ -198,18 +238,14 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 									))}
 								</select>
 							</td>
-							<td className={tdClass("h-full line-clamp-2")}>
-								{order.coupon ? order.coupon.name : "None"}
-							</td>
-							<td
-								className={tdClass("h-full text-xs text-green-500 text-right")}
-							>
+							<td className="px-2 py-1">{order.coupon?.name || "None"}</td>
+							<td className="px-2 py-1 text-green-600 font-semibold">
 								{formatPrice(order.total)}
 							</td>
-							<td className={tdClass("h-full text-right")}>
+							<td className="px-2 py-1">
 								{moment(order.createdAt).format("DD-MM-YYYY")}
 							</td>
-						</tr>
+						</motion.tr>
 					))}
 				</tbody>
 			</table>

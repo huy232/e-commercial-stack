@@ -4,6 +4,7 @@ import { profileSidebarOptions } from "@/constant"
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { Button } from "@/components"
 import { Fragment, memo, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { PanelLeft } from "lucide-react"
@@ -21,13 +22,20 @@ const ProfileSidebar = () => {
 	return (
 		<div className="relative mt-2 lg:mt-4 lg:mx-2">
 			{/* Toggle Button */}
-			<button
+			<Button
 				onClick={() => setOpen(true)}
 				className="font-bebasNeue p-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-black/40 duration-300 ease-in-out lg:hidden flex items-center gap-2"
+				aria-label="Open profile sidebar"
+				role="button"
+				tabIndex={0}
+				data-testid="open-profile-sidebar-button"
+				id="open-profile-sidebar-button"
+				disabled={open}
+				loading={open}
 			>
 				<PanelLeft size={20} />
 				<span className="font-semibold">Profile</span>
-			</button>
+			</Button>
 
 			{/* Sidebar for desktop */}
 			<div className="hidden lg:block w-32 border-r p-2">
@@ -63,12 +71,19 @@ const ProfileSidebar = () => {
 							className="fixed top-0 left-0 w-64 h-full bg-white shadow-lg z-50 p-2"
 						>
 							{/* Close button */}
-							<button
+							<Button
 								onClick={() => setOpen(false)}
 								className="p-2 mb-2 rounded-md border border-gray-200 hover:bg-gray-100"
+								aria-label="Close profile sidebar"
+								role="button"
+								tabIndex={0}
+								data-testid="close-profile-sidebar-button"
+								id="close-profile-sidebar-button"
+								disabled={!open}
+								loading={!open}
 							>
 								Close
-							</button>
+							</Button>
 
 							{profileSidebarOptions.map((option) => (
 								<Fragment key={option.id}>

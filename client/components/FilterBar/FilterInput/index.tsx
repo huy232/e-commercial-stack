@@ -1,4 +1,5 @@
 "use client"
+import { Button } from "@/components"
 import { useDebounce } from "@/hooks"
 import { formatPrice } from "@/utils"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -74,12 +75,19 @@ const FilterInput: FC<FilterInputProps> = ({ maxPrice }) => {
 				<span className="whitespace-nowrap">{`Max price: ${formatPrice(
 					maxPrice
 				)}`}</span>
-				<button
+				<Button
 					className="underline hover:text-main"
 					onClick={() => handleReset()}
+					type="button"
+					aria-label="Reset Price Filter"
+					disabled={!fromPrice && !toPrice}
+					role="button"
+					tabIndex={0}
+					data-testid="reset-price-filter-button"
+					id="reset-price-filter-button"
 				>
 					Reset
-				</button>
+				</Button>
 			</div>
 			<div className="flex items-center p-2 gap-2 text-xs">
 				<div className="flex items-center gap-2">

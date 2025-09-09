@@ -117,6 +117,12 @@ const User = ({ user }: UserProps) => {
 						<Button
 							className={clsx(itemClass, "text-left")}
 							onClick={handleLogout}
+							loading={false}
+							aria-label="Logout from your account"
+							role="button"
+							tabIndex={0}
+							data-testid="logout-button"
+							id="logout-button"
 						>
 							Logout
 						</Button>

@@ -80,6 +80,13 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 					resetForm()
 				}}
 				className="rounded bg-red-500 text-white p-1 hover-effect"
+				aria-label="Submit review"
+				role="button"
+				tabIndex={0}
+				data-testid="submit-review-button"
+				id="submit-review-button"
+				disabled={star === 0 || value.trim() === ""}
+				loading={star === 0 || value.trim() === ""}
 			>
 				Submit
 			</Button>

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { FaChevronDown } from "react-icons/fa"
 import clsx from "clsx"
+import { Button } from "@/components"
 
 interface AccordionProps {
 	title: string
@@ -21,12 +22,16 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
 			className="border rounded-lg overflow-hidden shadow-md transition-all"
 		>
 			{/* Button */}
-			<button
+			<Button
 				className={clsx(
 					"w-full flex justify-between items-center p-3 transition-all",
 					isOpen ? "bg-red-500 text-white shadow-lg" : "bg-gray-100 text-black"
 				)}
 				onClick={() => setIsOpen(!isOpen)}
+				type="button"
+				aria-expanded={isOpen}
+				aria-controls="accordion-content"
+				aria-label={`Toggle ${title} section`}
 			>
 				<span className="font-semibold text-left">{title}</span>
 				<motion.div
@@ -37,7 +42,7 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
 						className={clsx(isOpen ? "text-white" : "text-gray-500")}
 					/>
 				</motion.div>
-			</button>
+			</Button>
 
 			{/* Content */}
 			<motion.div

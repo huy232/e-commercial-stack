@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import clsx from "clsx"
 import { FC, useState } from "react"
 import { Menu, X } from "lucide-react"
+import { Button } from "@/components"
 import { motion, AnimatePresence } from "framer-motion"
 
 const Navbar: FC = () => {
@@ -38,7 +39,16 @@ const Navbar: FC = () => {
 				onClick={() => setIsOpen(!isOpen)}
 			>
 				<div className="font-bold text-xl">Menu</div>
-				<button>{isOpen ? <X size={24} /> : <Menu size={24} />}</button>
+				<Button
+					className="p-1 hover:opacity-70 duration-200 ease-in-out"
+					aria-label={isOpen ? "Close menu" : "Open menu"}
+					role="button"
+					tabIndex={0}
+					data-testid="toggle-menu-button"
+					id="toggle-menu-button"
+				>
+					{isOpen ? <X size={24} /> : <Menu size={24} />}
+				</Button>
 			</div>
 
 			{/* Animated mobile dropdown */}

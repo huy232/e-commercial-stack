@@ -142,6 +142,12 @@ const ProductCart: FC<ProductCartProps> = ({
 								product.allowVariants ? filteredVariants[0] : null
 							)
 						}
+						disabled={!allowQuantityButton}
+						aria-label="Add to cart"
+						role="button"
+						tabIndex={0}
+						data-testid="add-to-cart-button"
+						id="add-to-cart-button"
 					>
 						Add to cart
 					</Button>
@@ -172,19 +178,24 @@ const ProductCart: FC<ProductCartProps> = ({
 								const isSelected = selectedValues[variant.type] === value
 
 								return (
-									<button
+									<Button
 										key={value}
 										disabled={isOutOfStock}
 										onClick={() =>
 											!isOutOfStock && handleSelect(variant.type, value)
 										}
 										className={optionClass(isSelected, isOutOfStock)}
+										aria-label={`Select ${value} for ${variant.type}`}
+										role="button"
+										tabIndex={0}
+										data-testid={`select-variant-button-${variant.type}-${value}`}
+										id={`select-variant-button-${variant.type}-${value}`}
 									>
 										{value}
 										{isOutOfStock && (
 											<span className="ml-1 text-xs text-gray-500">(Out)</span>
 										)}
-									</button>
+									</Button>
 								)
 							})}
 						</div>

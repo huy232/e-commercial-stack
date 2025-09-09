@@ -1,20 +1,13 @@
 import { FaCircleXmark, IoMdCheckmarkCircleOutline } from "@/assets/icons"
 import { Button, Checkbox } from "@/components"
 import InputForm from "@/components/Forms/InputForm"
-import { roleSelection } from "@/constant"
+import { roleSelection, userTableColumns } from "@/constant"
 import { Users } from "@/types"
 import { inputClass } from "@/utils"
 import { validateEmail } from "@/validators"
 import clsx from "clsx"
 import moment from "moment"
-import {
-	BaseSyntheticEvent,
-	Dispatch,
-	FC,
-	ReactNode,
-	SetStateAction,
-	useState,
-} from "react"
+import { BaseSyntheticEvent, Dispatch, FC, SetStateAction } from "react"
 import {
 	FieldError,
 	FieldErrors,
@@ -62,8 +55,15 @@ const UserTableAction: FC<UserTableRowProps> = ({
 	// const [editElement, setEditElement] = useState<EditElement | null>(null)
 	const isBlocked =
 		editElement?._id === user._id ? editElement.isBlocked : user.isBlocked
-	const tdClass = (additionClassName?: string) =>
-		clsx("px-1 py-1 align-middle", additionClassName)
+	const tdClass = (
+		key: keyof typeof userTableColumns,
+		additionClassName?: string
+	) =>
+		clsx(
+			"px-2 py-2 align-middle text-sm border-b border-gray-200",
+			userTableColumns[key],
+			additionClassName
+		)
 
 	const handleRoleChange = (role: string, checked: boolean) => {
 		const normalizedRole = role.toLowerCase()
@@ -78,13 +78,10 @@ const UserTableAction: FC<UserTableRowProps> = ({
 
 	return (
 		<tr className="max-md:flex max-md:flex-col p-2 mt-2 text-xs">
-			<td className={tdClass("hidden lg:table-cell text-sm w-[30px]")}>
+			<td className={tdClass("index", "hidden lg:table-cell text-sm")}>
 				{index}
 			</td>
-			<td
-				// className={tdClass("max-md:order-3")}
-				className="order-3"
-			>
+			<td className={tdClass("email", "max-md:order-0")}>
 				<dt className="font-semibold mt-1 lg:hidden">Email</dt>
 				<InputForm
 					register={register}
@@ -95,7 +92,7 @@ const UserTableAction: FC<UserTableRowProps> = ({
 					className={inputClass()}
 				/>
 			</td>
-			<td className={tdClass("lg:w-[120px] max-md:order-1")}>
+			<td className={tdClass("firstName", "max-md:order-1")}>
 				<dt className="font-semibold mt-1 lg:hidden">First name</dt>
 				<InputForm
 					register={register}
@@ -105,7 +102,7 @@ const UserTableAction: FC<UserTableRowProps> = ({
 					className={inputClass()}
 				/>
 			</td>
-			<td className={tdClass("lg:w-[120px] max-md:order-2")}>
+			<td className={tdClass("lastName", "max-md:order-2")}>
 				<dt className="font-semibold mt-1 lg:hidden">Last name</dt>
 				<InputForm
 					register={register}
@@ -117,36 +114,27 @@ const UserTableAction: FC<UserTableRowProps> = ({
 			</td>
 			<td
 				className={tdClass(
-					"overflow-y-auto lg:h-[100px] flex flex-col justify-center lg:w-[100px] order-4"
+					"role",
+					"overflow-y-auto lg:h-[100px] flex flex-col justify-center max-md:order-4"
 				)}
 			>
 				<dt className="font-semibold mt-1 lg:hidden">Roles</dt>
 				{roleSelection.map((role) => (
 					<div key={role.id}>
 						<Checkbox
-							// type="checkbox"
-							// defaultChecked={editElement.role.includes(
-							// 	role.role.toLowerCase()
-							// )}
 							checked={editElement.role.includes(role.role.toLowerCase())}
 							onChange={(e) => handleRoleChange(role.role, e.target.checked)}
-							// value={role.role.normalize()}
 							name={role.role}
 							label={role.role}
-							// id={role.role}
-							// autoComplete="false"
 						/>
-						{/* <label className="ml-1" htmlFor={role.role}>
-							{role.role}
-						</label> */}
 					</div>
 				))}
 			</td>
-			<td className={tdClass("lg:w-[100px] order-5")}>
+			<td className={tdClass("phone", "max-md:order-5")}>
 				<dt className="font-semibold mt-1 lg:hidden">Phone</dt>
 				<span className="text-xs">0123456789</span>
 			</td>
-			<td className={tdClass("lg:w-[110px] order-6")}>
+			<td className={tdClass("status", "max-md:order-6")}>
 				<dt className="font-semibold mt-1 lg:hidden">Status</dt>
 				<Checkbox
 					name="user-status"
@@ -160,17 +148,24 @@ const UserTableAction: FC<UserTableRowProps> = ({
 					label="Block"
 				/>
 			</td>
-			<td className={tdClass("lg:w-[100px] order-7")}>
+			<td className={tdClass("created", "order-7")}>
 				<dt className="font-semibold mt-1 lg:hidden">Created</dt>
 				<dd className="text-sm lg:text-[12px]">
 					{moment(user.createdAt).fromNow()}
 				</dd>
 			</td>
-			<td className={tdClass("my-1 lg:w-[120px] text-center order-8")}>
+			<td className={tdClass("actions", "my-1 text-center max-md:order-8")}>
 				<div className="flex items-center gap-2 h-full">
 					<Button
 						type="submit"
 						className="flex flex-inline flex-row gap-1 items-center justify-center hover:bg-black/60 hover:bg-opacity-60 duration-300 ease-in-out hover:text-white rounded p-1 text-orange-600 border-[1px] border-orange-600 h-full"
+						disabled={Boolean(errors && Object.keys(errors).length > 0)}
+						onClick={() => onUserListChange()}
+						aria-label="Confirm user edits"
+						role="button"
+						tabIndex={0}
+						data-testid={`confirm-edit-user-button-${user._id}`}
+						id={`confirm-edit-user-button-${user._id}`}
 					>
 						<span className="lg:hidden text-semibold">Confirm</span>
 						<IoMdCheckmarkCircleOutline size={22} />
@@ -178,6 +173,13 @@ const UserTableAction: FC<UserTableRowProps> = ({
 					<Button
 						onClick={() => setEditElement(null)}
 						className=" flex flex-inline flex-row gap-1 items-center justify-center hover:bg-black/60 hover:bg-opacity-60 duration-300 ease-in-out hover:text-white rounded p-1 text-orange-600 border-[1px] border-orange-600 h-full"
+						type="button"
+						disabled={false}
+						aria-label="Cancel user edits"
+						role="button"
+						tabIndex={0}
+						data-testid={`cancel-edit-user-button-${user._id}`}
+						id={`cancel-edit-user-button-${user._id}`}
 					>
 						<span className="lg:hidden text-semibold">Cancel</span>
 						<FaCircleXmark size={22} />

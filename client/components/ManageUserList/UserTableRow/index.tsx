@@ -8,6 +8,7 @@ import moment from "moment"
 import { MdDelete, MdEdit } from "@/assets/icons"
 import clsx from "clsx"
 import UserTableAction from "./UserTableAction"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface EditElement {
 	_id?: string
@@ -30,6 +31,18 @@ const UserTableRow: FC<UserTableRowProps> = ({
 	userList,
 	onUserListChange,
 }) => {
+	const columnWidths = {
+		index: "w-[50px]",
+		email: "w-[250px]",
+		firstName: "w-[140px]",
+		lastName: "w-[140px]",
+		role: "w-[120px]",
+		phone: "w-[120px]",
+		status: "w-[100px]",
+		created: "w-[120px]",
+		actions: "w-[120px]",
+	}
+
 	const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
 	const [editElement, setEditElement] = useState<EditElement | null>(null)
 	const [isModalOpen, setModalOpen] = useState(false)
@@ -41,8 +54,8 @@ const UserTableRow: FC<UserTableRowProps> = ({
 		formState: { errors },
 	} = useForm()
 
-	const tdClass = (additionClassName?: string) =>
-		clsx("px-1 py-1 align-middle", additionClassName)
+	const tdClass = (additionClassName?: string, width?: string) =>
+		clsx("px-1 py-1 align-middle", additionClassName, width)
 
 	const onSubmit = handleSubmit(async (data) => {
 		const editedUser = editElement
@@ -116,23 +129,33 @@ const UserTableRow: FC<UserTableRowProps> = ({
 	return (
 		<>
 			<Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-				<div className="p-4">
-					<h2 className="text-lg font-semibold">Confirm Delete</h2>
-					<p>Are you sure you want to delete this user?</p>
-					<div className="flex justify-end gap-2 mt-4">
-						<Button
-							className="px-4 py-2 bg-gray-200 text-black rounded"
-							onClick={handleCloseModal}
-						>
-							No
-						</Button>
-						<Button
-							className="px-4 py-2 bg-red-600 text-white rounded"
-							onClick={handleConfirmDelete}
-						>
-							Yes
-						</Button>
-					</div>
+				<h2 className="text-lg font-semibold">Confirm Delete</h2>
+				<p className="mt-2 text-gray-600">
+					Are you sure you want to delete this user?
+				</p>
+				<div className="flex justify-end gap-2 mt-6">
+					<Button
+						className="px-4 py-2 bg-gray-200 text-black rounded"
+						onClick={handleCloseModal}
+						aria-label="Cancel user deletion"
+						role="button"
+						tabIndex={0}
+						data-testid="cancel-delete-user-button"
+						id="cancel-delete-user-button"
+					>
+						No
+					</Button>
+					<Button
+						className="px-4 py-2 bg-red-600 text-white rounded"
+						onClick={handleConfirmDelete}
+						aria-label="Confirm user deletion"
+						role="button"
+						tabIndex={0}
+						data-testid="confirm-delete-user-button"
+						id="confirm-delete-user-button"
+					>
+						Yes
+					</Button>
 				</div>
 			</Modal>
 
@@ -142,7 +165,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 						headers={userHeaders}
 						sortableFields={sortableUserFields}
 					/>
-					<tbody className="grid grid-cols-1 w-full lg:table-row-group text-left">
+					<AnimatePresence>
 						{userList.map((user, index) =>
 							editElement && editElement._id === user._id ? (
 								<UserTableAction
@@ -157,12 +180,20 @@ const UserTableRow: FC<UserTableRowProps> = ({
 									index={index + 1}
 								/>
 							) : (
-								<tr
+								<motion.tr
 									key={user._id}
+									layout
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -10 }}
+									transition={{ duration: 0.2 }}
 									className="p-2 mt-2 flex flex-col lg:table-row text-xs even:bg-gray-500/40 odd:bg-gray-300/40"
 								>
 									<td
-										className={tdClass("hidden lg:table-cell text-sm w-[30px]")}
+										className={tdClass(
+											"hidden lg:table-cell text-sm",
+											columnWidths.index
+										)}
 									>
 										{index + 1}
 									</td>
@@ -231,7 +262,8 @@ const UserTableRow: FC<UserTableRowProps> = ({
 									</td>
 									<td
 										className={tdClass(
-											"hidden lg:table-cell text-sm flex-inline relative group cursor-pointer w-[360px]"
+											"hidden lg:table-cell text-sm flex-inline relative group cursor-pointer",
+											columnWidths.email
 										)}
 										onClick={() => handleCopyEmail(user.email)}
 										data-title={userHeaders[1].title}
@@ -248,7 +280,11 @@ const UserTableRow: FC<UserTableRowProps> = ({
 														: "bg-gray-800"
 												)}
 											/>
-											<span
+											<motion.span
+												initial={{ opacity: 0, y: -5 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: -5 }}
+												transition={{ duration: 0.2 }}
 												className={clsx(
 													"p-1 text-sm text-white rounded-md select-none mx-auto",
 													copiedEmail === user.email
@@ -259,26 +295,29 @@ const UserTableRow: FC<UserTableRowProps> = ({
 												{copiedEmail === user.email
 													? `Copied!`
 													: `@${user.email.split("@")[1]}`}
-											</span>
+											</motion.span>
 										</span>
 									</td>
 									<td
 										className={tdClass(
-											"hidden lg:table-cell text-sm w-[120px]"
+											"hidden lg:table-cell text-sm",
+											columnWidths.firstName
 										)}
 									>
 										{user.firstName}
 									</td>
 									<td
 										className={tdClass(
-											"hidden lg:table-cell text-sm w-[120px]"
+											"hidden lg:table-cell text-sm",
+											columnWidths.lastName
 										)}
 									>
 										{user.lastName}
 									</td>
 									<td
 										className={tdClass(
-											"hidden lg:flex lg:flex-col h-[100px] overflow-y-auto justify-center w-[100px]"
+											"hidden lg:flex lg:flex-col h-[100px] overflow-y-auto justify-center",
+											columnWidths.role
 										)}
 									>
 										{user.role.sort().map((userRole, index) => (
@@ -297,12 +336,18 @@ const UserTableRow: FC<UserTableRowProps> = ({
 									</td>
 									<td
 										className={tdClass(
-											"hidden lg:table-cell text-xs w-[100px]"
+											"hidden lg:table-cell text-xs",
+											columnWidths.phone
 										)}
 									>
 										0123456789
 									</td>
-									<td className={tdClass("hidden lg:table-cell w-[80px]")}>
+									<td
+										className={tdClass(
+											"hidden lg:table-cell",
+											columnWidths.status
+										)}
+									>
 										<span
 											className={clsx(
 												"tracking-wider bg-opacity-50 px-1 lg:p-1 rounded my-1",
@@ -316,37 +361,53 @@ const UserTableRow: FC<UserTableRowProps> = ({
 									</td>
 									<td
 										className={tdClass(
-											"hidden lg:table-cell text-[12px] w-[110px]"
+											"hidden lg:table-cell text-[12px]",
+											columnWidths.created
 										)}
 									>
 										{moment(user.createdAt).fromNow()}
 									</td>
-									<td className={tdClass("my-1 lg:w-[120px] text-center")}>
+									<td
+										className={tdClass(
+											"my-1 text-center",
+											columnWidths.actions
+										)}
+									>
 										<div className="flex items-center gap-2 h-full">
 											<Button
 												onClick={(e) => {
-													// e.preventDefault()
 													setEditElement(user)
 												}}
 												className="flex flex-inline flex-row items-center gap-0.5 hover:bg-black/60 hover:bg-opacity-60 duration-300 ease-in-out hover:text-white rounded p-1 text-orange-600 h-full border-[1px] border-orange-600"
+												type="button"
+												aria-label="Edit user"
+												role="button"
+												tabIndex={0}
+												data-testid={`edit-user-button-${user._id}`}
+												id={`edit-user-button-${user._id}`}
 											>
 												<span className="lg:hidden text-semibold">Edit</span>
 												<MdEdit size={24} />
 											</Button>
 											<Button
 												className="flex flex-inline flex-row items-center gap-0.5 hover:bg-black/60 hover:bg-opacity-60 duration-300 ease-in-out hover:text-white rounded p-1 text-orange-600 h-full border-[1px] border-orange-600"
-												// onClick={() => handleDeleteUser(user._id)}
 												onClick={() => handleOpenModal(user._id)}
+												type="button"
+												aria-label="Delete user"
+												role="button"
+												tabIndex={0}
+												data-testid={`delete-user-button-${user._id}`}
+												id={`delete-user-button-${user._id}`}
 											>
 												<span className="lg:hidden text-semibold">Delete</span>
 												<MdDelete size={24} />
 											</Button>
 										</div>
 									</td>
-								</tr>
+								</motion.tr>
 							)
 						)}
-					</tbody>
+					</AnimatePresence>
 				</table>
 			</form>
 		</>

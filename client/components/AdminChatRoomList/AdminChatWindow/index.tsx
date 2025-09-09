@@ -4,6 +4,7 @@ import { io, Socket } from "socket.io-client"
 import { API } from "@/constant"
 import { useSelector } from "react-redux"
 import { selectAuthUser } from "@/store/slices/authSlice"
+import { Button } from "@/components"
 
 const socketServerURL =
 	process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"
@@ -105,12 +106,15 @@ const AdminChatWindow = ({ sessionId }: Props) => {
 					className="flex-1 border px-2 py-1 rounded"
 					placeholder="Reply to client..."
 				/>
-				<button
+				<Button
 					className="bg-blue-600 text-white px-4 py-1 rounded"
 					onClick={sendMessage}
+					type="button"
+					disabled={!input.trim()}
+					aria-label="Send Message"
 				>
 					Send
-				</button>
+				</Button>
 			</div>
 		</div>
 	)

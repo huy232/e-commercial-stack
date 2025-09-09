@@ -112,6 +112,11 @@ const ManageBrand: FC<ManageBrandProps> = () => {
 					<Button
 						type="submit"
 						className="bg-rose-500 p-1 rounded hover:brightness-125 hover:opacity-90 duration-300 ease-in-out text-white hover:bg-transparent hover:border-rose-500 border-transparent border-[2px] hover:text-black w-[120px]"
+						aria-label="Submit new brand"
+						role="button"
+						tabIndex={0}
+						data-testid="submit-brand-button"
+						id="submit-brand-button"
 					>
 						Submit
 					</Button>

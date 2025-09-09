@@ -105,6 +105,21 @@ const ProductOptions: FC<ProductOptionsProps> = ({ productSlug, product }) => {
 							onClick={handleWishlist}
 							title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
 							disabled={localLoading || wishlistLoading}
+							aria-label={
+								isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+							}
+							role="button"
+							tabIndex={0}
+							data-testid={
+								isWishlisted
+									? `remove-wishlist-button-${product._id}`
+									: `add-wishlist-button-${product._id}`
+							}
+							id={
+								isWishlisted
+									? `remove-wishlist-button-${product._id}`
+									: `add-wishlist-button-${product._id}`
+							}
 						>
 							{localLoading || wishlistLoading ? (
 								<span className="animate-spin">

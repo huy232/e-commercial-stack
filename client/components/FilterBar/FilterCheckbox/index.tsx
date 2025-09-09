@@ -1,5 +1,6 @@
 "use client"
 import { FaCheckSquare, FaSquare } from "@/assets/icons"
+import { Button } from "@/components"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState, useEffect, useCallback } from "react"
 
@@ -86,14 +87,21 @@ const FilterCheckbox: FC<FilterCheckboxProps> = ({ options, onChange }) => {
 					</label>
 				))}
 			</div>
-			<button
+			<Button
 				className="mt-2 text-xs text-red-500 hover:underline"
 				onClick={() => {
 					resetFilter()
 				}}
+				type="button"
+				disabled={selectedValues.length === 0}
+				aria-label="Clear Selection"
+				role="button"
+				tabIndex={0}
+				data-testid="clear-selection-button"
+				id="clear-selection-button"
 			>
 				Clear Selection
-			</button>
+			</Button>
 		</>
 	)
 }
