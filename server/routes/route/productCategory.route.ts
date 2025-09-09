@@ -26,4 +26,10 @@ router.delete(
 	ProductCategoryController.deleteCategory
 )
 
+router.delete(
+	"/bulk-delete",
+	[verifyAccessToken, isAdmin],
+	ProductCategoryController.bulkDeleteCategories
+)
+
 export { router as productCategoryRouter }

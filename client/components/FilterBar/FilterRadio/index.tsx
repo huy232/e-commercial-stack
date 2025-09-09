@@ -110,6 +110,7 @@ const FilterRadio: FC<FilterRadioProps> = ({ options, onChange }) => {
 				tabIndex={0}
 				data-testid="clear-selection-button"
 				id="clear-selection-button"
+				
 			>
 				Clear Selection
 			</Button>

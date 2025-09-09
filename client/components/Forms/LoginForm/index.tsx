@@ -83,6 +83,12 @@ const LoginForm: FC = () => {
 				form="hook-form"
 				disabled={loading}
 				loading={loading}
+				aria-label="Login"
+				role="button"
+				tabIndex={0}
+				data-testid="login-button"
+				id="login-button"
+				
 			>
 				{loading ? (
 					<div className="flex items-center gap-2">

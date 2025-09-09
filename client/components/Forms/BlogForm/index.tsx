@@ -502,6 +502,12 @@ export default function BlogForm({
 											className="absolute top-1 right-1 text-red-500 hover:text-red-700"
 											onClick={() => handleRelatedProductChange(product._id)}
 											aria-label={`Remove ${product.title}`}
+											role="button"
+											tabIndex={0}
+											data-testid={`remove-${product._id}-button`}
+											id={`remove-${product._id}-button`}
+											loading={isLoading}
+											disabled={isLoading}
 										>
 											&times;
 										</Button>

@@ -11,40 +11,25 @@ const router = express.Router()
 
 router.post("/register", UserController.register)
 router.post("/login", UserController.login)
-router.get("/current", verifyAccessToken, UserController.getCurrentUser)
 router.post("/refresh-token", UserController.refreshAccessToken)
 router.post("/logout", UserController.logout)
 router.post("/forgot-password", UserController.forgotPassword)
 router.put("/reset-password", UserController.resetPassword)
-router.get(
-	"/get-all-users",
-	[verifyAccessToken, isAdmin],
-	UserController.getAllUsers
-)
-router.delete(
-	"/delete-user",
-	[verifyAccessToken, isAdmin],
-	UserController.deleteUser
-)
+router.post("/complete-registration", UserController.verifyRegister)
+
+// AUTHENTICATED ROUTES
+router.get("/current", verifyAccessToken, UserController.getCurrentUser)
 router.put(
 	"/user-update",
 	verifyAccessToken,
-
 	uploadCloudAvatarFolder.fields([{ name: "avatar", maxCount: 1 }]),
 	UserController.updateUser
-)
-router.put(
-	"/user-update/:uid",
-	[verifyAccessToken, isAdmin],
-	UserController.updateUserByAdmin
 )
 router.put(
 	"/user-update-address",
 	verifyAccessToken,
 	UserController.updateUserAddress
 )
-// router.post("/update-cart", verifyAccessToken, UserController.updateUserCart)
-// router.put("/update-cart", verifyAccessToken, UserController.updateBulkUserCart)
 router.get(
 	"/validate-refresh-token",
 	verifyRefreshToken,
@@ -60,13 +45,27 @@ router.get(
 	[verifyAccessToken, verifyRefreshToken],
 	UserController.checkAuth
 )
-router.post("/complete-registration", UserController.verifyRegister)
+
+// ADMIN ROUTES
+router.put(
+	"/user-update/:uid",
+	[verifyAccessToken, isAdmin],
+	UserController.updateUserByAdmin
+)
+router.get(
+	"/get-all-users",
+	[verifyAccessToken, isAdmin],
+	UserController.getAllUsers
+)
+router.delete(
+	"/delete-user",
+	[verifyAccessToken, isAdmin],
+	UserController.deleteUser
+)
 router.get(
 	"/check-admin",
 	[verifyAccessToken, isAdmin],
 	UserController.checkAdmin
 )
-// router.post("/wishlist", verifyAccessToken, UserController.userWishlist)
-// router.get("/wishlist", verifyAccessToken, UserController.getUserWishlist)
 
 export { router as userRouter }

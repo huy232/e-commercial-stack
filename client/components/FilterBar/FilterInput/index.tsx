@@ -85,6 +85,7 @@ const FilterInput: FC<FilterInputProps> = ({ maxPrice }) => {
 					tabIndex={0}
 					data-testid="reset-price-filter-button"
 					id="reset-price-filter-button"
+					
 				>
 					Reset
 				</Button>

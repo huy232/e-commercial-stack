@@ -64,7 +64,7 @@ router.put(
 router.get("/daily-product", ProductController.getRandomProductWithFiveStars)
 router.get(
 	"/product-distribution",
-	verifyAccessToken,
+	[verifyAccessToken, isAdmin],
 	ProductController.getProductCategoryCounts
 )
 router.get("/normalize-product", ProductController.normalizeProduct)

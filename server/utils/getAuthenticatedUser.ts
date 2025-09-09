@@ -58,7 +58,7 @@ export const getAuthenticatedUser = async (
 				httpOnly: true,
 				sameSite: "none",
 				secure: true,
-				maxAge: 15 * 60 * 1000, // 15 minutes
+				maxAge: 15 * 60 * 1000,
 			})
 
 			return { userId: decodedRefresh._id, accessToken: newAccessToken }

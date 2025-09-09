@@ -4,6 +4,7 @@ import { isAdmin, verifyAccessToken } from "../../middlewares/verifyToken"
 
 const router = express.Router()
 
+router.get("/", verifyAccessToken, OrderController.getUserOrder)
 router.post("/", verifyAccessToken, OrderController.createNewOrder)
 router.post(
 	"/create-payment-intent",
@@ -20,7 +21,6 @@ router.put(
 	[verifyAccessToken, isAdmin],
 	OrderController.updateStatusOrder
 )
-router.get("/", verifyAccessToken, OrderController.getUserOrder)
 router.get(
 	"/get-orders",
 	[verifyAccessToken, isAdmin],

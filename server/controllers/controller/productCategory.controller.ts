@@ -140,6 +140,41 @@ class ProductCategoryController {
 			})
 		}
 	)
+
+	bulkDeleteCategories = asyncHandler(
+		async (req: Request, res: Response): Promise<void> => {
+			const { categoryIds } = req.body
+			if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+				res.status(400).json({
+					success: false,
+					message: "No category IDs provided for deletion.",
+				})
+				return
+			}
+
+			// Step 1: Remove the categories from all related products
+			await Product.updateMany(
+				{ category: { $in: categoryIds } },
+				{ $unset: { category: "" } } // or { $set: { category: null } }
+			)
+
+			// Step 2: Delete the categories themselves
+			const response = await ProductCategory.deleteMany({
+				_id: { $in: categoryIds },
+			})
+
+			const io = req.app.get("io")
+			io.emit("categoryUpdate")
+
+			res.json({
+				success: response.acknowledged,
+				message: response.deletedCount
+					? `Successfully deleted ${response.deletedCount} categories and cleared them from products.`
+					: "No categories were deleted.",
+				data: response || {},
+			})
+		}
+	)
 }
 
 export default new ProductCategoryController()

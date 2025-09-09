@@ -129,6 +129,7 @@ const SignUpForm = () => {
 					tabIndex={0}
 					data-testid="sign-up-button"
 					id="sign-up-button"
+					
 				>
 					Sign up
 				</Button>
