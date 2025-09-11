@@ -23,5 +23,10 @@ router.put(
 	ChatController.assignAdminToRoom
 )
 
+router.get(
+	"/all-rooms",
+	[verifyAccessToken, isAdmin],
+	ChatController.getAllChatRooms
+)
 router.get("/:sessionId", ChatController.getChatSession)
 export { router as chatRouter }

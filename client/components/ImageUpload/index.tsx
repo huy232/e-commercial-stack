@@ -27,7 +27,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 	})
 
 	const imageUploadClass = clsx(
-		`border border-gray-300 p-4 text-center cursor-pointer h-fit w-fit mt-2`,
+		`border border-gray-300 p-4 text-center cursor-pointer h-fit max-[768px]:w-full w-fit mt-2`,
 		isDragActive && "bg-gray-100"
 	)
 

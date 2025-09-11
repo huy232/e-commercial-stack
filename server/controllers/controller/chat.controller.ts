@@ -114,6 +114,30 @@ class ChatController {
 		}
 	}
 
+	async getAllChatRooms(req: Request, res: Response) {
+		try {
+			const page = parseInt(req.query.page as string) || 1
+			const limit = parseInt(req.query.limit as string) || 10
+			const skip = (page - 1) * limit
+
+			const total = await ChatSession.countDocuments()
+			const chatRooms = await ChatSession.find()
+				.skip(skip)
+				.limit(limit)
+				.sort({ updatedAt: -1 })
+
+			return res.status(200).json({
+				rooms: chatRooms,
+				total,
+				totalPages: Math.ceil(total / limit),
+				currentPage: page,
+			})
+		} catch (error) {
+			console.log("Error getting all chat rooms: ", error)
+			return res.status(500).json({ message: "Failed to fetch rooms" })
+		}
+	}
+
 	async assignAdminToRoom(req: AuthenticatedRequest, res: Response) {
 		try {
 			const { sessionId } = req.params

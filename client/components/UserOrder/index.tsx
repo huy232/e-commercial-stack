@@ -98,7 +98,7 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 						<div className="grid sm:grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-lg p-2 shadow-heavy">
 							{item.products.map((product, index) => (
 								<div
-									className="flex flex-col md:flex-row gap-2 max-sm:border-b-2 max-sm:border-black/20 pb-2 max-sm:last:border-b-0 hover:shadow-lg transition-shadow duration-300 justify-center items-center"
+									className="flex flex-col md:flex-row gap-2 max-sm:border-b-2 max-sm:border-black/20 pb-2 max-sm:last:border-b-0 hover:shadow-lg transition-shadow duration-300 justify-center"
 									key={`${product.product._id}-${
 										product.variant?._id || index
 									}`}
@@ -115,8 +115,10 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 										</span>
 									</div>
 									<div className="py-1 px-2">
-										<h4 className="w-[160px] h-[54px] line-clamp-2 text-sm text-gray-900 font-semibold relative">
-											{product.product.title}
+										<h4 className="w-[160px] h-[54px] text-sm text-gray-900 font-semibold relative">
+											<span className="line-clamp-2">
+												{product.product.title}
+											</span>
 										</h4>
 										<div className="flex flex-col">
 											{product.product.discount ? (

@@ -41,11 +41,11 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 		reader.readAsDataURL(file)
 	}
 
-	const editorClass = "p-2 rounded-md hover:bg-gray-200 transition-all"
+	const editorClass = "p-1 md:p-2 rounded-md hover:bg-gray-200 transition-all"
 
 	return (
 		<>
-			<div className="flex flex-wrap gap-2 bg-black/30 rounded p-2">
+			<div className="flex flex-wrap gap-1 md:gap-2 bg-black/30 rounded p-1 md:p-2">
 				{/* Bold */}
 				<Button
 					type="button"
@@ -299,7 +299,7 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 					htmlFor="image-upload"
 					className="cursor-pointer px-2 py-1 bg-gray-600 text-white rounded"
 				>
-					📷 Upload Images
+					📷 <span className="hidden md:inline-block">Upload Images</span>
 				</label>
 
 				{/* Undo */}

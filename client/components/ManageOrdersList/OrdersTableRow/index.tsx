@@ -86,7 +86,7 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 		<>
 			{/* Top Action Buttons */}
 			<motion.div
-				className="flex justify-end my-4 mx-2 gap-4"
+				className="flex flex-wrap justify-end my-4 mx-2 gap-2 sm:gap-4"
 				initial={{ opacity: 0, y: -10 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.3 }}
@@ -102,14 +102,8 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 						>
 							<Button
 								onClick={handleUpdateOrders}
-								className="ml-4 px-4 py-1 bg-green-500 hover:bg-opacity-80 hover:brightness-110 rounded shadow-sm transition-all"
+								className="px-4 py-1 bg-green-500 hover:bg-opacity-80 hover:brightness-110 rounded shadow-sm transition-all"
 								disabled={Object.keys(modifiedOrders).length === 0}
-								aria-disabled={Object.keys(modifiedOrders).length === 0}
-								aria-label="Update modified orders"
-								role="button"
-								tabIndex={0}
-								data-testid="update-orders-button"
-								id="update-orders-button"
 							>
 								Update
 							</Button>
@@ -128,34 +122,74 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 								setEnableEdit(false)
 								setModifiedOrders({})
 								setOrderStatuses(
-									Object.fromEntries(
-										orderList.map((order) => [order._id, order.status])
-									)
+									Object.fromEntries(orderList.map((o) => [o._id, o.status]))
 								)
-							} else {
-								setEnableEdit(true)
-							}
+							} else setEnableEdit(true)
 						}}
-						aria-label={enableEdit ? "Cancel editing orders" : "Edit orders"}
 						disabled={loadingRemove.length > 0}
-						aria-disabled={loadingRemove.length > 0}
-						role="button"
-						tabIndex={0}
-						data-testid="toggle-edit-orders-button"
-						id="toggle-edit-orders-button"
 					>
 						{enableEdit ? "Cancel" : "Edit"}
 					</Button>
 				</motion.div>
 			</motion.div>
 
-			{/* Orders Table */}
-			<table className="table-auto mb-6 text-left w-full">
+			{/* Mobile Cards */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 lg:hidden">
+				{orderList.map((order) => (
+					<div
+						key={order._id}
+						className={clsx(
+							"bg-white/60 shadow-sm hover:shadow-md rounded p-3 transition-all",
+							modifiedOrders[order._id] ? "border-2 border-red-500" : "border"
+						)}
+					>
+						<span className="line-clamp-1 text-sm font-semibold">
+							{order._id}
+						</span>
+
+						<div className="grid grid-cols-[80px_auto] gap-1 mt-2 text-xs">
+							<span className="text-gray-500">Total</span>
+							<span className="font-semibold text-green-600">
+								{formatPrice(order.total)}
+							</span>
+						</div>
+
+						<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+							<span className="text-gray-500">Status</span>
+							<select
+								value={orderStatuses[order._id]}
+								disabled={!enableEdit}
+								onChange={(e) => handleStatusChange(order._id, e.target.value)}
+								className="border rounded px-1 py-0.5 focus:outline-none focus:ring-main transition-all text-xs"
+							>
+								{orderStatus.map((s) => (
+									<option key={s}>{s}</option>
+								))}
+							</select>
+						</div>
+
+						<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+							<span className="text-gray-500">Coupon</span>
+							<span>{order.coupon?.name || "None"}</span>
+						</div>
+
+						<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+							<span className="text-gray-500">Created</span>
+							<span className="italic text-gray-500">
+								{moment(order.createdAt).fromNow()}
+							</span>
+						</div>
+					</div>
+				))}
+			</div>
+
+			{/* Desktop Table */}
+			<table className="hidden lg:table table-auto mb-6 text-left w-full">
 				<SortableTableHeader
 					headers={orderHeaders}
 					sortableFields={sortableOrderFields}
 				/>
-				<tbody className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 lg:table-row-group">
+				<tbody>
 					{orderList.map((order, index) => (
 						<motion.tr
 							key={order._id}
@@ -165,57 +199,12 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 							exit={{ opacity: 0, y: -10 }}
 							transition={{ duration: 0.25 }}
 							className={clsx(
-								"rounded block w-fit lg:table-row border text-sm mx-auto bg-white/60 shadow-sm hover:shadow-md transition-all",
-								{
-									"border-red-500 border-2": modifiedOrders[order._id],
-									"border-transparent border-2": !modifiedOrders[order._id],
-								}
+								"text-sm bg-white/60 shadow-sm hover:shadow-md transition-all",
+								modifiedOrders[order._id]
+									? "border-2 border-red-500"
+									: "border border-transparent"
 							)}
 						>
-							{/* Mobile Card */}
-							<div className="lg:hidden w-[280px] md:w-[240px] lg:w-[320px] bg-gray-50 rounded p-2 mb-1 shadow-sm">
-								<span className="line-clamp-1 text-sm font-semibold">
-									{order._id}
-								</span>
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs text-gray-500">Total</dt>
-									<dd className="text-xs font-semibold text-green-600">
-										{formatPrice(order.total)}
-									</dd>
-								</div>
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs text-gray-500">Status</dt>
-									<dd>
-										<select
-											name="order-status"
-											value={orderStatuses[order._id]}
-											disabled={!enableEdit}
-											onChange={(e) =>
-												handleStatusChange(order._id, e.target.value)
-											}
-											className="text-xs border rounded px-1 py-0.5 focus:outline-none focus:ring-main transition-all"
-										>
-											{orderStatus.map((status) => (
-												<option key={status} value={status}>
-													{status}
-												</option>
-											))}
-										</select>
-									</dd>
-								</div>
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs text-gray-500">Coupon</dt>
-									<dd className="text-xs">{order.coupon?.name || "None"}</dd>
-								</div>
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 items-center">
-									<dt className="text-xs text-gray-500">Created</dt>
-									<dd className="text-xs italic text-gray-500">
-										{moment(order.createdAt).fromNow()}
-									</dd>
-								</div>
-							</div>
-
-							{/* Desktop Table Cells */}
 							<td className="px-2 py-1">{index + 1}</td>
 							<td className="px-2 py-1">{order._id}</td>
 							<td className="px-2 py-1">
@@ -223,7 +212,6 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 							</td>
 							<td className="px-2 py-1">
 								<select
-									name="order-status"
 									value={orderStatuses[order._id]}
 									disabled={!enableEdit}
 									onChange={(e) =>
@@ -231,10 +219,8 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 									}
 									className="bg-transparent focus:outline-none"
 								>
-									{orderStatus.map((status) => (
-										<option key={status} value={status}>
-											{status}
-										</option>
+									{orderStatus.map((s) => (
+										<option key={s}>{s}</option>
 									))}
 								</select>
 							</td>

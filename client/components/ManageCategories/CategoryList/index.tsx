@@ -202,19 +202,30 @@ const CategoryList: FC<CategoryListProps> = ({
 					</div>
 				</div>
 			</Modal>
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mx-2">
 				{productCategories.map((category, index) => (
 					<div
 						key={category._id}
 						className={clsx(
-							"w-full md:w-[320px] lg:w-[320px] opacity-80 rounded p-2 lg:m-2 h-fit mx-2 lg:mx-auto mt-2 relative",
+							"relative lg:w-full opacity-80 rounded p-2 lg:m-2 h-fit mx-2 lg:mx-auto mt-2",
 							selectedCategories.includes(category._id)
 								? "bg-green-400/80"
 								: "bg-black/30"
 						)}
 					>
+						{/* Trash button */}
+						<Button
+							onClick={() => handleOpenDeleteModal(category)}
+							className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:opacity-80 hover:brightness-110 duration-300 ease-in-out flex items-center justify-center"
+							title="Delete category"
+							aria-label="Delete category"
+							disabled={selectedCategories.includes(category._id)}
+						>
+							<FaTrashAlt />
+						</Button>
+
 						<div className="mx-2 flex items-center gap-1 justify-between">
-							<div className="bg-black/30 rounded p-1 justify-center items-center flex-inline hover:opacity-80 hover:brightness-125 duration-300 ease-in-out mx-1 flex">
+							<div className="bg-black/30 rounded p-1 flex items-center hover:opacity-80 hover:brightness-125 duration-300 ease-in-out mx-1">
 								<Checkbox
 									checked={selectedCategories.includes(category._id)}
 									onChange={() => handleSelectCategory(category._id)}
@@ -228,48 +239,25 @@ const CategoryList: FC<CategoryListProps> = ({
 									{category.title}
 								</label>
 							</div>
-							<div className="flex flex-col items-center justify-end">
-								<Button
-									onClick={() => handleEditCategory(category)}
-									className="mx-2 group duration-300 transition-all hover:opacity-80 hover:brightness-110 bg-black/30 rounded p-1 flex flex-row items-center ease-in-out"
-									title="Edit category"
-									aria-label="Edit category"
-									role="button"
-									tabIndex={0}
-									data-testid={`edit-category-button-${category._id}`}
-									id={`edit-category-button-${category._id}`}
-								>
-									<span className="mr-0.5">Edit</span>{" "}
-									<IoMdSettings
-										size={20}
-										className="group-hover:animate-spin"
-									/>
-								</Button>
-								<Button
-									onClick={() => handleOpenDeleteModal(category)}
-									className="bg-red-500 text-white p-1 rounded hover:opacity-80 hover:brightness-110 duration-300 ease-in-out absolute top-[-14px] right-[-8px] flex items-center justify-center"
-									title="Delete category"
-									aria-label="Delete category"
-									disabled={selectedCategories.includes(category._id)}
-									aria-disabled={selectedCategories.includes(category._id)}
-									role="button"
-									tabIndex={0}
-									data-testid={`delete-category-button-${category._id}`}
-									id={`delete-category-button-${category._id}`}
-								>
-									<FaTrashAlt />
-								</Button>
-							</div>
+							<Button
+								onClick={() => handleEditCategory(category)}
+								className="mx-2 group duration-300 transition-all hover:opacity-80 hover:brightness-110 bg-black/30 rounded p-1 flex flex-row items-center ease-in-out"
+								title="Edit category"
+							>
+								<span className="mr-0.5">Edit</span>
+								<IoMdSettings size={20} className="group-hover:animate-spin" />
+							</Button>
 						</div>
+
 						<span className="font-medium mx-3 text-sm mt-2">
 							Brand available
 						</span>
 						{category.brand ? (
-							<ul className="whitespace-nowrap mx-2 px-2 py-1 flex flex-wrap gap-2 mt-1">
+							<ul className="mx-2 px-2 py-1 flex flex-wrap gap-2 mt-1">
 								{category.brand.map((brand) => (
 									<li
 										key={brand._id}
-										className="text-xs block w-fit bg-zinc-800 text-gray-300 p-1 rounded select-none font-light"
+										className="text-xs bg-zinc-800 text-gray-300 p-1 rounded select-none font-light"
 									>
 										{brand.title}
 									</li>

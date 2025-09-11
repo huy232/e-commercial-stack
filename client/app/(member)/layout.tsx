@@ -1,4 +1,12 @@
-import { Footer, Header, Navbar, ProfileSidebar, Toast } from "@/components"
+import {
+	ChatBox,
+	Footer,
+	Header,
+	Navbar,
+	ProfileSidebar,
+	ScrollToTop,
+	Toast,
+} from "@/components"
 import clsx from "clsx"
 import { AuthProvider, ReduxProvider } from "@/context"
 import "../globals.css"
@@ -30,12 +38,16 @@ export default function RootLayout({
 							<Navbar />
 							<Toast />
 							<div className="w-full xl:w-main flex flex-grow">
-								<div className="flex flex-col md:flex-row gap-1 w-full">
+								<div className="flex max-[768px]:flex-col flex-row gap-1 w-full">
 									<ProfileSidebar />
 									{children}
 								</div>
 							</div>
 							<Footer />
+							<div className="fixed bottom-2 right-0 max-sm:w-full md:bottom-4 md:right-4 flex flex-col-reverse gap-2 items-end z-10">
+								<ChatBox />
+								<ScrollToTop />
+							</div>
 						</AuthProvider>
 					</ReduxProvider>
 				</GoogleOAuthProvider>

@@ -32,7 +32,7 @@ const BlogCategory = ({
 						<Link
 							href={`/blog/${blog.slug}`}
 							key={blog._id}
-							className="rounded shadow p-1 hover:shadow-lg duration-300 flex items-center justify-end gap-2 hover:brightness-110 hover:opacity-80 transition-all"
+							className="rounded shadow p-1 hover:shadow-lg duration-300 flex items-center justify-center lg:justify-end gap-2 hover:brightness-110 hover:opacity-80 transition-all"
 							aria-label={`Blog: ${blog.title}`}
 						>
 							<CustomImage

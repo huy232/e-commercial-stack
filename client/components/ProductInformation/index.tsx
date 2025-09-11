@@ -17,19 +17,10 @@ const ProductInformation: FC<ProductInformationProps> = ({
 	updateReviews,
 }) => {
 	const mounted = useMounted()
+	const [loading, setLoading] = useState(false)
 	const [baseProduct, setBaseProduct] = useState(product)
-	const [activeTab, setActiveTab] = useState(1)
 	const [isVote, setIsVote] = useState(false)
 	const [reviews, setReviews] = useState(product.ratings)
-	const tabClass = (id: number) =>
-		clsx(`font-semibold p-2 rounded cursor-pointer whitespace-nowrap`, {
-			"bg-gray-300": id === activeTab,
-		})
-
-	const handleTabClick = useCallback((id: number) => {
-		setActiveTab(id)
-	}, [])
-
 	const handleToggleVote = useCallback(() => {
 		setIsVote(!isVote)
 	}, [isVote])
@@ -46,6 +37,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 				return
 			}
 			try {
+				setLoading(true)
 				const updatedAt = Date.now()
 				const ratingResponse = await fetch("/api/product/rating-product", {
 					method: "PUT",
@@ -68,6 +60,8 @@ const ProductInformation: FC<ProductInformationProps> = ({
 				closeVoteModal()
 			} catch (error) {
 				console.log(error)
+			} finally {
+				setLoading(true)
 			}
 		},
 		[closeVoteModal, updateReviews]
@@ -75,17 +69,6 @@ const ProductInformation: FC<ProductInformationProps> = ({
 
 	return (
 		<div>
-			{/* <div className="flex items-center gap-2">
-				{productInformationTabs.map((tab) => (
-					<span
-						className={tabClass(tab.id)}
-						key={tab.id}
-						onClick={() => handleTabClick(tab.id)}
-					>
-						{tab.name}
-					</span>
-				))}
-			</div> */}
 			{mounted ? (
 				<Review
 					totalRatings={baseProduct.totalRatings}
@@ -95,6 +78,7 @@ const ProductInformation: FC<ProductInformationProps> = ({
 					productName={baseProduct.title}
 					handleSubmitReview={handleSubmitReview}
 					productId={baseProduct._id}
+					loading={loading}
 				/>
 			) : (
 				<></>

@@ -302,7 +302,7 @@ export default function BlogForm({
 	return (
 		<form
 			onSubmit={handleSubmit(submitHandler)}
-			className="w-full grid grid-cols-2 gap-4"
+			className="w-full grid max-[768px]:grid-cols-1 grid-cols-2 gap-4"
 		>
 			<div className="bg-neutral-400 bg-opacity-50 rounded py-1 px-3 mt-2 mb-6 inline-block h-fit">
 				<InputField
@@ -325,7 +325,7 @@ export default function BlogForm({
 				</div>
 			</div>
 
-			<div className="space-y-4">
+			<div className="space-y-4 mx-2">
 				<div className="flex flex-col gap-2 mt-4">
 					<label htmlFor="blog-category" className="font-semibold">
 						(Optional) Select blog category
@@ -536,7 +536,7 @@ export default function BlogForm({
 				</div>
 			</div>
 
-			<div className="flex flex-col items-end gap-2">
+			<div className="flex flex-col max-[768px]:items-center items-end gap-2 mx-2">
 				<Button
 					type="submit"
 					className="custom-button w-fit bg-rose-500 p-1 hover:bg-opacity-70 hover:brightness-125 duration-300 ease-in-out rounded"

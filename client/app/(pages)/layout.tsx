@@ -18,6 +18,9 @@ const Header = dynamic(() => import("@/components/Header"), {
 const Navbar = dynamic(() => import("@/components/Navbar"), {
 	ssr: false,
 })
+const ScrollToTop = dynamic(() => import("@/components/ScrollToTop"), {
+	ssr: false,
+})
 
 const bodyClassName = clsx(
 	"w-full flex flex-col items-center min-h-screen",
@@ -42,9 +45,12 @@ export default function RootLayout({
 							<Header />
 							<Navbar />
 							<Toast />
-							<ChatBox />
 							<div className="w-full xl:w-main flex-grow">{children}</div>
 							<Footer />
+							<div className="fixed bottom-2 right-0 max-sm:w-full md:bottom-4 md:right-4 flex flex-col-reverse gap-2 items-end z-10">
+								<ChatBox />
+								<ScrollToTop />
+							</div>
 						</AuthProvider>
 					</ReduxProvider>
 				</GoogleOAuthProvider>

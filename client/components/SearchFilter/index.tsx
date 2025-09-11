@@ -58,7 +58,6 @@ const SearchFilter: FC<SearchFilterProps> = ({ title, fields }) => {
 				)}
 
 				{/* Search bar */}
-				{/* Search bar */}
 				<div className="w-full flex flex-row items-center gap-2">
 					<InputField
 						label="Search"

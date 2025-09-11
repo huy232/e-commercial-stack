@@ -1,7 +1,7 @@
 "use client"
 import { renderStarFromNumber } from "@/utils"
 import { Button, Modal, ReviewOption, VoteBar } from "@/components"
-import { FC, useEffect } from "react"
+import { FC, useEffect, useState } from "react"
 import { selectAuthUser, selectIsAuthenticated } from "@/store/slices/authSlice"
 import Link from "next/link"
 import { path } from "@/utils"
@@ -16,6 +16,7 @@ interface ReviewProps {
 	productName: string
 	handleSubmitReview: (data: any) => void
 	productId: string
+	loading: boolean
 }
 
 const Review: FC<ReviewProps> = ({
@@ -26,9 +27,9 @@ const Review: FC<ReviewProps> = ({
 	productName,
 	handleSubmitReview,
 	productId,
+	loading,
 }) => {
 	const user = useSelector(selectAuthUser)
-	console.log(user)
 	const isAuthenticated = useSelector(selectIsAuthenticated)
 	const shouldShowModal = user && isAuthenticated
 	if (!shouldShowModal) {
@@ -89,8 +90,8 @@ const Review: FC<ReviewProps> = ({
 					tabIndex={0}
 					data-testid="review-now-button"
 					id="review-now-button"
-					disabled={isVote}
-					loading={isVote}
+					disabled={loading}
+					loading={loading}
 				>
 					Review now!
 				</Button>

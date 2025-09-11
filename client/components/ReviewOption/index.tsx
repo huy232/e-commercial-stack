@@ -53,7 +53,7 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 
 			<TextEditor value={value} onChange={setValue} />
 			<div className="w-full flex flex-col gap-4">
-				<p>How do you like this product</p>
+				<p className="text-center mt-2">How do you like this product</p>
 				<div className="flex items-center justify-center gap-4">
 					{reviewRating.map((review) => (
 						<div

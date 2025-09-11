@@ -4,10 +4,11 @@ import { SubmitHandler, useForm } from "react-hook-form"
 import { LoadingSpinner, passwordHashingClient } from "@/utils"
 import { Button, InputField } from "@/components"
 import { useRouter } from "next/navigation"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch } from "@/types"
 import { handleUserLogin } from "@/store/actions"
 import { CiLogin } from "@/assets/icons"
+import { selectAuthUser } from "@/store/slices/authSlice"
 
 type LoginFormData = {
 	email: string
@@ -15,6 +16,7 @@ type LoginFormData = {
 }
 
 const LoginForm: FC = () => {
+	const user = useSelector(selectAuthUser)
 	const dispatch = useDispatch<AppDispatch>()
 	const router = useRouter()
 	const {
@@ -64,7 +66,7 @@ const LoginForm: FC = () => {
 				required={"Email is required"}
 				errorMessage={errors.email?.message}
 				pattern={/^\S+@\S+$/i}
-				disabled={loading}
+				disabled={user || loading}
 			/>
 			<InputField
 				label="Password"
@@ -75,20 +77,19 @@ const LoginForm: FC = () => {
 				required={"Password is required"}
 				togglePassword
 				errorMessage={errors.password?.message}
-				disabled={loading}
+				disabled={user || loading}
 			/>
 			<Button
 				className="cursor-pointer border-2 border-main hover:bg-main hover-effect rounded py-1 px-4 mt-4 group hover:text-white flex items-center justify-center gap-0.5"
 				type="submit"
 				form="hook-form"
-				disabled={loading}
-				loading={loading}
+				disabled={user || loading}
+				loading={user || loading}
 				aria-label="Login"
 				role="button"
 				tabIndex={0}
 				data-testid="login-button"
 				id="login-button"
-				
 			>
 				{loading ? (
 					<div className="flex items-center gap-2">

@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
 			},
 			credentials: "include",
 		})

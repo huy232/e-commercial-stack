@@ -223,7 +223,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 			</div>
 			{relatedProducts && (
 				<div className="w-full xl:w-main m-auto my-4">
-					<h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main mx-2 mt-4 font-bebasNeue max-sm:text-center">
+					<h3 className="text-2xl font-semibold py-[15px] border-b-2 border-main mx-2 mt-4 font-bebasNeue max-sm:text-center">
 						Other products you may like
 					</h3>
 					<div className="w-full xl:w-main m-auto">

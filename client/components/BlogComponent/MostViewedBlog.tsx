@@ -31,7 +31,7 @@ const MostViewedBlog = ({
 	const [first, second, third, ...rest] = highestViewBlogsData.data
 
 	return (
-		<div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
+		<div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:p-4">
 			{/* BIG BLOG */}
 			<div className="xl:col-span-2 row-span-2 bg-white rounded shadow p-4 hover:shadow-lg transition-shadow duration-300">
 				<Link href={`/blog/${first.slug}`} className="block hover:opacity-90">

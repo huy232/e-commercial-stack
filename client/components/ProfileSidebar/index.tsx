@@ -24,7 +24,7 @@ const ProfileSidebar = () => {
 			{/* Toggle Button */}
 			<Button
 				onClick={() => setOpen(true)}
-				className="font-bebasNeue p-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-black/40 duration-300 ease-in-out lg:hidden flex items-center gap-2"
+				className="font-bebasNeue p-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-black/40 duration-300 ease-in-out lg:hidden flex items-center gap-2 mx-2"
 				aria-label="Open profile sidebar"
 				role="button"
 				tabIndex={0}

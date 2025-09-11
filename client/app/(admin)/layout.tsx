@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
-import { AdminSidebar, Toast } from "@/components"
+import { AdminSidebar, ScrollToTop, Toast } from "@/components"
 import clsx from "clsx"
 import { anton, bebasNeue, inter, poppins } from "@/utils"
 import "../globals.css"
@@ -37,6 +37,9 @@ export default function AdminLayout({
 							<div className="flex flex-grow w-full">
 								<AdminSidebar />
 								{children}
+							</div>
+							<div className="fixed bottom-2 right-0 max-sm:w-full md:bottom-4 md:right-4 flex flex-col-reverse gap-2 items-end z-10">
+								<ScrollToTop />
 							</div>
 						</AuthProvider>
 					</ReduxProvider>

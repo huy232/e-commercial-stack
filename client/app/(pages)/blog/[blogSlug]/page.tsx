@@ -147,7 +147,7 @@ export default async function Blog(props: Props) {
 
 	return (
 		<main className="w-full xl:w-main">
-			<nav className="text-sm my-2 text-gray-600">
+			<nav className="text-sm my-2 text-gray-600 mx-4">
 				<Link href="/blog" className="hover:underline text-blue-600">
 					Blog
 				</Link>
@@ -167,40 +167,48 @@ export default async function Blog(props: Props) {
 				<SingleBlog blogPostData={blogPostData} />
 				<div className="col-span-12 lg:col-span-4 space-y-6">
 					<section className="">
-						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#03304b] rounded relative">
-							<span className="text-white mx-4">E-commercial Blogs</span>
-							<FaBoltLightning
-								size={42}
-								className="text-yellow-500 absolute top-[-16px] right-[-14px] rounded-full p-2 bg-black"
-							/>
+						<h2 className="relative font-bebasNeue text-2xl font-bold mb-4 text-center md:text-right uppercase p-2 bg-[#03304b] rounded">
+							<span className="text-white mx-4 md:mr-8">
+								E-commercial Blogs
+							</span>
+							<span className="absolute -top-3 right-1 md:-top-4 md:right-2">
+								<FaBoltLightning
+									size={42}
+									className="text-yellow-500 rounded-full p-2 bg-black shadow-heavy"
+								/>
+							</span>
 						</h2>
 						<BlogCategory blogCategoryData={ecommercialBlogs} />
 					</section>
 					<section className="">
-						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#771f5d] rounded relative">
-							<span className="text-white mx-4">Review Blogs</span>
-							<FaReadme
-								size={42}
-								className="text-yellow-500 absolute top-[-16px] right-[-14px] rounded-full p-2 bg-black"
-							/>
+						<h2 className="relative font-bebasNeue text-2xl font-bold mb-4 text-center md:text-right uppercase p-2 bg-[#771f5d] rounded">
+							<span className="text-white mx-4 md:mr-8">Review Blogs</span>
+							<span className="absolute -top-3 right-1 md:-top-4 md:right-2">
+								<FaReadme
+									size={42}
+									className="text-yellow-500 rounded-full p-2 bg-black shadow-heavy"
+								/>
+							</span>
 						</h2>
 						<BlogCategory blogCategoryData={reviewBlogs} />
 					</section>
 					<section className="">
-						<h2 className="font-bebasNeue text-2xl font-bold mb-4 text-right uppercase p-2 bg-[#83361e] rounded relative">
-							<span className="text-white mx-4">Technology Blogs</span>
-							<GrTechnology
-								size={42}
-								className="text-yellow-500 absolute top-[-16px] right-[-14px] rounded-full p-2 bg-black"
-							/>
+						<h2 className="relative font-bebasNeue text-2xl font-bold mb-4 text-center md:text-right uppercase p-2 bg-[#83361e] rounded ">
+							<span className="text-white mx-4 md:mr-8">Technology Blogs</span>
+							<span className="absolute -top-3 right-1 md:-top-4 md:right-2">
+								<GrTechnology
+									size={42}
+									className="text-yellow-500 rounded-full p-2 bg-black shadow-heavy"
+								/>
+							</span>
 						</h2>
 						<BlogCategory blogCategoryData={technologyBlogs} />
 					</section>
 				</div>
 			</div>
 			{blogPostData.data.relatedProducts.length > 0 && (
-				<div className="mt-8 p-4 bg-gray-50 rounded-lg shadow">
-					<h2 className="text-3xl font-bold mb-4 font-bebasNeue">
+				<div className="mt-8 bg-gray-50 rounded-lg shadow">
+					<h2 className="text-3xl font-bold mb-4 font-bebasNeue mx-4">
 						Related Products
 					</h2>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -229,7 +237,7 @@ export default async function Blog(props: Props) {
 			)}
 			{relatedBlogsFromSameCategory.data.length > 0 && (
 				<section className="mt-8 mb-4">
-					<h2 className="text-3xl font-bold mb-4 font-bebasNeue">
+					<h2 className="text-3xl font-bold mb-4 font-bebasNeue mx-4">
 						Related Blogs
 					</h2>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

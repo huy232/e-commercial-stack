@@ -11,6 +11,7 @@ interface SellerProps {
 }
 
 const Seller: FC<SellerProps> = ({ initialProducts }) => {
+	const [loading, setLoading] = useState(false)
 	const tabs = useMemo(
 		() => [
 			{ id: 1, name: "Best sellers", sort: "-sold", markLabel: "Trending" },
@@ -26,6 +27,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 
 	const fetchProductsComponent = useCallback(
 		async (sort: {}, tabId: number) => {
+			setLoading(true)
 			try {
 				const response = await fetch(
 					`/api/product/get-all-product?` + new URLSearchParams(sort),
@@ -36,6 +38,8 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 				setTitleId(tabId)
 			} catch (error) {
 				console.error("Error fetching products:", error)
+			} finally {
+				setLoading(false)
 			}
 		},
 		[]
@@ -64,7 +68,7 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 							data-testid={`tab-${name.replace(" ", "-").toLowerCase()}-button`}
 							id={`tab-${name.replace(" ", "-").toLowerCase()}-button`}
 							disabled={titleId === id}
-							loading={titleId === id}
+							loading={loading && titleId !== id}
 						>
 							{name}
 						</Button>

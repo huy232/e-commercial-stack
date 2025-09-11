@@ -120,7 +120,7 @@ const Notification = ({ user, notifications }: UserProps) => {
 					<div
 						className={clsx(
 							"absolute z-10 min-w-[280px] duration-300 transition-all bg-white shadow-heavy border-b border-black/60 rounded-lg flex flex-col",
-							"top-[42px] -right-2"
+							"top-[42px] right-[-60px] md:-right-2"
 						)}
 					>
 						<div className="p-2 border-b border-gray-200 flex justify-end items-center text-xs gap-2">

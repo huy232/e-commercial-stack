@@ -1,28 +1,20 @@
 "use client"
 
-import { API } from "@/constant"
 import { selectAuthUser } from "@/store/slices/authSlice"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { io, Socket } from "socket.io-client"
 import { Button } from "@/components"
+import { formatDate, formatHourMinute } from "@/utils"
 
 const socketServerURL =
 	process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"
 
 let socket: Socket
 
-interface ChatRoom {
-	_id: string
-	clientName: string
-	adminName: string | null
-	createdAt: string
-	updatedAt: string
-	isGuest: boolean
-}
-
 const ChatBox = () => {
 	const user = useSelector(selectAuthUser)
+	const [loading, setLoading] = useState(false)
 	const [chatStarted, setChatStarted] = useState(false)
 	const [isMinimized, setIsMinimized] = useState(false)
 	const [isInitialMinimized, setIsInitialMinimized] = useState(true)
@@ -32,10 +24,12 @@ const ChatBox = () => {
 	const [chatSessionId, setChatSessionId] = useState<string | null>(null)
 	const [currentSender, setCurrentSender] = useState<string | null>(null)
 	const [messages, setMessages] = useState<
-		{ sender: string; message: string }[]
+		{ sender: string; message: string; createdAt: string }[]
 	>([])
 	const [inputMessage, setInputMessage] = useState("")
-	const [guestNameInput, setGuestNameInput] = useState("")
+	const [guestNameInput, setGuestNameInput] = useState(
+		user ? user.firstName + user.lastName : ""
+	)
 
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -112,11 +106,12 @@ const ChatBox = () => {
 		}
 
 		try {
-			const res = await fetch(API + "/chat/start", {
+			setLoading(true)
+			const res = await fetch("/api/chat/start", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					adminId: "admin-static-id",
+					adminId: user._id,
 					clientId,
 					clientName,
 					isGuest: !user,
@@ -140,12 +135,15 @@ const ChatBox = () => {
 			initSocket(sessionId, clientId)
 		} catch (err) {
 			console.error("Error starting chat:", err)
+		} finally {
+			setLoading(false)
 		}
 	}
 
 	const fetchMessages = async (sessionId: string) => {
+		setLoading(true)
 		try {
-			const res = await fetch(API + `/chat/${sessionId}`)
+			const res = await fetch(`/api/chat/${sessionId}`)
 			if (!res.ok) {
 				throw new Error("Failed to fetch messages")
 			}
@@ -153,6 +151,8 @@ const ChatBox = () => {
 			setMessages(data?.messages || [])
 		} catch (error) {
 			console.error("Error fetching chat messages:", error)
+		} finally {
+			setLoading(false)
 		}
 	}
 
@@ -167,6 +167,7 @@ const ChatBox = () => {
 		}
 
 		try {
+			setLoading(true)
 			if (!chatSessionId) {
 				console.error("❌ No chatSessionId available")
 				return
@@ -180,6 +181,8 @@ const ChatBox = () => {
 			setInputMessage("")
 		} catch (err) {
 			console.error("Error sending message:", err)
+		} finally {
+			setLoading(false)
 		}
 	}
 
@@ -190,13 +193,20 @@ const ChatBox = () => {
 		}
 	}, [messages, isMinimized])
 
-	const handleToggleMinimize = () => {
+	const handleToggleMinimize = useCallback(() => {
 		setIsMinimized((prev) => !prev)
 		if (isMinimized) {
 			// Opening the chat, clear unread
 			setUnreadCount(0)
 		}
-	}
+	}, [isMinimized])
+
+	const groupedMessages = messages.reduce((groups, msg) => {
+		const dateKey = formatDate(msg.createdAt)
+		if (!groups[dateKey]) groups[dateKey] = []
+		groups[dateKey].push(msg)
+		return groups
+	}, {} as Record<string, typeof messages>)
 
 	// ========== UI ===========
 
@@ -205,9 +215,8 @@ const ChatBox = () => {
 			return (
 				<Button
 					onClick={() => setIsInitialMinimized(false)}
-					className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-full shadow-md z-20"
+					className="bg-blue-600 text-white px-3 py-2 rounded-full shadow-md text-sm sm:text-base"
 					type="button"
-					aria-label="Start Chat"
 				>
 					Need help?
 				</Button>
@@ -215,14 +224,13 @@ const ChatBox = () => {
 		}
 
 		return (
-			<div className="fixed bottom-4 right-4 bg-white p-4 rounded shadow-md z-20 w-60">
+			<div className="bg-gray-300 p-2 md:p-4 rounded shadow-heavy w-full md:w-60">
 				<div className="flex justify-between items-center mb-2">
 					<p className="font-medium">Need help?</p>
 					<Button
 						onClick={() => setIsInitialMinimized(true)}
 						className="text-sm text-gray-500"
 						type="button"
-						aria-label="Close Chat"
 					>
 						×
 					</Button>
@@ -238,7 +246,8 @@ const ChatBox = () => {
 					onClick={startChat}
 					className="bg-blue-600 text-white w-full px-4 py-2 rounded"
 					type="button"
-					aria-label="Start Chat"
+					loading={loading}
+					disabled={loading}
 				>
 					Start Chat
 				</Button>
@@ -247,14 +256,13 @@ const ChatBox = () => {
 	}
 
 	return (
-		<div className="fixed bottom-4 right-4 w-80 bg-white shadow-lg rounded-lg z-20 overflow-hidden">
+		<div className="w-[280px] md:w-80 bg-gray-300 shadow-heavy rounded-lg overflow-hidden">
 			<div className="bg-blue-600 text-white p-2 flex justify-between items-center">
-				<span>Chat with Admin</span>
+				<span className="text-sm">Chat with Admin</span>
 				<Button
 					onClick={handleToggleMinimize}
 					className="text-sm"
 					type="button"
-					aria-label={isMinimized ? "Open Chat" : "Minimize Chat"}
 				>
 					{isMinimized ? "Open" : "Minimize"}
 				</Button>
@@ -262,44 +270,68 @@ const ChatBox = () => {
 
 			{/* Notification badge */}
 			{isMinimized && unreadCount > 0 && (
-				<div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center z-30">
+				<div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
 					{unreadCount}
 				</div>
 			)}
 
 			{!isMinimized && (
 				<>
-					<div className="flex-1 p-2 h-64 overflow-y-auto">
-						{messages.map((msg, idx) => (
-							<div
-								key={idx}
-								className={`mb-2 text-sm ${
-									msg.sender === currentSender
-										? "text-right text-blue-700"
-										: "text-left text-gray-700"
-								}`}
-							>
-								<span className="inline-block bg-gray-100 px-2 py-1 rounded">
-									{msg.message}
-								</span>
+					<div className="flex-1 p-2 h-64 sm:h-80 max-h-[60vh] overflow-y-auto bg-gray-50">
+						{loading ? (
+							/* Skeleton loader */
+							<div className="space-y-2">
+								<div className="h-4 w-2/3 bg-gray-500 rounded animate-pulse" />
+								<div className="h-4 w-1/2 bg-gray-500 rounded animate-pulse" />
+								<div className="h-4 w-3/4 bg-gray-500 rounded animate-pulse" />
 							</div>
-						))}
+						) : (
+							Object.entries(groupedMessages).map(([date, msgs]) => (
+								<div key={date}>
+									{/* Date divider */}
+									<div className="flex justify-center my-3">
+										<span className="text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-full">
+											{date}
+										</span>
+									</div>
+
+									{msgs.map((msg, idx) => (
+										<div
+											key={idx}
+											className={`mb-2 text-sm ${
+												msg.sender === currentSender
+													? "text-right text-blue-700"
+													: "text-left text-gray-700"
+											}`}
+										>
+											<div className="inline-block bg-white px-3 py-1 rounded shadow">
+												{msg.message}
+											</div>
+											<div className="text-[10px] text-gray-400 mt-1">
+												{formatHourMinute(msg.createdAt)}
+											</div>
+										</div>
+									))}
+								</div>
+							))
+						)}
 						<div ref={messagesEndRef} />
 					</div>
-					<div className="p-2 border-t flex gap-2">
+					<div className="p-1 md:p-2 border-t flex gap-1 md:gap-2">
 						<input
-							className="flex-1 border px-2 py-1 rounded"
+							className="w-[200px] md:w-fit flex-1 border px-2 py-1 rounded"
 							value={inputMessage}
 							onChange={(e) => setInputMessage(e.target.value)}
 							onKeyDown={(e) => e.key === "Enter" && sendMessage()}
 							placeholder="Type a message..."
+							disabled={loading}
 						/>
 						<Button
-							className="bg-blue-600 text-white px-3 rounded"
+							className="w-fit bg-blue-600 text-white text-xs md:text-base px-1 md:px-2 rounded"
 							onClick={sendMessage}
 							type="button"
-							disabled={!inputMessage.trim()}
-							aria-label="Send Message"
+							disabled={loading || !inputMessage.trim()}
+							loading={loading}
 						>
 							Send
 						</Button>
