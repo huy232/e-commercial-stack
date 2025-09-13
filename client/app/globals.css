@@ -10,6 +10,40 @@
 	}
 }
 
+@-webkit-keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	20%,
+	60% {
+		transform: translateX(-5px);
+	}
+	40%,
+	80% {
+		transform: translateX(5px);
+	}
+}
+
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	20%,
+	60% {
+		transform: translateX(-5px);
+	}
+	40%,
+	80% {
+		transform: translateX(5px);
+	}
+}
+.animate-shake {
+	-webkit-animation: shake 0.3s ease-in-out;
+	        animation: shake 0.3s ease-in-out;
+}
+
 .hover-effect {
 	@apply duration-300 ease-in-out hover:brightness-125 transition-all;
 }

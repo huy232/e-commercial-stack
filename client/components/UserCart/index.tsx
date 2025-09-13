@@ -14,7 +14,7 @@ import {
 } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Button, CustomImage } from "@/components"
+import { Button, CustomImage, EmptyCart } from "@/components"
 import { useMounted } from "@/hooks"
 import Link from "next/link"
 import { FaTrash } from "@/assets/icons"
@@ -41,6 +41,7 @@ import {
 	updateCart,
 } from "@/store/slices/cartSlice"
 import { toast } from "react-toastify"
+import { AnimatePresence, motion } from "framer-motion"
 type CouponFormInputs = {
 	couponCode: string
 }
@@ -65,6 +66,8 @@ const UserCart = ({ discount, coupon }: UserCartProps) => {
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const { replace } = useRouter()
+
+	const anyCartLoading = loadingCart || isLoading
 
 	const {
 		register,
@@ -199,227 +202,223 @@ const UserCart = ({ discount, coupon }: UserCartProps) => {
 	}
 
 	useEffect(() => {
-		if (mounted && !user) {
-			router.push("/login")
-		}
 		if (discount) {
 			setValue("couponCode", Array.isArray(discount) ? discount[0] : discount)
 		}
 	}, [discount, mounted, router, setValue, user])
 
 	if (!mounted) {
-		return null
-	}
-
-	if (mounted && !cart) {
-		return <div>There is no product in the cart right now.</div>
+		return (
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				className="flex flex-col items-center justify-center h-64 gap-4"
+			>
+				<div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+				<p className="text-gray-500 text-sm">Loading your cart...</p>
+			</motion.div>
+		)
 	}
 
 	return (
-		<>
-			<div className="hidden lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr] lg:gap-4 lg:mb-4">
-				<div className="font-semibold">Product details</div>
-				<div className="font-semibold text-center">Quantity</div>
-				<div className="font-semibold text-center">Price</div>
-				<div className="font-semibold text-right">Total</div>
-			</div>
-			{cart &&
-				cart.map((item: Cart, index: number) => (
-					<div
-						key={item.product._id}
-						className="border-rose-500 lg:border-transparent rounded border-2 p-1 mx-1 lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr] lg:gap-4 mb-2 lg:mb-4 items-center"
-					>
-						<div className="flex items-center gap-1 lg:gap-4 group">
-							<div className="relative flex justify-center items-center w-fit">
-								<CustomImage
-									src={item.product.thumbnail}
-									alt={item.product.title}
-									fill
-									className="w-[120px] h-[120px]"
-								/>
-								<div
-									className="absolute z-10 cursor-pointer hover-effect hidden group-hover:block text-red-500 p-2 rounded-full bg-black/70"
-									onClick={() => {
-										deleteCartItem(item)
-									}}
-								>
-									<FaTrash size={16} />
+		<AnimatePresence>
+			{cart && cart.length > 0 ? (
+				<>
+					{/* Table Header */}
+					<div className="hidden lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr] lg:gap-4 lg:mb-4">
+						<div className="font-semibold">Product details</div>
+						<div className="font-semibold text-center">Quantity</div>
+						<div className="font-semibold text-center">Price</div>
+						<div className="font-semibold text-right">Total</div>
+					</div>
+
+					{/* Cart Items */}
+					{cart.map((item: Cart, index: number) => (
+						<motion.div
+							key={item.product._id}
+							layout
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.3 }}
+							className="border-rose-500 lg:border-transparent rounded border-2 p-1 mx-1 lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr] lg:gap-4 mb-2 lg:mb-4 items-center hover:shadow-lg hover:scale-[1.01] transition-all duration-300"
+						>
+							<div className="flex items-center gap-1 lg:gap-4 group">
+								<div className="relative flex justify-center items-center w-[120px] h-[120px]">
+									<CustomImage
+										src={item.product.thumbnail}
+										alt={item.product.title}
+										fill
+										className="w-[120px] h-[120px] rounded-lg"
+									/>
+									<div
+										className="absolute z-10 cursor-pointer hover-effect hidden group-hover:block text-red-500 p-2 rounded-full bg-black/70"
+										onClick={() => deleteCartItem(item)}
+									>
+										<FaTrash size={16} />
+									</div>
+								</div>
+								<div className="">
+									<span className="text-sm font-semibold line-clamp-2">
+										{item.product.title}
+									</span>
+									{item.variant && renderVariantDetails(item.variant)}
 								</div>
 							</div>
-							<div className="w-full">
-								<span className="text-sm font-semibold line-clamp-2">
-									{item.product.title}
-								</span>
-								{item.variant && renderVariantDetails(item.variant)}
+
+							{/* Quantity */}
+							<div className="inline-block w-full text-center">
+								<input
+									className="w-[40px] outline-none text-xs lg:mx-2 rounded text-center border border-gray-300 focus:ring-1 focus:ring-rose-500"
+									type="number"
+									min="1"
+									max={
+										item.variant ? item.variant.stock : item.product.quantity
+									}
+									value={item.quantity}
+									onChange={(e) =>
+										handleQuantityChange(index, parseInt(e.target.value))
+									}
+								/>
 							</div>
-						</div>
-						<div className="inline-block lg:w-full">
-							<input
-								className="w-[40px] lg:w-full outline-none text-xs lg:mx-2 rounded text-center"
-								type="number"
-								min="1"
-								max={item.variant ? item.variant.stock : item.product.quantity}
-								value={item.quantity}
-								onChange={(e) =>
-									handleQuantityChange(index, parseInt(e.target.value))
-								}
-							/>
-						</div>
-						<span className="inline-block lg:hidden text-xs font-light gap-1">
-							x
-						</span>
-						<div className="inline-flex items-center lg:flex-col ml-0.5">
-							<div className="text-xs">
-								{discountValidate(item.product)
-									? formatPrice(item.product.discount.productPrice)
-									: formatPrice(item.product.price)}
-							</div>
-							{item.variant && (
-								<>
-									<div className="inline-block lg:hidden h-[42px] w-[6px] mx-2 my-1">
-										<div className="self-stretch bg-gray-500 -skew-x-12 inline-block h-full w-[2px]"></div>
+
+							{/* Price */}
+							<div className="inline-flex items-center lg:flex-col ml-0.5 text-xs">
+								<div>
+									{discountValidate(item.product)
+										? formatPrice(item.product.discount.productPrice)
+										: formatPrice(item.product.price)}
+								</div>
+								{item.variant && (
+									<div className="italic text-gray-500 flex flex-col items-center">
+										<span>(Variant)</span>
+										<span>{formatPrice(item.variant.price)}</span>
 									</div>
-									<span className="italic text-[14px] flex flex-col items-center">
-										<span className="text-gray-500">(Variant)</span>
-										<span className="text-gray-500">
-											{formatPrice(item.variant.price)}
-										</span>
-									</span>
-								</>
-							)}
-						</div>
-						<div className="flex text-sm max-sm:bg-rose-500 max-sm:p-2 max-sm:rounded justify-end items-center">
-							<span className="inline-block lg:hidden mr-1 font-anton text-sm">
-								Total
-							</span>
-							<span className="text-xs text-green-500 italic font-semibold max-sm:mb-[2px]">
-								{handleCalculatePrice(item).toLocaleString("it-IT", {
-									style: "currency",
-									currency: "VND",
-								})}
-							</span>
-						</div>
-					</div>
-				))}
-			<div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-4">
-				<Button
-					className="inline py-2 lg:py-3 lg:px-6 rounded-md bg-rose-500 text-gray-50 before:border-rose-500 hover-effect mx-4 my-1 lg:my-2"
-					onClick={() => {
-						handleUpdateCartQuantity()
-					}}
-					disabled={isLoading}
-					loading={isLoading}
-					aria-label="Update cart"
-					role="button"
-					tabIndex={0}
-					data-testid="update-cart-button"
-					id="update-cart-button"
-				>
-					Update cart
-				</Button>
-				<Button
-					className="inline py-2 lg:py-3 lg:px-6 rounded-md bg-rose-500 text-gray-50 before:border-rose-500 hover-effect mx-4 my-1 lg:my-2"
-					onClick={() => handleCartWipe()}
-					disabled={isLoading}
-					loading={isLoading}
-					aria-label="Empty the cart"
-					role="button"
-					tabIndex={0}
-					data-testid="empty-cart-button"
-					id="empty-cart-button"
-				>
-					Empty the cart
-				</Button>
-			</div>
-			<div className="lg:grid grid-cols-3 my-4">
-				<form onSubmit={handleSubmit(onSubmit)} className="mx-2">
-					<div className="flex flex-col items-end gap-y-3 border border-gray-900 rounded-md p-5">
-						{coupon && coupon.message && (
-							<span
-								className={clsx(
-									coupon.success ? "text-teal-500" : "text-red-500",
-									"mr-auto ml-0"
 								)}
-							>
-								{coupon.message}
-							</span>
-						)}
-						<input
-							type="text"
-							placeholder="Enter discount code here"
-							className="w-full border rounded-md py-2 px-4"
-							{...register("couponCode")}
-						/>
+							</div>
+
+							{/* Total */}
+							<div className="flex text-sm justify-end items-center">
+								<span className="text-xs text-green-500 italic font-semibold">
+									{handleCalculatePrice(item).toLocaleString("it-IT", {
+										style: "currency",
+										currency: "VND",
+									})}
+								</span>
+							</div>
+						</motion.div>
+					))}
+
+					{/* Action Buttons */}
+					<div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-4">
 						<Button
-							type="submit"
-							className="inline py-3 px-6 rounded-md bg-rose-500 text-gray-50 before:border-rose-500 hover-effect"
-							disabled={isLoading}
-							loading={isLoading}
-							aria-label="Apply coupon"
-							role="button"
-							tabIndex={0}
-							data-testid="apply-coupon-button"
-							id="apply-coupon-button"
+							className="inline py-2 lg:py-3 lg:px-6 rounded-md bg-red-500 text-gray-50 hover:bg-red-600 hover:opacity-70 transition-all duration-300 mx-4 my-1 lg:my-2"
+							onClick={handleUpdateCartQuantity}
+							disabled={anyCartLoading}
+							loading={anyCartLoading}
 						>
-							Apply coupon
+							Update cart
+						</Button>
+						<Button
+							className="inline py-2 lg:py-3 lg:px-6 rounded-md bg-gray-500 text-white hover:bg-red-500 transition-all duration-300 mx-4 my-1 lg:my-2"
+							onClick={handleCartWipe}
+							disabled={anyCartLoading}
+							loading={anyCartLoading}
+						>
+							Empty the cart
 						</Button>
 					</div>
-				</form>
-				<div />
-				<div className="border border-gray-900 rounded-md p-5 mt-5 lg:mt-0 mx-2">
-					<div className="text-xl font-medium">Summary</div>
-					<div className="divide-y">
-						<div className="flex justify-between items-center py-4">
-							<span className="font-medium">Orignal price</span>
-							<span className="text-xs text-gray-500">
-								{formatPrice(totalPrice)}
-							</span>
-						</div>
-						<div className="flex justify-between items-center py-4">
-							<span className="font-medium">Discount</span>
-							<span className="text-sm bg-yellow-500 rounded p-1 text-black">
-								{coupon && coupon.data
-									? formatDiscountDisplay(coupon.data)
-									: "None"}
-							</span>
-						</div>
-						<div className="flex justify-between items-center py-4">
-							<span className="font-medium">Total price</span>
-							<span className="text-sm text-teal-500">
-								{coupon && coupon.data
-									? formatPrice(
-											formatDiscount(
-												coupon.data.discountType,
-												coupon.data.discount,
-												totalPrice
-											)
-									  )
-									: formatPrice(totalPrice)}
-							</span>
-						</div>
-					</div>
-					<div className="flex justify-center w-full">
-						<Button
-							className="w-full hover-effect"
-							loading={isLoading}
-							disabled={isLoading}
-							aria-label="Proceed to checkout"
-							role="button"
-							tabIndex={0}
-							data-testid="proceed-to-checkout-button"
-							id="proceed-to-checkout-button"
-						>
-							<Link
-								className="w-full block py-3 text-center bg-rose-500 text-gray-50 rounded-md font-medium"
-								href={createCheckoutUrl(coupon?.data || null)}
+
+					{/* Coupon & Summary */}
+					<div className="lg:grid grid-cols-3 my-4 gap-4">
+						{/* Coupon Form */}
+						<form onSubmit={handleSubmit(onSubmit)} className="mx-2">
+							<div className="flex flex-col items-end gap-y-3 border border-gray-900 rounded-md p-5">
+								{coupon?.message && (
+									<span
+										className={clsx(
+											coupon.success ? "text-teal-500" : "text-red-500",
+											"mr-auto ml-0"
+										)}
+									>
+										{coupon.message}
+									</span>
+								)}
+								<input
+									type="text"
+									placeholder="Enter discount code here"
+									className="w-full border rounded-md py-2 px-4 focus:ring-1 focus:ring-rose-500"
+									{...register("couponCode")}
+								/>
+								<Button
+									type="submit"
+									className="inline py-3 px-6 rounded-md bg-red-500 text-gray-50 hover:bg-red-600 hover:opacity-70 transition-all duration-300"
+									disabled={anyCartLoading}
+									loading={anyCartLoading}
+								>
+									Apply coupon
+								</Button>
+							</div>
+						</form>
+
+						<div />
+
+						{/* Summary & Checkout */}
+						<div className="border border-gray-900 rounded-md p-5 mt-5 lg:mt-0 mx-2 flex flex-col justify-between">
+							<div>
+								<div className="text-xl font-medium mb-4">Summary</div>
+								<div className="divide-y divide-gray-300">
+									<div className="flex justify-between items-center py-4">
+										<span className="font-medium">Original price</span>
+										<span className="text-xs text-gray-500">
+											{formatPrice(totalPrice)}
+										</span>
+									</div>
+									<div className="flex justify-between items-center py-4">
+										<span className="font-medium">Discount</span>
+										<span className="text-sm bg-yellow-500 rounded p-1 text-black">
+											{coupon?.data
+												? formatDiscountDisplay(coupon.data)
+												: "None"}
+										</span>
+									</div>
+									<div className="flex justify-between items-center py-4">
+										<span className="font-medium">Total price</span>
+										<span className="text-sm text-teal-500">
+											{coupon?.data
+												? formatPrice(
+														formatDiscount(
+															coupon.data.discountType,
+															coupon.data.discount,
+															totalPrice
+														)
+												  )
+												: formatPrice(totalPrice)}
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<Button
+								className="w-full mt-4 hover:scale-[1.02] transition-all duration-300 relative"
+								disabled={anyCartLoading}
+								loading={anyCartLoading}
 							>
-								Checkout
-							</Link>
-						</Button>
+								<Link
+									href={createCheckoutUrl(coupon?.data || null)}
+									className="w-full block py-3 text-center bg-red-500 text-gray-50 rounded-md font-medium"
+								>
+									Checkout
+								</Link>
+							</Button>
+						</div>
 					</div>
-				</div>
-			</div>
-		</>
+				</>
+			) : (
+				// Empty Cart UI
+				<EmptyCart />
+			)}
+		</AnimatePresence>
 	)
 }
 

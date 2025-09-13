@@ -20,7 +20,7 @@ interface ChatRoom {
 }
 
 const SkeletonRoom = () => (
-	<div className="p-2 mb-2 rounded bg-gray-200 animate-pulse h-14"></div>
+	<div className="p-2 mb-2 rounded bg-gray-300 animate-pulse h-14"></div>
 )
 
 const AdminChatRoomList = () => {
@@ -91,7 +91,7 @@ const AdminChatRoomList = () => {
 			<div className="absolute top-4 left-4 lg:hidden z-50">
 				<button
 					onClick={() => setSidebarOpen(!sidebarOpen)}
-					className="p-2 rounded bg-gray-200 hover:bg-gray-300"
+					className="p-2 rounded bg-gray-200 hover:bg-gray-400"
 				>
 					<FiMenu size={20} />
 				</button>
@@ -131,7 +131,7 @@ const AdminChatRoomList = () => {
 									{/* Date divider */}
 									<div className="text-center text-xs text-gray-400 my-2 relative">
 										<span className="bg-white px-2">{date}</span>
-										<div className="absolute left-0 right-0 top-1/2 border-t border-gray-200 -z-10" />
+										<div className="absolute left-0 right-0 top-1/2 border-t border-gray-300 -z-10" />
 									</div>
 
 									{/* Rooms for that date */}

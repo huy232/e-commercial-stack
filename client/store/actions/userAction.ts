@@ -10,53 +10,38 @@ export interface UserCartType {
 
 export const handleUserLogin = createAsyncThunk(
 	"auth/handleUserLogin",
-	async ({ email, password }: { email: string; password: string }) => {
+	async (
+		{ email, password }: { email: string; password: string },
+		{ rejectWithValue }
+	) => {
 		try {
-			// const loginResponse = await fetch(API + "/user/login", {
-			// 	method: "POST",
-			// 	credentials: "include",
-			// 	headers: {
-			// 		"Content-Type": "application/json",
-			// 	},
-			// 	body: JSON.stringify({
-			// 		email,
-			// 		password,
-			// 	}),
-			// })
-
 			const loginResponse = await fetch(`/api/user/login`, {
 				method: "POST",
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					email,
-					password,
-				}),
+				body: JSON.stringify({ email, password }),
 			})
 
 			const response = await loginResponse.json()
-			return response
-		} catch (error) {
+
+			// Reject if login failed
+			if (!loginResponse.ok || !response.success) {
+				return rejectWithValue(response.message || "Invalid credentials")
+			}
+
+			return response // must include userData, token, etc.
+		} catch (error: any) {
 			console.error("Error while logging in:", error)
-			return false
+			return rejectWithValue(error.message || "Network error")
 		}
 	}
 )
-
 export const checkAuthentication = createAsyncThunk<boolean, void>(
 	"auth/checkAuthentication",
 	async () => {
 		try {
-			// const response = await fetch(API + `/user/check-auth`, {
-			// 	method: "GET",
-			// 	credentials: "include",
-			// 	headers: {
-			// 		"Content-Type": "application/json",
-			// 	},
-			// })
-
 			const response = await fetch(`/api/user/check-auth`, {
 				method: "GET",
 				credentials: "include",

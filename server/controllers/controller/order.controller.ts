@@ -420,8 +420,6 @@ class OrderController {
 					const userId = checkoutSucceeded.metadata?.userId
 					const couponId = checkoutSucceeded.metadata?.couponId
 
-					// const orderId = checkoutSucceeded.metadata?.orderId
-					// if (userId && orderId)
 					if (userId) {
 						const user = await User.findById(userId)
 
@@ -455,10 +453,8 @@ class OrderController {
 
 						const filterVariantStock = (cartItems: any[]) => {
 							return cartItems.map((item) => {
-								// Perform a deep copy of item to remove Mongoose properties
 								let newItem = JSON.parse(JSON.stringify(item))
 
-								// Proceed with filtering as usual
 								if (newItem.variant) {
 									const { stock, ...filteredVariant } = newItem.variant
 									newItem = { ...newItem, variant: filteredVariant }
@@ -697,6 +693,9 @@ class OrderController {
 		async (req: AuthenticatedRequest, res: Response) => {
 			const { orderId } = req.query
 			const { _id } = req.user
+
+			console.log("Order ID: ", orderId)
+			console.log("User: ", _id)
 			if (!_id) {
 				res.json({
 					success: false,

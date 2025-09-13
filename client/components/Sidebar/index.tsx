@@ -24,9 +24,15 @@ const Sidebar: FC<SidebarProps> = ({ categories }) => {
 		<div className="lg:bg-[#282A3E] mx-1 p-1 rounded-md w-full flex-1">
 			{/* Title bar */}
 			<div className="flex items-center justify-between lg:block">
-				<h2 className="font-bebasNeue font-bold text-2xl mx-1 uppercase h-[40px] mb-1 lg:border-b-2 lg:border-b-gray-200 text-black lg:text-[#EDF2F4] text-center lg:text-left bg-[#5f5f5f29] p-2 rounded">
+				<motion.h2
+					initial={{ opacity: 0, y: -10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5, ease: "easeOut" }}
+					className="font-bebasNeue font-bold text-3xl mx-1 uppercase px-1 mb-2 text-black lg:text-[#EDF2F4] text-center lg:text-left relative rounded bg-gradient-to-r from-[#5f5f5f29] to-[#8a8a8a20] overflow-hidden"
+				>
 					Categories
-				</h2>
+					<span className="absolute bottom-0 left-0 w-full h-1 bg-main scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 rounded"></span>
+				</motion.h2>
 
 				{/* Mobile toggle */}
 				<Button
@@ -46,19 +52,34 @@ const Sidebar: FC<SidebarProps> = ({ categories }) => {
 			</div>
 
 			{/* Desktop view */}
-			<div className="hidden lg:flex lg:flex-col lg:overflow-y-scroll lg:h-[420px]">
+			<motion.div
+				initial={{ opacity: 0, x: -20 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ duration: 0.4, ease: "easeOut" }}
+				className="hidden lg:flex lg:flex-col lg:overflow-y-auto lg:h-[420px] gap-1 p-1"
+			>
 				{categories.map((category) => (
 					<Link
 						key={category._id}
 						href={`/products?category=${category.slug}`}
-						className={sidebarClass}
+						className={clsx(
+							"relative group flex items-center px-4 py-2 rounded-lg text-gray-300 font-medium transition-colors duration-300 cursor-pointer overflow-hidden",
+							"hover:text-white hover:bg-white/10"
+						)}
 					>
-						{category.title}
+						<span className="absolute left-0 top-0 h-full w-1 bg-main rounded-l-lg scale-y-0 origin-top transition-transform duration-300 group-hover:scale-y-100"></span>
+						<span className="relative z-10">{category.title}</span>
+						<motion.div
+							className="absolute inset-0 bg-white/5 rounded-lg pointer-events-none"
+							initial={{ opacity: 0 }}
+							whileHover={{ opacity: 1 }}
+							transition={{ duration: 0.3 }}
+						/>
 					</Link>
 				))}
-			</div>
+			</motion.div>
 
-			{/* Mobile animated dropdown */}
+			{/* Mobile dropdown */}
 			<AnimatePresence>
 				{isOpen && (
 					<motion.div

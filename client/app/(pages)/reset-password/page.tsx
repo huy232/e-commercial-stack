@@ -44,8 +44,8 @@ export default function ResetPassword(props: Props) {
 
 	return (
 		<section className="flex flex-col items-center justify-center h-full">
-			<h2 className="text-center font-bold uppercase">
-				Resetting your password
+			<h2 className="text-2xl font-semibold font-bebasNeue">
+				Reset your password
 			</h2>
 			<ResetPasswordForm token={token as string} />
 		</section>

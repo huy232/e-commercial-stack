@@ -132,7 +132,7 @@ const ManageBlogs = ({ initialSearchParams }: ManageBlogsProps) => {
 							{blogs.map((blog) => (
 								<div
 									key={blog._id}
-									className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 items-center px-4 py-2 border-b border-gray-200 text-sm"
+									className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 items-center px-4 py-2 border-b border-gray-300 text-sm"
 								>
 									<div className="flex items-center gap-2 px-2 py-1">
 										<div className="w-20 h-28 relative shrink-0">

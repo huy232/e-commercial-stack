@@ -20,13 +20,13 @@ export const UserOrderSkeleton = () => {
 						className="flex flex-col md:flex-row gap-2 p-2 border-b last:border-none"
 					>
 						{/* Image skeleton */}
-						<div className="w-[120px] h-[120px] bg-gray-300 rounded-md"></div>
+						<div className="w-[120px] h-[120px] bg-gray-400 rounded-md"></div>
 
 						{/* Text skeletons */}
 						<div className="flex flex-col justify-between flex-1">
-							<div className="h-4 w-32 bg-gray-300 rounded mb-2"></div>
-							<div className="h-4 w-24 bg-gray-200 rounded mb-1"></div>
-							<div className="h-4 w-20 bg-gray-200 rounded"></div>
+							<div className="h-4 w-32 bg-gray-400 rounded mb-2"></div>
+							<div className="h-4 w-24 bg-gray-400 rounded mb-1"></div>
+							<div className="h-4 w-20 bg-gray-400 rounded"></div>
 						</div>
 					</div>
 				))}

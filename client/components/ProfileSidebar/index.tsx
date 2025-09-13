@@ -73,7 +73,7 @@ const ProfileSidebar = () => {
 							{/* Close button */}
 							<Button
 								onClick={() => setOpen(false)}
-								className="p-2 mb-2 rounded-md border border-gray-200 hover:bg-gray-100"
+								className="p-2 mb-2 rounded-md border border-gray-300 hover:bg-gray-100"
 								aria-label="Close profile sidebar"
 								role="button"
 								tabIndex={0}

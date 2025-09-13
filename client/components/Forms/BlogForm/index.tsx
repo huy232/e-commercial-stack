@@ -425,7 +425,7 @@ export default function BlogForm({
 								<div className="mt-4 flex items-center gap-2">
 									<Button
 										type="button"
-										className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+										className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
 										disabled={currentPage <= 1}
 										onClick={() => handlePageChange(currentPage - 1)}
 										aria-label="Previous Page"
@@ -457,7 +457,7 @@ export default function BlogForm({
 
 									<Button
 										type="button"
-										className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+										className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
 										disabled={currentPage >= totalPages}
 										onClick={() => handlePageChange(currentPage + 1)}
 										aria-label="Next Page"

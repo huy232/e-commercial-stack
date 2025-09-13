@@ -41,7 +41,7 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 		reader.readAsDataURL(file)
 	}
 
-	const editorClass = "p-1 md:p-2 rounded-md hover:bg-gray-200 transition-all"
+	const editorClass = "p-1 md:p-2 rounded-md hover:bg-gray-300 transition-all"
 
 	return (
 		<>
@@ -352,7 +352,7 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 								<Button
 									type="button"
 									onClick={() => setIsLinkModalOpen(false)}
-									className="px-3 py-1 rounded bg-gray-200"
+									className="px-3 py-1 rounded bg-gray-300"
 									aria-label="Cancel link insertion"
 									role="button"
 									tabIndex={0}

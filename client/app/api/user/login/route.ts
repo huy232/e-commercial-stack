@@ -8,7 +8,10 @@ export async function POST(request: NextRequest) {
 
 		const response = await fetch(url.toString(), {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: {
+				"Content-Type": "application/json",
+				cookie: request.headers.get("cookie") || "",
+			},
 			body: JSON.stringify(body),
 			credentials: "include",
 		})

@@ -290,7 +290,7 @@ const ChatBox = () => {
 								<div key={date}>
 									{/* Date divider */}
 									<div className="flex justify-center my-3">
-										<span className="text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-full">
+										<span className="text-xs bg-gray-300 text-gray-600 px-3 py-1 rounded-full">
 											{date}
 										</span>
 									</div>

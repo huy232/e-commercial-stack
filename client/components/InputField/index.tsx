@@ -1,9 +1,9 @@
 "use client"
-import { ChangeEventHandler, useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import {
 	RegisterOptions,
 	UseFormRegister,
-	ValidationRule,
+	UseFormSetValue,
 } from "react-hook-form"
 import { BiShow, BiHide } from "@/assets/icons"
 import { Button } from "@/components"
@@ -16,7 +16,8 @@ interface InputFieldProps {
 	name: string
 	label?: string
 	register: UseFormRegister<any>
-	required?: boolean | string | ValidationRule<boolean>
+	setValue?: UseFormSetValue<any> // ✅ added
+	required?: boolean | string
 	pattern?: RegisterOptions["pattern"]
 	errorMessage?: string
 	placeholder?: string
@@ -24,7 +25,7 @@ interface InputFieldProps {
 	validate?: (value: string) => boolean | string
 	minLength?: number
 	readOnly?: boolean
-	onChange?: ChangeEventHandler<HTMLInputElement>
+	onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 	disabled?: boolean
 	inputAdditionalClass?: string
 	labelClassName?: string
@@ -39,26 +40,22 @@ interface InputFieldProps {
 		| undefined
 }
 
-type ValidationPattern = RegExp | undefined
-
-const validateTypePatterns: Record<
-	NonNullable<InputFieldProps["validateType"]>,
-	ValidationPattern
-> = {
+const validateTypePatterns = {
 	email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
 	noSpaceNoNumber: /^[^\s0-9]+$/,
-	onlyWords: /^[A-Za-z\s]+$/,
+	onlyWords: /^[A-Za-zÀ-ỹà-ỹĂăÂâĐđÊêÔôƠơƯư\s]+$/,
 	onlyNumbers: /^[0-9,.]+$/,
 	password: /^[^\s]+$/,
 	phoneNumber: /^0\d{9,10}$/,
 	custom: undefined,
-}
+} as const
 
 const InputField: React.FC<InputFieldProps> = ({
 	type = "text",
 	name,
 	label,
 	register,
+	setValue, // ✅
 	required,
 	pattern,
 	errorMessage,
@@ -79,6 +76,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	const togglePasswordVisibility = () => {
 		setPasswordVisible(!passwordVisible)
 	}
+
 	const formatInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (validateType !== "onlyNumbers") {
 			onChange && onChange(e)
@@ -98,6 +96,16 @@ const InputField: React.FC<InputFieldProps> = ({
 		onChange && onChange(e)
 	}
 
+	useEffect(() => {
+		if (!setValue) return
+		const input = document.querySelector<HTMLInputElement>(
+			`input[name="${name}"]`
+		)
+		if (input && input.value) {
+			setValue(name, input.value, { shouldValidate: true })
+		}
+	}, [name, setValue])
+
 	return (
 		<>
 			{label && (
@@ -115,6 +123,18 @@ const InputField: React.FC<InputFieldProps> = ({
 						inputClass(inputAdditionalClass)
 					)}
 					type={togglePassword ? (passwordVisible ? "text" : "password") : type}
+					placeholder={placeholder}
+					autoComplete={
+						name === "firstName"
+							? "given-name"
+							: name === "lastName"
+							? "family-name"
+							: name === "email"
+							? "email"
+							: type === "password"
+							? "new-password"
+							: "on"
+					}
 					{...register(name, {
 						required,
 						pattern: validateType
@@ -128,15 +148,7 @@ const InputField: React.FC<InputFieldProps> = ({
 						},
 						onChange: formatInput,
 					})}
-					placeholder={placeholder}
-					autoComplete={
-						type === "password"
-							? "current-password"
-							: name === "email"
-							? "email"
-							: "on"
-					}
-					onBlur={formatInput}
+					defaultValue={value}
 				/>
 				{togglePassword && (
 					<Button

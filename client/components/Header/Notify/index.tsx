@@ -123,7 +123,7 @@ const Notification = ({ user, notifications }: UserProps) => {
 							"top-[42px] right-[-60px] md:-right-2"
 						)}
 					>
-						<div className="p-2 border-b border-gray-200 flex justify-end items-center text-xs gap-2">
+						<div className="p-2 border-b border-gray-300 flex justify-end items-center text-xs gap-2">
 							<Button
 								className={clsx(
 									filter === "all" ? "text-blue-600 font-bold" : "text-gray-600"
@@ -217,7 +217,7 @@ const Notification = ({ user, notifications }: UserProps) => {
 							)}
 						</div>
 						{notifications.notifications.length > 0 && (
-							<div className="p-2 border-t border-gray-200 bg-white sticky bottom-0">
+							<div className="p-2 border-t border-gray-300 bg-white sticky bottom-0">
 								<Button
 									onClick={markAllAsRead}
 									className="w-full text-sm font-medium text-blue-600 hover:text-blue-800 transition-all hover:bg-black/30 hover:bg-opacity-50 duration-300 ease-in-out py-1 rounded-md"

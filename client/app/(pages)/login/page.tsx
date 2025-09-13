@@ -27,34 +27,56 @@ const LoginForm = dynamic(() => import("@/components/Forms/LoginForm"), {
 
 export default async function Login() {
 	return (
-		<section className="flex flex-col items-center justify-center h-full">
-			<h2 className="text-center font-bold uppercase mb-2">
-				<span className="text-red-500">Log in</span> to your account
-			</h2>
-			<LoginForm />
-			<div className="flex items-center w-[320px] my-2">
-				<div className="flex-1 border-t-2 border-gray-300"></div>
-				<span className="px-2 text-gray-500 text-sm">OR</span>
-				<div className="flex-1 border-t-2 border-gray-300"></div>
-			</div>
-			<GoogleAuth />
-			<div className="flex flex-col text-center my-2 bg-red-500/20 p-2 rounded-lg">
-				<span className="flex gap-1">
-					<span>Don&apos;t have an account?</span>
-					<Link
-						className="text-blue-700 font-semibold hover:opacity-70 duration-200 ease-in-out"
-						href={path.REGISTER}
-					>
-						Sign Up
-					</Link>
-				</span>
-				<span className="italic text-gray-500 text-xs">OR</span>
-				<Link
-					className="text-blue-700 font-semibold hover:opacity-70 duration-200 ease-in-out"
-					href={path.FORGOT_PASSWORD}
-				>
-					Forgot your password?
-				</Link>
+		<section className="flex items-center justify-center">
+			<div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl p-4 flex flex-col gap-2 transition-transform duration-300 my-4">
+				{/* Heading */}
+				<h2 className="text-center text-2xl font-extrabold tracking-wide uppercase text-gray-800 font-bebasNeue">
+					<span className="text-red-500">Log in</span> to your account
+				</h2>
+
+				{/* Form */}
+				<LoginForm />
+
+				{/* Divider */}
+				<div className="flex items-center gap-2">
+					<div className="flex-1 border-t border-gray-300"></div>
+					<span className="text-gray-500 text-sm">OR</span>
+					<div className="flex-1 border-t border-gray-300"></div>
+				</div>
+
+				{/* Google Auth */}
+				<GoogleAuth />
+
+				{/* Footer */}
+				<div className="relative w-full mt-6">
+					{/* gradient line */}
+					<div className="absolute -top-4 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-pink-400 to-purple-500 rounded-full"></div>
+
+					<div className="bg-white shadow-lg rounded-xl p-2 text-center flex flex-col gap-3 border border-gray-300">
+						<span className="text-sm text-gray-700">
+							Don&apos;t have an account?{" "}
+							<Link
+								className="text-red-400 font-semibold hover:underline hover:text-red-800 duration-300"
+								href={path.REGISTER}
+							>
+								Sign Up
+							</Link>
+						</span>
+
+						<div className="flex items-center justify-center gap-2">
+							<div className="flex-1 border-t border-gray-300"></div>
+							<span className="text-xs text-gray-400">OR</span>
+							<div className="flex-1 border-t border-gray-300"></div>
+						</div>
+
+						<Link
+							className="text-sm font-medium text-blue-400 hover:text-blue-800 hover:underline duration-300"
+							href={path.FORGOT_PASSWORD}
+						>
+							Forgot your password?
+						</Link>
+					</div>
+				</div>
 			</div>
 		</section>
 	)

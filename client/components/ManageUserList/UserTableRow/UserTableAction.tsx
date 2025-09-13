@@ -60,7 +60,7 @@ const UserTableAction: FC<UserTableRowProps> = ({
 		additionClassName?: string
 	) =>
 		clsx(
-			"px-2 py-2 align-middle text-sm border-b border-gray-200",
+			"px-2 py-2 align-middle text-sm border-b border-gray-300",
 			userTableColumns[key],
 			additionClassName
 		)

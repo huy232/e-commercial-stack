@@ -8,14 +8,6 @@ export async function authorizeMiddleware(request: NextRequest) {
 	let accessTokenCookie = request.cookies.get("accessToken")
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		// const checkUserResponse = await fetch(API + "/user/check-auth", {
-		// 	method: "GET",
-		// 	headers: {
-		// 		"Content-Type": "application/json",
-		// 		Cookie: cookieHeader || "",
-		// 	},
-		// 	credentials: "include",
-		// })
 
 		const checkUserResponse = await fetch(WEB_URL + `/api/user/check-auth`, {
 			method: "GET",
@@ -44,14 +36,6 @@ export async function loginMiddleware(request: NextRequest) {
 
 	if (refreshTokenCookie || accessTokenCookie) {
 		const cookieHeader = request.headers.get("cookie")
-		// const checkUserResponse = await fetch(API + "/user/check-auth", {
-		// 	method: "GET",
-		// 	headers: {
-		// 		"Content-Type": "application/json",
-		// 		Cookie: cookieHeader || "",
-		// 	},
-		// 	credentials: "include",
-		// })
 
 		const checkUserResponse = await fetch(WEB_URL + `/api/user/check-auth`, {
 			method: "GET",
@@ -97,7 +81,11 @@ export async function adminMiddleware(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
-	const publicRoutes = ["/login", "/register", "/complete-registration"]
+	const publicRoutes = [
+		"/login",
+		"/register",
+		"/complete-registration, /cart, /checkout",
+	]
 	const adminRoutes = ["/admin"]
 	const profileRoutes = ["/profile"]
 	if (

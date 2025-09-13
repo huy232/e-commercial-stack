@@ -40,7 +40,7 @@ export default async function Cart(props: Props) {
 	}
 	return (
 		<main className="w-full xl:w-main">
-			<h1 className="font-bold text-right font-bebasNeue text-2xl mx-2">
+			<h1 className="font-bold text-right font-bebasNeue text-3xl mx-2">
 				<span className="mr-1 text-main">User</span>
 				<span className="">cart</span>
 			</h1>

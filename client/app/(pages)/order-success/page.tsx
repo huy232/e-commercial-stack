@@ -1,11 +1,4 @@
-"use client"
-import { CustomImage } from "@/components"
-import { API } from "@/constant"
-import { OrderType } from "@/types"
-import { formatPrice } from "@/utils"
 import dynamic from "next/dynamic"
-import { redirect } from "next/navigation"
-import { useEffect, useState } from "react"
 
 type Props = {
 	params: {}

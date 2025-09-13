@@ -34,7 +34,7 @@ export default function AdminLayout({
 					<ReduxProvider>
 						<AuthProvider>
 							<Toast />
-							<div className="flex flex-grow w-full">
+							<div className="w-full xl:w-main flex-grow flex flex-col">
 								<AdminSidebar />
 								{children}
 							</div>

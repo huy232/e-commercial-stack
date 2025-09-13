@@ -18,7 +18,7 @@ const PreviewComponent: React.FC<PreviewProps> = ({
 			<h2 className="font-bold">Preview</h2>
 			{content && (
 				<div
-					className="prose prose-lg bg-gray-200 rounded-md p-2 resize-y overflow-auto [&_img]:max-h-64 [&_img]:h-auto [&_img]:mx-auto"
+					className="prose prose-lg bg-gray-300 rounded-md p-2 resize-y overflow-auto [&_img]:max-h-64 [&_img]:h-auto [&_img]:mx-auto"
 					dangerouslySetInnerHTML={{ __html: content }}
 					style={{ minHeight: "120px", maxHeight: "500px" }}
 				/>

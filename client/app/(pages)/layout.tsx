@@ -45,7 +45,9 @@ export default function RootLayout({
 							<Header />
 							<Navbar />
 							<Toast />
-							<div className="w-full xl:w-main flex-grow">{children}</div>
+							<div className="w-full xl:w-main flex-grow flex flex-col">
+								{children}
+							</div>
 							<Footer />
 							<div className="fixed bottom-2 right-0 max-sm:w-full md:bottom-4 md:right-4 flex flex-col-reverse gap-2 items-end z-10">
 								<ChatBox />

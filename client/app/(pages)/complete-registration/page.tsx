@@ -20,69 +20,61 @@ type Props = {
 	searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default async function CompleteRegistration(props: Props) {
-	const token = props.searchParams.token as string | undefined
-	if (!token) {
-		return (
-			<div className="w-main">
-				<div className="flex flex-col gap-2 items-center">
-					<span className="text-rose-500 italic">
-						Something went wrong, please goes back and try sign up again.
-					</span>
-					<span>Please try sign up again.</span>
-					<Link
-						className="border-2 border-rose-500 p-1 rounded hover:bg-rose-500 hover:text-white hover-effect"
-						href={"/register"}
-					>
-						Sign up
-					</Link>
-				</div>
+export default async function CompleteRegistration({ searchParams }: Props) {
+	const token = searchParams.token as string | undefined
+
+	const renderError = (message: string) => (
+		<div className="w-full xl:w-main mx-auto flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
+			<div className="bg-rose-50 border border-rose-300 rounded-xl p-8 text-center shadow-lg">
+				<span className="text-rose-600 font-semibold text-lg block mb-2">
+					{message}
+				</span>
+				<span className="text-rose-400 mb-4 block">
+					Please try signing up again.
+				</span>
+				<Link
+					className="inline-block mt-2 px-6 py-2 border-2 border-rose-500 rounded-full font-medium text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300"
+					href="/register"
+				>
+					Sign Up
+				</Link>
 			</div>
-		)
+		</div>
+	)
+
+	if (!token) {
+		return renderError("Something went wrong, invalid token.")
 	}
 
 	const response = await fetch(
 		WEB_URL + `/user/complete-registration?token=${token}`,
 		{
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
+			headers: { "Content-Type": "application/json" },
 		}
 	)
 	const verifyResponse = await response.json()
+
 	if (!verifyResponse.success) {
-		return (
-			<div className="w-full xl:w-main">
-				<div className="flex flex-col gap-2 items-center">
-					<span className="text-rose-500 italic">
-						{verifyResponse.message
-							? verifyResponse.message
-							: "Something went wrong, please goes back and try sign up again."}
-					</span>
-					<span>Please try sign up again.</span>
-					<Link
-						className="border-2 border-rose-500 p-1 rounded hover:bg-rose-500 hover:text-white hover-effect"
-						href={"/register"}
-					>
-						Sign up
-					</Link>
-				</div>
-			</div>
+		return renderError(
+			verifyResponse.message || "Something went wrong during verification."
 		)
 	}
+
 	return (
-		<div className="w-full xl:w-main">
-			<div className="flex flex-col gap-2 items-center">
-				<span className="text-teal-500 italic">
-					Successfully verifying your account
+		<div className="w-full xl:w-main mx-auto flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
+			<div className="bg-teal-50 border border-teal-300 rounded-xl p-8 text-center shadow-lg transform hover:scale-[1.02] transition-transform duration-300">
+				<span className="text-teal-600 font-semibold text-lg block mb-2">
+					Account Verified!
 				</span>
-				<span>Your account has verified, you can proceed to shopping now.</span>
+				<span className="text-teal-400 mb-4 block">
+					Your account has been successfully verified. Start shopping now!
+				</span>
 				<Link
-					className="border-2 border-teal-500 p-1 rounded hover:bg-teal-500 hover:text-white hover-effect"
-					href={"/"}
+					className="inline-block mt-2 px-6 py-2 border-2 border-teal-500 rounded-full font-medium text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300"
+					href="/"
 				>
-					Home page
+					Go to Home
 				</Link>
 			</div>
 		</div>

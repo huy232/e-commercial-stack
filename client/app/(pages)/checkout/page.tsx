@@ -40,7 +40,7 @@ export default async function Cart(props: Props) {
 	}
 	return (
 		<main className="w-full xl:w-main">
-			<h1 className="font-bold font-bebasNeue text-center text-xl my-2 underline">
+			<h1 className="font-bold font-bebasNeue text-center text-3xl my-2 underline">
 				Checkout cart
 			</h1>
 			<Checkout discount={discount} coupon={coupon} />

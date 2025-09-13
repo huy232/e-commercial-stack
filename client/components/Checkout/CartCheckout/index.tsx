@@ -1,6 +1,7 @@
 import { CustomImage } from "@/components"
 import { Cart, ProfileUser, VariantProperties, VariantType } from "@/types"
 import { formatPrice, handleCalculatePrice } from "@/utils"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface ICartCheckout {
 	mounted: boolean
@@ -12,51 +13,56 @@ const CartCheckout = ({ mounted, cart }: ICartCheckout) => {
 		return null
 	}
 	if (!cart) {
-		return <div>No product in your cart.</div>
+		return <div className="text-center">No product in your cart.</div>
 	}
 
-	const renderVariantDetails = (variant: VariantType) => {
-		return (
-			<div>
-				{variant.variant.map((key, index) => (
-					<div key={index}>
-						<span className="capitalize text-xs font-medium">{key.type}: </span>
-						<span className="text-xs text-gray-500">{key.value}</span>
-					</div>
-				))}
-			</div>
-		)
-	}
-
-	return (
-		<>
-			{cart.map((cartItem, index) => (
-				<div className="flex flex-row items-center mt-2" key={index}>
-					<div className="relative my-auto">
-						<CustomImage
-							src={cartItem.product.thumbnail}
-							alt={cartItem.product.title}
-							fill
-							className="w-[120px] h-[120px]"
-						/>
-						<span className="text-xs absolute top-0 left-0 p-2 bg-black text-white rounded-full w-[30px] h-[30px] flex justify-center items-center">
-							{cartItem.quantity}
-						</span>
-					</div>
-					<div>
-						<span className="font-semibold line-clamp-2">
-							{cartItem.product.title}
-						</span>
-						{cartItem.variant && renderVariantDetails(cartItem.variant)}
-						<div>
-							<span className="text-sm text-teal-500">
-								{formatPrice(handleCalculatePrice(cartItem))}
-							</span>
-						</div>
-					</div>
+	const renderVariantDetails = (variant: VariantType) => (
+		<div className="mt-1">
+			{variant.variant.map((key, index) => (
+				<div key={index} className="text-xs text-gray-500">
+					<span className="capitalize font-medium">{key.type}: </span>
+					{key.value}
 				</div>
 			))}
-		</>
+		</div>
+	)
+
+	return (
+		<div className="space-y-3">
+			<AnimatePresence>
+				{cart.map((cartItem, index) => (
+					<motion.div
+						key={index}
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -20 }}
+						transition={{ duration: 0.3, delay: index * 0.1 }}
+						className="flex items-center gap-3 p-3 bg-white rounded-lg shadow hover:shadow-lg transition-all"
+					>
+						<div className="relative w-[80px] h-[80px] flex-shrink-0">
+							<CustomImage
+								src={cartItem.product.thumbnail}
+								alt={cartItem.product.title}
+								fill
+								className="rounded-lg"
+							/>
+							<span className="absolute -top-2 -left-2 bg-rose-500 text-white text-xs font-bold rounded-full w-[28px] h-[28px] flex justify-center items-center shadow">
+								{cartItem.quantity}
+							</span>
+						</div>
+						<div className="flex-1">
+							<p className="font-semibold line-clamp-2">
+								{cartItem.product.title}
+							</p>
+							{cartItem.variant && renderVariantDetails(cartItem.variant)}
+							<p className="text-sm text-teal-600 mt-1">
+								{formatPrice(handleCalculatePrice(cartItem))}
+							</p>
+						</div>
+					</motion.div>
+				))}
+			</AnimatePresence>
+		</div>
 	)
 }
 export default CartCheckout

@@ -158,7 +158,7 @@ const SingleBlog = ({ blogPostData }: SingleBlogProps) => {
 						<p>You need to be logged in to like or dislike.</p>
 						<div className="mt-4 flex justify-end gap-2">
 							<Button
-								className="px-4 py-2 bg-gray-200 rounded"
+								className="px-4 py-2 bg-gray-300 rounded"
 								onClick={() => setShowModal(false)}
 								aria-label="Continue as guest"
 								role="button"

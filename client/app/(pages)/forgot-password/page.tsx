@@ -16,16 +16,9 @@ export const metadata: Metadata = {
 
 const ForgotPasswordForm = dynamic(
 	() => import("@/components/Forms/ForgotPasswordForm"),
-	{
-		ssr: false,
-	}
+	{ ssr: false }
 )
 
 export default function ForgotPassword() {
-	return (
-		<main className="w-full xl:w-main">
-			<h2>Forgot your password?</h2>
-			<ForgotPasswordForm />
-		</main>
-	)
+	return <ForgotPasswordForm />
 }

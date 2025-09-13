@@ -27,7 +27,7 @@ const ImagePreview: FC<ImagePreviewProps> = ({
 		return (
 			<div
 				key={index}
-				className="relative group w-[160px] h-[160px] shrink-0 mx-2 border border-gray-200 rounded overflow-hidden"
+				className="relative group w-[160px] h-[160px] shrink-0 mx-2 border border-gray-300 rounded overflow-hidden"
 			>
 				<CustomImage
 					src={src}

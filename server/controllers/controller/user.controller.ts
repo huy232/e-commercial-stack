@@ -15,6 +15,7 @@ import { parseInteger } from "../../utils/parseInteger"
 import { UploadedFiles } from "../../types/uploadFile"
 import { transformCartItems } from "../../utils/cartUtils"
 import { userCartPopulate } from "../../constant"
+import { decryptToRawPassword } from "../../utils/decodePassword"
 
 class UserController {
 	register = async (req: Request, res: Response): Promise<void> => {
@@ -69,9 +70,57 @@ class UserController {
 			}/complete-registration?token=${encodeURIComponent(token)}`
 
 			const emailHtml = `
-        <p>Click the following link to complete your registration:</p>
-        <a href="${registrationUrl}">${registrationUrl}</a>
-      `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm your registration</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f6f9fc; font-family:Arial, sans-serif;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td align="center" style="padding:20px 0;">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <tr>
+              <td align="center" style="background-color:#03304b; padding:24px;">
+                <h1 style="margin:0; color:#ffffff; font-size:24px;">Confirm Your Registration</h1>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px; color:#333333; font-size:16px; line-height:24px;">
+                <p style="margin:0 0 16px;">Thank you for signing up! Please confirm your registration by clicking the button below:</p>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding:20px 0;">
+                      <a href="${registrationUrl}" 
+                        style="background-color:#03304b; color:#ffffff; text-decoration:none; padding:12px 24px; border-radius:6px; display:inline-block; font-weight:bold; font-size:16px;">
+                        Complete Registration
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:16px 0 0; font-size:14px; color:#666666;">
+                  Or copy and paste this link into your browser:
+                </p>
+                <p style="margin:8px 0 0; word-break:break-all; font-size:14px; color:#0066cc;">
+                  <a href="${registrationUrl}" style="color:#0066cc; text-decoration:none;">${registrationUrl}</a>
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="background-color:#f0f4f8; padding:16px; font-size:12px; color:#666666;">
+                If you didn’t create an account, you can safely ignore this email.
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+`
 
 			try {
 				await sendMail({
@@ -182,7 +231,6 @@ class UserController {
 			Validators.validateLogin.forEach((validation) => validation.run(req))
 			Validators.runValidation(req, res, async () => {
 				let { email, password } = req.body
-				console.log("Server expected hash:", password)
 				if (!email || !password) {
 					res.status(400).json({
 						success: false,
@@ -208,8 +256,8 @@ class UserController {
 					})
 					return
 				}
-
-				const passwordCheck = await user.isCorrectPassword(password)
+				const rawPassword = decryptToRawPassword(password)
+				const passwordCheck = await user.isCorrectPassword(rawPassword)
 
 				if (passwordCheck) {
 					const userData = user.toObject()
@@ -419,17 +467,101 @@ class UserController {
 				const resetToken = user.createPasswordChangedToken()
 				await user.save()
 
-				const html = `Xin vui lòng nhấn vào đường dẫn bên dưới để thay đổi mật khẩu. Đường dẫn có hiệu lực từ lúc nhận tin nhắn cho đến 15 phút sau. 
-			<a 
-			href=${process.env.URL_CLIENT}/reset-password?token=${encodeURIComponent(
-					resetToken
-				)}
-			>Quên mật khẩu</a>`
+				const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Reset</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f8fa;
+    margin: 0;
+    padding: 0;
+    -webkit-text-size-adjust: 100%;
+  }
+  .container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  h1 {
+    color: #333333;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  p {
+    color: #555555;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+  a.button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff !important;
+    background-color: #4CAF50;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  a.button:hover {
+    background-color: #45a049;
+  }
+  .footer {
+    margin-top: 32px;
+    font-size: 12px;
+    color: #888888;
+  }
+  @media (max-width: 480px) {
+    .card {
+      padding: 24px 16px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    p {
+      font-size: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Password Reset Request</h1>
+      <p>We received a request to reset your password. Click the button below to set a new password. This link will expire in <strong>15 minutes</strong>.</p>
+      <a 
+        href="${
+					process.env.URL_CLIENT
+				}/reset-password?token=${encodeURIComponent(resetToken)}" 
+        class="button"
+      >
+        Reset Your Password
+      </a>
+      <p class="footer">If you did not request a password reset, please ignore this email.</p>
+    </div>
+  </div>
+</body>
+</html>
+`
 
 				const data = {
 					email: email as string,
 					html,
-					subject: "Forgot password",
+					subject: "Reset your password",
 				}
 				await sendMail(data)
 				res.status(200).json({
@@ -461,27 +593,36 @@ class UserController {
 			if (!password || !token) {
 				throw new Error("Missing inputs")
 			}
+
+			// Hash token to match DB
 			const passwordResetToken = crypto
 				.createHash("sha256")
 				.update(token)
 				.digest("hex")
+
 			const user = await User.findOne({
 				passwordResetToken,
 				passwordResetExpired: { $gt: Date.now() },
 			})
+
 			if (!user) {
-				throw new Error("Invalid reset token")
+				throw new Error("Invalid or expired reset token")
 			}
-			user.password = password
+
+			const rawPassword = decryptToRawPassword(password)
+			if (!rawPassword) {
+				throw new Error("Password decryption failed")
+			}
+
+			user.password = rawPassword
 			user.passwordResetToken = undefined
 			user.passwordResetExpired = undefined
 			user.passwordChangedAt = Date.now().toString()
 			await user.save()
+
 			res.status(200).json({
-				success: user ? true : false,
-				message: user
-					? "Updated password"
-					: "Something went wrong while reset password",
+				success: true,
+				message: "Password updated successfully",
 			})
 		}
 	)

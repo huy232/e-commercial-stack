@@ -2,12 +2,8 @@
 
 import { ICoupon } from "@/types"
 import clsx from "clsx"
+import { motion } from "framer-motion"
 import { useFormContext } from "react-hook-form"
-import PaymentCheckout from "../PaymentCheckout"
-
-type CouponFormInputs = {
-	couponCode: string
-}
 
 type UserCartProps = {
 	discount?: string | string[]
@@ -31,21 +27,27 @@ const CouponCheckout = ({
 		return null
 	}
 	return (
-		<div>
-			<div
+		<div className="space-y-2">
+			<motion.p
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
 				className={clsx(
 					coupon && (coupon.success ? "text-teal-500" : "text-red-500"),
-					"text-xs"
+					"text-sm font-medium"
 				)}
 			>
 				{coupon && coupon.message && <p>{coupon.message}</p>}
-			</div>
+			</motion.p>
 			<input
 				type="text"
-				placeholder="Enter discount code here"
+				placeholder="Coupon applied"
 				className={clsx(
-					"w-full border rounded-md py-2 px-4 mt-2",
-					readOnly && "disabled:cursor-not-allowed"
+					"w-full border rounded-md py-2 px-4 transition focus:ring-2 focus:ring-rose-400",
+					readOnly && "disabled:cursor-not-allowed",
+					coupon &&
+						(coupon.success
+							? `border-teal-500 shadow`
+							: `border-red-400 animate-shake`)
 				)}
 				{...register("couponCode")}
 				readOnly={readOnly}

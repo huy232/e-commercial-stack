@@ -60,11 +60,19 @@ const authSlice = createSlice({
 	extraReducers: (builder) => {
 		// Login
 		builder.addCase(handleUserLogin.fulfilled, (state, action) => {
-			state.isAuthenticated = true
-			state.user = action.payload.userData
-			state.isAdmin = action.payload.userData.role.includes("admin")
+			const userData = action.payload?.userData
+			if (userData) {
+				state.isAuthenticated = true
+				state.user = userData
+				state.isAdmin = userData.role?.includes("admin") || false
+			} else {
+				state.isAuthenticated = false
+				state.user = null
+				state.isAdmin = false
+			}
 			state.isLoading = false
 		})
+
 		builder.addCase(handleUserLogin.pending, (state, action) => {
 			state.isLoading = true
 		})
@@ -73,6 +81,7 @@ const authSlice = createSlice({
 			state.user = null
 			state.isAdmin = false
 			state.isLoading = false
+			state.error = action.payload as string // gets "Invalid credentials"
 		})
 
 		// Check authentication

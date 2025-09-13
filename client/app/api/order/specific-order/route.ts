@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
 		if (!res.ok) {
 			return NextResponse.json(
-				{ success: false, message: "Failed to fetch orders" },
+				{ success: false, message: "Failed to fetch specific order" },
 				{ status: res.status }
 			)
 		}

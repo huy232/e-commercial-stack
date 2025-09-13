@@ -22,7 +22,9 @@ const SignUpForm = dynamic(() => import("@/components/Forms/SignUpForm"), {
 export default function SignUp() {
 	return (
 		<section className="flex flex-col items-center justify-center h-full">
-			<h2 className="text-center font-bold uppercase">Creating your account</h2>
+			<h2 className="text-center font-bold uppercase text-3xl mb-6 font-bebasNeue">
+				Creating your account
+			</h2>
 			<SignUpForm />
 		</section>
 	)

@@ -37,7 +37,7 @@ export default function RootLayout({
 							<Header />
 							<Navbar />
 							<Toast />
-							<div className="w-full xl:w-main flex flex-grow">
+							<div className="w-full xl:w-main flex-grow flex flex-col">
 								<div className="flex max-[768px]:flex-col flex-row gap-1 w-full">
 									<ProfileSidebar />
 									{children}

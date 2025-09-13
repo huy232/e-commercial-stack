@@ -14,7 +14,7 @@ const FooterContent = () => {
 					<div className="mx-4">
 						<span>Address: </span>
 						<span className="opacity-50">
-							474 Ontario St Toronto, ON M4X 1M7 Canada
+							123 E-Commerce St, Ho Chi Minh City, VN
 						</span>
 					</div>
 					<div className="mx-4">
@@ -23,7 +23,7 @@ const FooterContent = () => {
 					</div>
 					<div className="mx-4">
 						<span> Mail: </span>
-						<span className="opacity-50">digitalworld@gmail.com</span>
+						<span className="opacity-50">thai.giahuy123@gmail.com</span>
 					</div>
 				</div>
 				<div className="">

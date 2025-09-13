@@ -135,7 +135,7 @@ const UserTableRow: FC<UserTableRowProps> = ({
 				</p>
 				<div className="flex justify-end gap-2 mt-6">
 					<Button
-						className="px-4 py-2 bg-gray-200 text-black rounded"
+						className="px-4 py-2 bg-gray-300 text-black rounded"
 						onClick={handleCloseModal}
 						aria-label="Cancel user deletion"
 						role="button"

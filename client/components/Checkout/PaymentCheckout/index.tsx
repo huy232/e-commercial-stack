@@ -1,14 +1,13 @@
-// PaymentForm.tsx
 "use client"
 import React, { useState } from "react"
 import { useFormContext } from "react-hook-form"
-import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js"
+import { useStripe, useElements } from "@stripe/react-stripe-js"
 import { Button } from "@/components"
 import { CheckoutFormValues } from "../index"
 import { loadStripe } from "@stripe/stripe-js"
 import { Cart, ICoupon } from "@/types"
-import { API } from "@/constant"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
+import { motion } from "framer-motion"
 
 interface IPayment {
 	userCart: Cart[] | null
@@ -29,10 +28,11 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const backUrl = `${pathname}?${searchParams.toString()}`
+
 	const makePayment = async () => {
 		try {
 			setIsProcessing(true)
-			const stripe = await loadStripe(
+			const stripeClient = await loadStripe(
 				process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
 			)
 			const body = {
@@ -40,46 +40,54 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 				couponCode: coupon ? coupon.data.code : "",
 				backUrl,
 			}
-			const headers = {
-				"Content-Type": "application/json",
-			}
 
 			const response = await fetch("/api/order/create-checkout-session", {
 				method: "POST",
-				headers,
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(body),
 				credentials: "include",
 			})
 
 			const session = await response.json()
-			const result = stripe?.redirectToCheckout({
-				sessionId: session.id,
-			})
+			await stripeClient?.redirectToCheckout({ sessionId: session.id })
 		} catch (error) {
-			setMessage("Something went wrong while doing checkout process.")
-			console.log(error)
+			setMessage("⚠️ Something went wrong while processing your checkout.")
+			console.error(error)
 		} finally {
 			setIsProcessing(false)
 		}
 	}
 
 	return (
-		<div className="text-center">
+		<div className="text-center space-y-4">
 			<Button
-				className="py-2 px-6 rounded-md hover-effect border-2 bg-rose-500 hover:text-white inline-block"
+				className="py-3 px-8 rounded-full font-semibold bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md hover:from-rose-600 hover:to-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				type="submit"
 				disabled={isProcessing || !stripe || !elements}
 				loading={isProcessing}
 				onClick={handleSubmit(makePayment)}
 				aria-label="Submit Payment"
 				role="button"
-				tabIndex={0}
-				data-testid="submit-payment-button"
 				id="submit-payment-button"
 			>
-				Submit
+				{isProcessing ? "Processing..." : "Submit Payment"}
 			</Button>
-			{message && <div className="text-red-500 italic">{message}</div>}
+
+			{message && (
+				<motion.div
+					initial={{ opacity: 0, y: -10 }}
+					animate={{ opacity: 1, y: 0 }}
+					className="p-3 rounded-md bg-red-100 text-red-700 text-sm font-medium shadow-sm"
+				>
+					{message}
+				</motion.div>
+			)}
+
+			{!isProcessing && (
+				<p className="text-xs text-gray-500 italic">
+					You’ll be securely redirected to Stripe to complete your payment.
+				</p>
+			)}
 		</div>
 	)
 }

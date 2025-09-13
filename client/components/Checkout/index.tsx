@@ -19,6 +19,8 @@ import {
 	handleCalculatePrice,
 } from "@/utils"
 import { selectCart } from "@/store/slices/cartSlice"
+import PaymentSkeleton from "./PaymentSkeleton"
+import { motion } from "framer-motion"
 
 const stripePromise = loadStripe(
 	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -86,7 +88,7 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 	return (
 		<FormProvider {...methods}>
 			<form className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-				<div className="mx-4 col-span-1 max-h-[260px] overflow-y-auto">
+				<div className="mx-4 col-span-1 row-span-2 max-h-[500px] overflow-y-auto">
 					<CartCheckout mounted={mounted} cart={cart} />
 				</div>
 				<div className="mx-4 col-span-1">
@@ -94,31 +96,36 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 						mounted={mounted}
 						coupon={coupon}
 						discount={discount}
-						readOnly
+						readOnly={true}
 					/>
 				</div>
-				{clientSecret && (
+				{!clientSecret ? (
+					<PaymentSkeleton />
+				) : (
 					<Elements stripe={stripePromise} options={{ clientSecret }}>
-						<div className="flex flex-col col-span-1 lg:col-start-2 lg:col-end-2">
-							<div className="mx-4 border-rose-500 border-2 rounded p-2 mb-4">
-								<div className="flex justify-between items-center py-4">
-									<span className="font-medium">Orignal price</span>
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.4 }}
+							className="flex flex-col col-span-1 lg:col-start-2 lg:col-end-2 mb-4"
+						>
+							<div className="mx-4 border-rose-500 border-2 rounded-lg p-4 mb-4 shadow-sm hover:shadow-md transition">
+								<div className="flex justify-between items-center py-3">
+									<span className="font-medium">Original price</span>
 									<span className="text-xs text-gray-500">
 										{formatPrice(totalPrice)}
 									</span>
 								</div>
-								<div className="flex justify-between items-center py-4">
+								<div className="flex justify-between items-center py-3">
 									<span className="font-medium">Discount</span>
-									<span className="text-sm bg-yellow-500 rounded p-1 text-black">
-										{coupon && coupon.data
-											? formatDiscountDisplay(coupon.data)
-											: "None"}
+									<span className="text-sm bg-yellow-400/90 rounded px-2 py-1 text-black font-semibold">
+										{coupon?.data ? formatDiscountDisplay(coupon.data) : "None"}
 									</span>
 								</div>
-								<div className="flex justify-between items-center py-4">
+								<div className="flex justify-between items-center py-3 border-t pt-3">
 									<span className="font-medium">Total price</span>
-									<span className="text-sm text-teal-500">
-										{coupon && coupon.data
+									<span className="text-base text-teal-600 font-bold">
+										{coupon?.data
 											? formatPrice(
 													formatDiscount(
 														coupon.data.discountType,
@@ -130,8 +137,9 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 									</span>
 								</div>
 							</div>
+
 							<PaymentForm userCart={cart} coupon={coupon} />
-						</div>
+						</motion.div>
 					</Elements>
 				)}
 			</form>

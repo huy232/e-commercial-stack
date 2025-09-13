@@ -23,6 +23,7 @@ import {
 } from "@/store/slices/cartSlice"
 import { RootState } from "@/store"
 import { toast } from "react-toastify"
+import { AnimatePresence, motion } from "framer-motion"
 const SidebarCart = () => {
 	const dispatch = useDispatch<AppDispatch>()
 	const router = useRouter()
@@ -162,11 +163,29 @@ const SidebarCart = () => {
 			>
 				<BsHandbagFill color="red" />
 
-				{!loadingCart && (
-					<span className="whitespace-nowrap">
-						{cart ? cart.length : 0} item(s)
-					</span>
-				)}
+				<AnimatePresence mode="wait">
+					{loadingCart ? (
+						<motion.span
+							key="loading"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							className="text-gray-400 text-xs"
+						>
+							...
+						</motion.span>
+					) : (
+						<motion.span
+							key="count"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							className="whitespace-nowrap"
+						>
+							{cart ? cart.length : 0} item(s)
+						</motion.span>
+					)}
+				</AnimatePresence>
 			</div>
 
 			{typeof window !== "undefined" &&
@@ -288,14 +307,30 @@ const SidebarCart = () => {
 											Update cart
 										</Button>
 										<Link
-											className="rounded p-2 my-1 border-green-500 hover:bg-green-500 hover:text-black hover-effect duration-300 border-2 text-center"
 											href={path.CART}
-											onClick={() => {
+											onClick={(e) => {
+												if (loadingCart) {
+													e.preventDefault()
+													return
+												}
 												router.push(path.CART)
 												setOpen(false)
 											}}
+											className={clsx(
+												"relative rounded p-2 my-1 border-green-500 text-center border-2 flex items-center justify-center gap-2 transition-all duration-300",
+												loadingCart
+													? "pointer-events-none opacity-50 bg-green-300 text-white"
+													: "hover:bg-green-500 hover:text-black"
+											)}
 										>
-											Proceed
+											{loadingCart ? (
+												<>
+													<span className="animate-spin rounded-full border-2 border-t-white border-b-white w-4 h-4"></span>
+													<span>Processing...</span>
+												</>
+											) : (
+												"Proceed"
+											)}
 										</Link>
 									</div>
 								)}
