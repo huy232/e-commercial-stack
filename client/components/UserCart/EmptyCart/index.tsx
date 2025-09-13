@@ -22,7 +22,7 @@ const EmptyCart = () => {
 						Your cart is empty
 					</h2>
 					<p className="text-gray-500 mb-4">
-						Looks like you haven't added any products yet.
+						Looks like you have not added any products yet.
 					</p>
 					<div className="flex flex-col items-center justify-center">
 						<Link
