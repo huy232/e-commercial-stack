@@ -1,4 +1,3 @@
-// Checkout.tsx
 "use client"
 import { useEffect, useMemo, useState } from "react"
 import { CountryCode } from "libphonenumber-js"
@@ -10,8 +9,7 @@ import CartCheckout from "./CartCheckout"
 import CouponCheckout from "./CouponCheckout"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
-import PaymentForm from "./PaymentCheckout" // Import the PaymentForm component
-import { API } from "@/constant"
+import PaymentForm from "./PaymentCheckout"
 import {
 	formatDiscount,
 	formatDiscountDisplay,
@@ -21,6 +19,7 @@ import {
 import { selectCart } from "@/store/slices/cartSlice"
 import PaymentSkeleton from "./PaymentSkeleton"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 const stripePromise = loadStripe(
 	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -87,6 +86,24 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 	}, [])
 	return (
 		<FormProvider {...methods}>
+			<motion.div
+				initial={{ x: -50, opacity: 0 }}
+				animate={{ x: 0, opacity: 1 }}
+				transition={{ duration: 0.6, ease: "easeOut" }}
+				className="text-center sm:text-left mx-2"
+			>
+				<Link
+					href="/cart"
+					className="inline-flex items-center gap-2 py-2 px-4 bg-rose-500 text-white rounded-lg relative overflow-hidden group font-medium transition-all duration-500 hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-500"
+				>
+					<span className="absolute left-2 opacity-0 -translate-x-5 transition-all duration-500 group-hover:-translate-x-1 group-hover:opacity-100">
+						←
+					</span>
+					<span className="relative z-10 transition-transform duration-500 group-hover:translate-x-1">
+						Back to cart
+					</span>
+				</Link>
+			</motion.div>
 			<form className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 				<div className="mx-4 col-span-1 row-span-2 max-h-[500px] overflow-y-auto">
 					<CartCheckout mounted={mounted} cart={cart} />

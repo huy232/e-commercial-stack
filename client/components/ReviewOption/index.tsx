@@ -28,6 +28,8 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 }) => {
 	const [value, setValue] = useState("")
 	const [star, setStar] = useState<number>(0)
+	const [isSubmitting, setIsSubmitting] = useState(false)
+
 	const headingClassName = clsx(
 		`hidden lg:block mb-1 text-lg font-bold border-l-2 border-main pl-1 uppercase font-bebasNeue`
 	)
@@ -76,8 +78,13 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 			)}
 			<Button
 				onClick={() => {
-					handleSubmitReview({ value, star, productId })
-					resetForm()
+					setIsSubmitting(true)
+					try {
+						handleSubmitReview({ value, star, productId })
+						resetForm()
+					} finally {
+						setIsSubmitting(false)
+					}
 				}}
 				className="rounded bg-red-500 text-white p-1 hover-effect"
 				aria-label="Submit review"
@@ -85,8 +92,8 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 				tabIndex={0}
 				data-testid="submit-review-button"
 				id="submit-review-button"
-				disabled={star === 0 || value.trim() === ""}
-				loading={star === 0 || value.trim() === ""}
+				disabled={star === 0 || value.trim() === "" || isSubmitting}
+				loading={isSubmitting}
 			>
 				Submit
 			</Button>
