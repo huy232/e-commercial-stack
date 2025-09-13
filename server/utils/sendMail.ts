@@ -19,7 +19,7 @@ const sendMail = async ({ email, html, subject }: MailParams) => {
 		})
 
 		const info = await transporter.sendMail({
-			from: '"E-commercial Takama" <no-reply@takama.com>', // sender address
+			from: '"Digital World Commercial" <no-reply@takama.com>', // sender address
 			to: email, // list of receivers
 			subject: subject, // Subject line
 			html: html, // html body

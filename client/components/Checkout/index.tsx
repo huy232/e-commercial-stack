@@ -20,6 +20,7 @@ import { selectCart } from "@/store/slices/cartSlice"
 import PaymentSkeleton from "./PaymentSkeleton"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { selectAuthUser } from "@/store/slices/authSlice"
 
 const stripePromise = loadStripe(
 	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -54,10 +55,10 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 			couponCode: discount ? (discount as string) : "",
 		},
 	})
-
-	const mounted = useMounted()
+	const user = useSelector(selectAuthUser)
 	const cart = useSelector<RootState, Cart[] | null>(selectCart)
 	const [clientSecret, setClientSecret] = useState("")
+	const mounted = useMounted()
 
 	const totalPrice = useMemo(() => {
 		if (!cart) {
@@ -70,6 +71,7 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 	}, [cart])
 
 	useEffect(() => {
+		if (!user) return
 		const createPaymentIntent = async () => {
 			const response = await fetch("/api/order/create-payment-intent", {
 				method: "POST",
@@ -83,7 +85,55 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 			setClientSecret(data.clientSecret)
 		}
 		createPaymentIntent()
-	}, [])
+	}, [user])
+
+	if (!mounted) {
+		return (
+			<div className="flex items-center justify-center">
+				<div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+			</div>
+		)
+	}
+
+	if (mounted && !user) {
+		// UI for users not logged in
+		return (
+			<div className="flex flex-col items-center justify-center gap-4 h-[60vh]">
+				<motion.div
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5 }}
+					className="text-center"
+				>
+					<h2 className="text-2xl font-bold mb-2">You need to log in first</h2>
+					<p className="text-gray-600 mb-4">
+						Please login to complete your checkout and proceed with payment.
+					</p>
+					<div className="flex gap-4 justify-center flex-wrap">
+						<Link
+							href="/login"
+							className="px-6 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition"
+						>
+							Login
+						</Link>
+						<Link
+							href="/register"
+							className="px-6 py-2 border-2 border-teal-500 text-teal-500 rounded-lg font-medium hover:bg-teal-500 hover:text-white transition"
+						>
+							Register
+						</Link>
+						<Link
+							href="/cart"
+							className="px-6 py-2 border-2 border-gray-400 text-gray-600 rounded-lg font-medium hover:bg-gray-200 transition"
+						>
+							Continue as guest
+						</Link>
+					</div>
+				</motion.div>
+			</div>
+		)
+	}
+
 	return (
 		<FormProvider {...methods}>
 			<motion.div

@@ -16,7 +16,7 @@ interface InputFieldProps {
 	name: string
 	label?: string
 	register: UseFormRegister<any>
-	setValue?: UseFormSetValue<any> // ✅ added
+	setValue?: UseFormSetValue<any>
 	required?: boolean | string
 	pattern?: RegisterOptions["pattern"]
 	errorMessage?: string
@@ -38,6 +38,7 @@ interface InputFieldProps {
 		| "phoneNumber"
 		| "custom"
 		| undefined
+	maxLength?: number
 }
 
 const validateTypePatterns = {
@@ -50,12 +51,22 @@ const validateTypePatterns = {
 	custom: undefined,
 } as const
 
+// default max lengths based on field name or type
+const defaultMaxLength = (name: string, validateType?: string) => {
+	if (validateType === "email") return 100
+	if (validateType === "password") return 50
+	if (validateType === "phoneNumber") return 11
+	if (validateType === "noSpaceNoNumber" || validateType === "onlyWords")
+		return 50
+	return 255
+}
+
 const InputField: React.FC<InputFieldProps> = ({
 	type = "text",
 	name,
 	label,
 	register,
-	setValue, // ✅
+	setValue,
 	required,
 	pattern,
 	errorMessage,
@@ -70,6 +81,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	value,
 	inputAdditionalClass,
 	labelClassName,
+	maxLength,
 }) => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -77,17 +89,19 @@ const InputField: React.FC<InputFieldProps> = ({
 		setPasswordVisible(!passwordVisible)
 	}
 
+	const appliedMaxLength = maxLength ?? defaultMaxLength(name, validateType)
+
 	const formatInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (validateType !== "onlyNumbers") {
 			onChange && onChange(e)
 			return
 		}
 
-		let { value } = e.target
-		value = value.replace(/[^0-9]/g, "")
+		let val = e.target.value
+		val = val.replace(/[^0-9]/g, "").slice(0, appliedMaxLength) // enforce maxLength
 
-		if (value) {
-			const numberValue = parseFloat(value)
+		if (val) {
+			const numberValue = parseFloat(val)
 			e.target.value = isNaN(numberValue) ? "" : numberValue.toLocaleString()
 		} else {
 			e.target.value = "0"
@@ -135,15 +149,18 @@ const InputField: React.FC<InputFieldProps> = ({
 							? "new-password"
 							: "on"
 					}
+					maxLength={appliedMaxLength}
 					{...register(name, {
 						required,
 						pattern: validateType
 							? validateTypePatterns[validateType]
 							: pattern,
 						validate: (inputValue) => {
-							if (validate) return validate(inputValue)
 							if (minLength && inputValue.length < minLength)
-								return `Password must be at least ${minLength} characters`
+								return `Must be at least ${minLength} characters`
+							if (inputValue.length > appliedMaxLength)
+								return `Must be at most ${appliedMaxLength} characters`
+							if (validate) return validate(inputValue)
 							return true
 						},
 						onChange: formatInput,

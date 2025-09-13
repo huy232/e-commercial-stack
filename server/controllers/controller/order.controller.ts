@@ -618,7 +618,7 @@ class OrderController {
 				default:
 					console.log(`Unhandled event type ${event.type}`)
 			}
-			res.status(200).send()
+			res.status(200).send("ok")
 		} catch (error) {
 			console.log("Something wrong with webhook")
 			console.log(error)

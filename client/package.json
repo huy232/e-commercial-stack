@@ -72,6 +72,7 @@
     "sharp": "^0.33.4",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.7.5",
+    "stripe": "^18.5.0",
     "swiper": "^11.1.14",
     "vn-local-plus": "^1.1.5"
   },

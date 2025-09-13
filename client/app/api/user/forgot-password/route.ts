@@ -24,11 +24,11 @@ export async function POST(request: NextRequest) {
 			},
 		})
 	} catch (error) {
-		console.error("Error forgotting password:", error)
+		console.error("Error forgetting password:", error)
 		return NextResponse.json(
 			{
 				success: false,
-				message: "Error forgotting password",
+				message: "Error forgetting password",
 			},
 			{ status: 500 }
 		)

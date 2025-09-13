@@ -69,7 +69,7 @@ const ForgotPasswordForm = () => {
 			initial={{ opacity: 0, scale: 0.95 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ duration: 0.4, ease: "easeOut" }}
-			className="w-full max-w-md bg-white shadow-xl rounded-2xl p-4 border border-gray-100 flex flex-col items-center justify-center flex-grow h-full"
+			className="w-full bg-white shadow-xl rounded-2xl p-4 border border-gray-100 flex flex-col items-center justify-center flex-grow h-full"
 		>
 			<form
 				className="flex flex-col space-y-6"
