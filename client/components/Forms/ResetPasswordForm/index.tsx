@@ -78,7 +78,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 			initial={{ opacity: 0, scale: 0.95 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ duration: 0.4, ease: "easeOut" }}
-			className="w-full max-w-md bg-white shadow-xl rounded-2xl p-4 border border-gray-100"
+			className="w-full bg-white shadow-xl rounded-2xl p-4 border border-gray-100"
 		>
 			<AnimatePresence mode="wait">
 				{confirm ? (
