@@ -119,7 +119,6 @@ class CouponController {
 				{ activeCouple: { $exists: false } },
 				{ $set: { activeCouple: true } }
 			)
-			console.log("Print this: ", response)
 			res.json({
 				success: response ? true : false,
 				data: response ? response : [],

@@ -997,7 +997,6 @@ class UserController {
 
 	checkAuth = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-			// console.log("Auth check: ", req.user)
 			res.status(200).json({ success: true, message: "Valid user" })
 		}
 	)

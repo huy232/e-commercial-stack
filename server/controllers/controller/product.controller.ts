@@ -125,7 +125,6 @@ class ProductController {
 
 				let queryString = JSON.stringify(queries)
 
-				console.log(queryString)
 				queryString = queryString.replace(
 					/\b(gte|gt|lt|lte)\b/g,
 					(matchedElement) => `$${matchedElement}`

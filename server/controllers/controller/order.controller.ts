@@ -693,9 +693,6 @@ class OrderController {
 		async (req: AuthenticatedRequest, res: Response) => {
 			const { orderId } = req.query
 			const { _id } = req.user
-
-			console.log("Order ID: ", orderId)
-			console.log("User: ", _id)
 			if (!_id) {
 				res.json({
 					success: false,

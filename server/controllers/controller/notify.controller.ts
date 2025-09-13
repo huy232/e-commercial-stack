@@ -29,8 +29,6 @@ class NotifyController {
 			const limit = parseInt(req.query.limit as string) || 5
 			const type = (req.query.type as string) || "all"
 
-			console.log("Filter: ", type)
-
 			if (!["all", "unread", "read"].includes(type)) {
 				return res.status(400).json({
 					success: false,

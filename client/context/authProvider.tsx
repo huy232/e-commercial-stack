@@ -68,7 +68,6 @@ export default function AuthProvider({
 
 			socket.on("connect", () => {
 				socket?.emit("registerUser", user._id)
-				console.log(`User ${user._id} registered with socket ${socket?.id}`)
 			})
 
 			socket.on("newNotification", async (notification) => {

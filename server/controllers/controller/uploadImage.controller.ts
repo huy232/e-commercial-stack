@@ -59,7 +59,6 @@ class UploadImageController {
 						return { url, success: false, error: "Invalid Cloudinary URL" }
 
 					try {
-						console.log(publicId)
 						await cloudinary.uploader.destroy(publicId)
 						return { url, success: true }
 					} catch (err) {

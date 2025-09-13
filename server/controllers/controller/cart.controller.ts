@@ -295,15 +295,8 @@ class CartController {
 
 				if (existingItem) {
 					if (quantity <= 0) {
-						// console.log("Removing item from cart:", existingItem)
 						cart!.items = cart!.items.filter((item) => item !== existingItem)
 					} else {
-						// console.log(
-						// 	"Updating quantity:",
-						// 	existingItem.quantity,
-						// 	"->",
-						// 	quantity
-						// )
 						existingItem.quantity = quantity
 					}
 				}

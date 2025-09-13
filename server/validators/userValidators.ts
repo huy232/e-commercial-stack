@@ -4,7 +4,6 @@ import CryptoJS from "crypto-js"
 
 const passwordPolicy = check("password").custom((value, { req }) => {
 	try {
-		console.log("Server secret:", `"${process.env.CLIENT_HASH_SECRET}"`)
 		const bytes = CryptoJS.AES.decrypt(
 			value,
 			process.env.CLIENT_HASH_SECRET as string

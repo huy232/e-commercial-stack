@@ -61,8 +61,6 @@ class WishlistController {
 			const { _id } = req.user
 			const { page = 1, limit = 10 } = req.query
 
-			console.log("Page: ", page, "Limit: ", limit)
-
 			if (!_id) {
 				return res.status(400).json({
 					success: false,
