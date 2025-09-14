@@ -4,36 +4,30 @@ import { OrderType } from "@/types"
 import clsx from "clsx"
 import moment from "moment"
 import { formatPrice } from "@/utils"
-import { API, orderHeaders, sortableOrderFields } from "@/constant"
+import { orderHeaders, sortableOrderFields } from "@/constant"
 import { SortableTableHeader, Button } from "@/components"
 import { AnimatePresence, motion } from "framer-motion"
 
 interface OrdersTableRowProps {
 	orderList: OrderType[] | []
 	onOrderListChange: () => void
-}
-
-interface ModifiedOrder {
-	_id: string
-	status: string
+	loading: boolean
 }
 
 const OrdersTableRow: FC<OrdersTableRowProps> = ({
 	orderList,
 	onOrderListChange,
+	loading,
 }) => {
 	const [loadingRemove, setLoadingRemove] = useState<string[]>([])
 	const [enableEdit, setEnableEdit] = useState<boolean>(false)
 	const [modifiedOrders, setModifiedOrders] = useState<{
-		[key: string]: string // Store the status as the value
+		[key: string]: string
 	}>({})
 	const [orderStatuses, setOrderStatuses] = useState<{ [key: string]: string }>(
 		() =>
 			Object.fromEntries(orderList.map((order) => [order._id, order.status]))
 	)
-
-	const tdClass = (additionClassName?: string) =>
-		clsx("hidden lg:table-cell px-1 py-1 align-middle", additionClassName)
 
 	const orderStatus = [
 		"Cancelled",
@@ -43,32 +37,29 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 		"Delivering",
 	]
 
-	// Track the status change of an order
 	const handleStatusChange = (orderId: string, newStatus: string) => {
 		const originalOrder = orderList.find((order) => order._id === orderId)
 		if (!originalOrder) return
 
 		const originalStatus = originalOrder.status
 
-		// Update displayed status
 		setOrderStatuses((prev) => ({
 			...prev,
 			[orderId]: newStatus,
 		}))
 
-		// Track changes only if status is different
 		setModifiedOrders((prev) => {
 			if (originalStatus !== newStatus) {
 				return { ...prev, [orderId]: newStatus }
 			} else {
-				const { [orderId]: _, ...rest } = prev // Remove if status is unchanged
+				const { [orderId]: _, ...rest } = prev
 				return rest
 			}
 		})
 	}
 
 	const handleUpdateOrders = async () => {
-		const response = await fetch("/api/order/update-orders", {
+		await fetch("/api/order/update-orders", {
 			body: JSON.stringify(modifiedOrders),
 			credentials: "include",
 			method: "PUT",
@@ -76,11 +67,34 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 				"Content-Type": "application/json",
 			},
 		})
-		// Add your update logic here
 		setModifiedOrders({})
 		setEnableEdit(false)
 		onOrderListChange()
 	}
+
+	// Skeleton for loading state
+	const SkeletonRow = () => (
+		<motion.tr
+			className="animate-pulse text-sm bg-white/60 border"
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+		>
+			{Array.from({ length: 7 }).map((_, idx) => (
+				<td key={idx} className="px-2 py-3">
+					<div className="h-4 bg-gray-200 rounded w-3/4"></div>
+				</td>
+			))}
+		</motion.tr>
+	)
+
+	const SkeletonCard = () => (
+		<div className="animate-pulse bg-white/60 border rounded p-3 shadow-sm">
+			<div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+			<div className="h-3 bg-gray-200 rounded w-1/3 mb-1"></div>
+			<div className="h-3 bg-gray-200 rounded w-1/2 mb-1"></div>
+			<div className="h-3 bg-gray-200 rounded w-1/4"></div>
+		</div>
+	)
 
 	return (
 		<>
@@ -135,52 +149,58 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 
 			{/* Mobile Cards */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 lg:hidden">
-				{orderList.map((order) => (
-					<div
-						key={order._id}
-						className={clsx(
-							"bg-white/60 shadow-sm hover:shadow-md rounded p-3 transition-all",
-							modifiedOrders[order._id] ? "border-2 border-red-500" : "border"
-						)}
-					>
-						<span className="line-clamp-1 text-sm font-semibold">
-							{order._id}
-						</span>
-
-						<div className="grid grid-cols-[80px_auto] gap-1 mt-2 text-xs">
-							<span className="text-gray-500">Total</span>
-							<span className="font-semibold text-green-600">
-								{formatPrice(order.total)}
-							</span>
-						</div>
-
-						<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
-							<span className="text-gray-500">Status</span>
-							<select
-								value={orderStatuses[order._id]}
-								disabled={!enableEdit}
-								onChange={(e) => handleStatusChange(order._id, e.target.value)}
-								className="border rounded px-1 py-0.5 focus:outline-none focus:ring-main transition-all text-xs"
+				{loading
+					? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+					: orderList.map((order) => (
+							<div
+								key={order._id}
+								className={clsx(
+									"bg-white/60 shadow-sm hover:shadow-md rounded p-3 transition-all",
+									modifiedOrders[order._id]
+										? "border-2 border-red-500"
+										: "border"
+								)}
 							>
-								{orderStatus.map((s) => (
-									<option key={s}>{s}</option>
-								))}
-							</select>
-						</div>
+								<span className="line-clamp-1 text-sm font-semibold">
+									{order._id}
+								</span>
 
-						<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
-							<span className="text-gray-500">Coupon</span>
-							<span>{order.coupon?.name || "None"}</span>
-						</div>
+								<div className="grid grid-cols-[80px_auto] gap-1 mt-2 text-xs">
+									<span className="text-gray-500">Total</span>
+									<span className="font-semibold text-green-600">
+										{formatPrice(order.total)}
+									</span>
+								</div>
 
-						<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
-							<span className="text-gray-500">Created</span>
-							<span className="italic text-gray-500">
-								{moment(order.createdAt).fromNow()}
-							</span>
-						</div>
-					</div>
-				))}
+								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+									<span className="text-gray-500">Status</span>
+									<select
+										value={orderStatuses[order._id]}
+										disabled={!enableEdit}
+										onChange={(e) =>
+											handleStatusChange(order._id, e.target.value)
+										}
+										className="border rounded px-1 py-0.5 focus:outline-none focus:ring-main transition-all text-xs"
+									>
+										{orderStatus.map((s) => (
+											<option key={s}>{s}</option>
+										))}
+									</select>
+								</div>
+
+								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+									<span className="text-gray-500">Coupon</span>
+									<span>{order.coupon?.name || "None"}</span>
+								</div>
+
+								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+									<span className="text-gray-500">Created</span>
+									<span className="italic text-gray-500">
+										{moment(order.createdAt).fromNow()}
+									</span>
+								</div>
+							</div>
+					  ))}
 			</div>
 
 			{/* Desktop Table */}
@@ -190,49 +210,51 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 					sortableFields={sortableOrderFields}
 				/>
 				<tbody>
-					{orderList.map((order, index) => (
-						<motion.tr
-							key={order._id}
-							layout
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -10 }}
-							transition={{ duration: 0.25 }}
-							className={clsx(
-								"text-sm bg-white/60 shadow-sm hover:shadow-md transition-all",
-								modifiedOrders[order._id]
-									? "border-2 border-red-500"
-									: "border border-transparent"
-							)}
-						>
-							<td className="px-2 py-1">{index + 1}</td>
-							<td className="px-2 py-1">{order._id}</td>
-							<td className="px-2 py-1">
-								{order.orderBy.firstName} {order.orderBy.lastName}
-							</td>
-							<td className="px-2 py-1">
-								<select
-									value={orderStatuses[order._id]}
-									disabled={!enableEdit}
-									onChange={(e) =>
-										handleStatusChange(order._id, e.target.value)
-									}
-									className="bg-transparent focus:outline-none"
+					{loading
+						? Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
+						: orderList.map((order, index) => (
+								<motion.tr
+									key={order._id}
+									layout
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -10 }}
+									transition={{ duration: 0.25 }}
+									className={clsx(
+										"text-sm bg-white/60 shadow-sm hover:shadow-md transition-all",
+										modifiedOrders[order._id]
+											? "border-2 border-red-500"
+											: "border border-transparent"
+									)}
 								>
-									{orderStatus.map((s) => (
-										<option key={s}>{s}</option>
-									))}
-								</select>
-							</td>
-							<td className="px-2 py-1">{order.coupon?.name || "None"}</td>
-							<td className="px-2 py-1 text-green-600 font-semibold">
-								{formatPrice(order.total)}
-							</td>
-							<td className="px-2 py-1">
-								{moment(order.createdAt).format("DD-MM-YYYY")}
-							</td>
-						</motion.tr>
-					))}
+									<td className="px-2 py-1">{index + 1}</td>
+									<td className="px-2 py-1">{order._id}</td>
+									<td className="px-2 py-1">
+										{order.orderBy.firstName} {order.orderBy.lastName}
+									</td>
+									<td className="px-2 py-1">
+										<select
+											value={orderStatuses[order._id]}
+											disabled={!enableEdit}
+											onChange={(e) =>
+												handleStatusChange(order._id, e.target.value)
+											}
+											className="bg-transparent focus:outline-none"
+										>
+											{orderStatus.map((s) => (
+												<option key={s}>{s}</option>
+											))}
+										</select>
+									</td>
+									<td className="px-2 py-1">{order.coupon?.name || "None"}</td>
+									<td className="px-2 py-1 text-green-600 font-semibold">
+										{formatPrice(order.total)}
+									</td>
+									<td className="px-2 py-1">
+										{moment(order.createdAt).format("DD-MM-YYYY")}
+									</td>
+								</motion.tr>
+						  ))}
 				</tbody>
 			</table>
 		</>

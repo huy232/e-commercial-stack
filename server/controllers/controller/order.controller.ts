@@ -669,11 +669,11 @@ class OrderController {
 	updateOrders = async (req: Request, res: Response) => {
 		try {
 			const modifiedOrders = req.body
+
 			if (!modifiedOrders) {
 				return res.status(400).json({ message: "Invalid request body" })
 			}
 
-			// Cast Object.entries to ensure TypeScript knows that status is a string
 			const modifiedOrdersArray = Object.entries(modifiedOrders).map(
 				([_id, status]) => ({ _id, status: status as string })
 			)
@@ -682,7 +682,7 @@ class OrderController {
 				(order: { _id: string; status: string }) => {
 					return {
 						updateOne: {
-							filter: { _id: order._id },
+							filter: { _id: new mongoose.Types.ObjectId(order._id) },
 							update: { status: order.status },
 						},
 					}

@@ -4,7 +4,7 @@ import { API } from "@/constant"
 export async function PUT(request: NextRequest) {
 	try {
 		const body = await request.json()
-		const res = await fetch(`${API}/order`, {
+		const res = await fetch(`${API}/order/update-orders`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",

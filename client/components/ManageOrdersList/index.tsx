@@ -53,16 +53,13 @@ const ManageProducts: FC = () => {
 
 	return (
 		<div className="w-full p-4">
-			{!loading && (
-				<>
-					<SearchOrders />
-					<OrdersTableRow
-						orderList={ordersList}
-						onOrderListChange={handleOrdersListChange}
-					/>
-					<Pagination totalPages={totalPages} />
-				</>
-			)}
+			<SearchOrders />
+			<OrdersTableRow
+				orderList={ordersList}
+				onOrderListChange={handleOrdersListChange}
+				loading={loading}
+			/>
+			<Pagination totalPages={totalPages} />
 		</div>
 	)
 }
