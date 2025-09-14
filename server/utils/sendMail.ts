@@ -82,6 +82,10 @@ export async function sendMail({ email, subject, html }: MailOptions) {
 			html,
 		})
 
+		if (response.data.error) {
+			throw new Error(response.data.error)
+		}
+
 		return response.data
 	} catch (err: any) {
 		console.error("Failed to send email via Vercel:", err.message)
