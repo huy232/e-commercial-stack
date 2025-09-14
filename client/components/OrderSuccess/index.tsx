@@ -100,17 +100,19 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 						/>
 						<div className="flex-1 flex flex-col">
 							<span className="font-semibold">{item.product.title}</span>
-							{(item.variant.variant as { type: string; value: string }[]).map(
-								(v, idx) => (
-									<p className="text-gray-500 text-xs capitalize" key={idx}>
-										{v.type}: {v.value}
-									</p>
-								)
-							)}
+							{item.variant &&
+								Array.isArray(item.variant.variant) &&
+								item.variant.variant.map(
+									(v: { type: string; value: string }, idx: number) => (
+										<p className="text-gray-500 text-xs capitalize" key={idx}>
+											{v.type}: {v.value}
+										</p>
+									)
+								)}
 							<span className="text-sm">Quantity: {item.quantity}</span>
 						</div>
 						<div className="text-green-500 font-semibold">
-							{formatPrice(item.product.price + (item.variant.price || 0))}
+							{formatPrice(item.product.price + (item.variant?.price || 0))}
 						</div>
 					</motion.div>
 				))}

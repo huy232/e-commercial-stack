@@ -28,7 +28,7 @@ const ChatBox = () => {
 	>([])
 	const [inputMessage, setInputMessage] = useState("")
 	const [guestNameInput, setGuestNameInput] = useState(
-		user ? user.firstName + user.lastName : ""
+		user ? user.firstName + " " + user.lastName : ""
 	)
 
 	const messagesEndRef = useRef<HTMLDivElement>(null)

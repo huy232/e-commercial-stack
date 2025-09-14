@@ -70,15 +70,19 @@ const WishlistComponent = () => {
 
 	if (loading) return <LoadingSpinner />
 
-	if (!wishlistData) {
+	if (!wishlistData || wishlistData.wishlist.length === 0) {
 		return <div className="text-center text-gray-500">No wishlist found.</div>
 	}
 
 	const { wishlist, totalPages } = wishlistData
 
 	return (
-		<div className="w-full flex flex-col h-full justify-between">
-			<UserWishlist user={user} userWishlist={wishlist} />
+		<div className="w-full flex flex-col justify-between">
+			<UserWishlist
+				user={user}
+				userWishlist={wishlist}
+				refreshWishlist={() => fetchUserWishlist(1)}
+			/>
 			<Pagination totalPages={totalPages} showPageInput />
 		</div>
 	)

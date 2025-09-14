@@ -18,17 +18,14 @@ import { AiOutlineLoading, FaTrashAlt } from "@/assets/icons"
 interface UserOrderProps {
 	user: ProfileUser
 	userWishlist: any
+	refreshWishlist: () => Promise<void>
 }
 
-interface Product {
-	_id: string
-	title: string
-	thumbnail: string
-	allowVariants: boolean
-	price: number
-}
-
-const UserWishlist: FC<UserOrderProps> = ({ user, userWishlist }) => {
+const UserWishlist: FC<UserOrderProps> = ({
+	user,
+	userWishlist,
+	refreshWishlist,
+}) => {
 	const [loading, setLoading] = useState(false)
 	const dispatch = useDispatch<AppDispatch>()
 	const handleRemoveWishlist = async (product_id: string) => {
@@ -38,11 +35,8 @@ const UserWishlist: FC<UserOrderProps> = ({ user, userWishlist }) => {
 		}
 		setLoading(true)
 		await dispatch(handleUserWishlist(product_id))
+		await refreshWishlist()
 		setLoading(false)
-	}
-
-	if (userWishlist.length === 0) {
-		return <div>There is currently no wishlist.</div>
 	}
 
 	return (
