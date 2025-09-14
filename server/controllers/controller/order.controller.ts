@@ -593,11 +593,20 @@ class OrderController {
 								  </div>
 								`
 
-								const response = await sendMail({
-									email: user.email,
-									html: emailHtml,
-									subject: "User billing information",
-								})
+								try {
+									await sendMail({
+										email: user.email,
+										html: emailHtml,
+										subject: "User billing information",
+									})
+								} catch (error) {
+									res.status(500).json({
+										success: false,
+										message:
+											"Something went wrong when trying to send mail for user billing information.",
+									})
+									return
+								}
 
 								const io = req.app.get("io") // Access io instance from app
 								io.emit("orderUpdated", {

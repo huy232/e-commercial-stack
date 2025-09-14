@@ -26,7 +26,10 @@ dbConnect()
 		app.use(
 			cors({
 				credentials: true,
-				origin: [process.env.CLIENT_URL as string],
+				origin: [
+					process.env.CLIENT_URL as string,
+					process.env.VERCEL_MAILER_URI as string,
+				],
 				methods: ["POST", "PUT", "GET", "DELETE"],
 			})
 		)

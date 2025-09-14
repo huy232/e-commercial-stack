@@ -66,9 +66,7 @@
 
 import axios from "axios"
 
-const VERCE_MAILER_URL =
-	process.env.VERCEL_MAILER_URL ||
-	"https://vercel-mailer-hazel.vercel.app/api/send-email"
+const VERCEL_MAILER_URL = process.env.VERCEL_MAILER_URL as string
 
 interface MailOptions {
 	email: string
@@ -78,10 +76,9 @@ interface MailOptions {
 
 export async function sendMail({ email, subject, html }: MailOptions) {
 	try {
-		const response = await axios.post(VERCE_MAILER_URL, {
+		const response = await axios.post(VERCEL_MAILER_URL, {
 			to: email,
 			subject,
-			text: "",
 			html,
 		})
 

@@ -138,9 +138,9 @@ class UserController {
 			} catch (err) {
 				res.status(500).json({
 					success: false,
-					message: "Something went wrong with verify email.",
+					message:
+						"Something went wrong when trying to send mail for user registration",
 				})
-
 				return
 			}
 		} catch (error) {
@@ -557,13 +557,21 @@ class UserController {
 </body>
 </html>
 `
-
-				const data = {
-					email: email as string,
-					html,
-					subject: "Reset your password",
+				try {
+					const data = {
+						email: email as string,
+						html,
+						subject: "Reset your password",
+					}
+					await sendMail(data)
+				} catch (error) {
+					res.status(500).json({
+						success: false,
+						message:
+							"Something went wrong when trying to send mail for verifying resetting password.",
+					})
+					return
 				}
-				await sendMail(data)
 				res.status(200).json({
 					success: true,
 					message: "Verify your password resetting in the mail.",
