@@ -42,14 +42,13 @@ export default async function Products(props: Props) {
 			if (typeof value === "string") {
 				acc[key] = value
 			} else if (Array.isArray(value)) {
-				acc[key] = value.join(",") // or handle arrays as needed
+				acc[key] = value.join(",")
 			}
 			return acc
 		},
 		{}
 	)
 
-	// Construct the query string using URLSearchParams
 	const queryString = new URLSearchParams(normalizedParams).toString()
 
 	const productsResponse = await fetch(
@@ -71,9 +70,9 @@ export default async function Products(props: Props) {
 
 	return (
 		<main className="w-full xl:w-main">
-			<div className="justify-center items-center mx-auto">
-				<h2 className="uppercase font-semibold">{category}</h2>
-			</div>
+			<h2 className="uppercase font-semibold font-bebasNeue text-center text-3xl">
+				Browsing category: {category ? category : "All"}
+			</h2>
 			<ProductList
 				searchParams={searchParams}
 				products={products.data}

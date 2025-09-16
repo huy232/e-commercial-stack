@@ -1,12 +1,6 @@
 "use client"
-import {
-	ApiProductResponse,
-	CategoryType,
-	ProductExtraType,
-	ProductType,
-} from "@/types"
+import { CategoryType, ProductExtraType } from "@/types"
 import { FC, useState, useEffect } from "react"
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import {
 	Button,
 	FilterBar,
@@ -16,7 +10,6 @@ import {
 	SearchBar,
 } from "@/components"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
-import { filterCategory } from "@/constant"
 import { sortByOptions } from "@/constant/sortBy"
 import { useFetchMaxPrice } from "@/hooks"
 import { FaRegSquareMinus, FaRegSquarePlus } from "@/assets/icons"
@@ -38,7 +31,6 @@ const ProductList: FC<ProductsProps> = ({
 }) => {
 	const params = useSearchParams() as URLSearchParams
 	const pathname = usePathname()
-	const router = useRouter()
 	const categoryParam = params.get("category")
 	const initialCategory =
 		typeof categoryParam === "string" ? categoryParam : null
@@ -122,8 +114,7 @@ const ProductList: FC<ProductsProps> = ({
 									/>
 								))}
 
-							{/* Price Filter */}
-							{/* <FilterBar name="price" type="input" maxPrice={maxPrice} /> */}
+							<FilterBar name="Price" type="input" />
 						</div>
 						<div className="flex flex-col gap-2">
 							<span className="font-semibold text-base text-white">

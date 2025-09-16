@@ -65,7 +65,7 @@ const FilterBar: FC<FilterBarProps> = ({
 						onChange={(value: string) => handleFilterChange(value)} // Pass single string
 					/>
 				)}
-				{type === "input" && maxPrice && <FilterInput maxPrice={maxPrice} />}
+				{type === "input" && <FilterInput />}
 			</div>
 			{/* )} */}
 		</div>

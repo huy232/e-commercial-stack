@@ -20,7 +20,8 @@ const Button: React.FC<ButtonProps> = ({
 		baseClass,
 		className,
 		disabled && "disabled",
-		loading && "loading"
+		loading && "loading",
+		disabled && !loading && "opacity-50 cursor-not-allowed pointer-events-none"
 	)
 
 	return (

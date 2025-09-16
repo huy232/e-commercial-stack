@@ -1,70 +1,70 @@
 "use client"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { motion } from "framer-motion"
 import { Button } from "@/components"
 import { CiSearch } from "@/assets/icons"
 
 const SearchBar: FC = () => {
 	const searchProductParams = useSearchParams()
 	const { replace } = useRouter()
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm()
+	const { register, handleSubmit } = useForm()
 
 	const handleSearch = useCallback(
 		async (event: any) => {
-			try {
-				const { search } = event
-				const params = new URLSearchParams(searchProductParams)
+			const { search } = event
+			const params = new URLSearchParams(searchProductParams)
 
-				if (search) {
-					params.set("search", search)
-				} else {
-					params.delete("search")
-				}
-
-				params.set("page", "1")
-				replace(`/products?${params.toString()}`)
-			} catch (error) {}
+			if (search) {
+				params.set("search", search)
+			} else {
+				params.delete("search")
+			}
+			params.set("page", "1")
+			replace(`/products?${params.toString()}`)
 		},
 		[replace, searchProductParams]
 	)
 
 	return (
-		<form className="flex group h-[40px]" onSubmit={handleSubmit(handleSearch)}>
+		<motion.form
+			initial={{ opacity: 0, y: 8 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.4, ease: "easeOut" }}
+			className="relative flex items-center w-full mx-auto group"
+			onSubmit={handleSubmit(handleSearch)}
+		>
+			{/* Input */}
 			<input
 				id="search"
 				type="search"
-				placeholder="Search for product"
-				autoFocus
-				className="relative border-0 text-[1rem] outline-0 w-100 pl-[30px] pr-[20px] border-rounded appearance-none w-full transition-all duration-300 bg-gray-500 rounded h-full"
+				placeholder="Search for products..."
+				className="w-full h-11 pl-10 pr-4 text-sm rounded-xl border border-gray-200 
+					bg-white shadow-sm text-gray-700 placeholder-gray-400
+					focus:ring-2 focus:ring-blue-400 focus:border-blue-400 
+					transition-all duration-300"
 				{...register("search")}
 				name="search"
 			/>
+
 			<label
-				className="absolute p-0 border-0 h-[1px] w-[1px] overflow-hidden"
 				htmlFor="search"
+				className="absolute p-0 border-0 h-[1px] w-[1px] overflow-hidden"
 			>
-				Search for product...
+				Search for products
 			</label>
+
 			<Button
-				className="absolute top-0 left-0 font-bold border-0 z-10 h-full pl-[4px]"
 				type="submit"
-				aria-label="Search for product"
-				role="button"
-				tabIndex={0}
-				data-testid="search-button"
-				id="search-button"
-				disabled={!!errors.search}
-				title={errors.search ? errors.search.message?.toString() : "Search"}
-				loading={!!errors.search}
+				className="absolute left-2 flex items-center justify-center h-7 w-7 
+					rounded-full bg-blue-500 text-white shadow-md 
+					hover:bg-red-500 hover:shadow-lg transition-all duration-500"
+				aria-label="Search for products"
 			>
-				<CiSearch />
+				<CiSearch size={18} />
 			</Button>
-		</form>
+		</motion.form>
 	)
 }
 

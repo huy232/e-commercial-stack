@@ -67,7 +67,6 @@ const Seller: FC<SellerProps> = ({ initialProducts }) => {
 							tabIndex={0}
 							data-testid={`tab-${name.replace(" ", "-").toLowerCase()}-button`}
 							id={`tab-${name.replace(" ", "-").toLowerCase()}-button`}
-							disabled={titleId === id}
 							loading={loading && titleId !== id}
 						>
 							{name}

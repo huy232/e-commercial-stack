@@ -56,6 +56,7 @@
     "react-hook-form": "^7.51.1",
     "react-icons": "^4.12.0",
     "react-image-magnifiers-v2": "^2.0.1",
+    "react-inner-image-zoom": "^4.0.1",
     "react-leaflet": "^4.2.1",
     "react-paginate": "^8.2.0",
     "react-phone-number-input": "^3.4.3",

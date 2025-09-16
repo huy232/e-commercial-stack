@@ -120,7 +120,7 @@ const ProductDetail: FC<ProductDetailProps> = ({
 							<span className="flex items-center">
 								{renderStarFromNumber(product.totalRatings, 24)}
 							</span>
-							<span className="italic text-sm">100 sold</span>
+							<span className="italic text-sm">{product.sold} sold</span>
 						</span>
 
 						{discountValidate(product) ? (

@@ -23,7 +23,7 @@ export const useFetchMaxPrice = ({ fetchProducts }: FetchMaxPriceProps) => {
 		}
 
 		fetchMaxPrice()
-	}, [])
+	}, [fetchProducts])
 
 	return maxPrice
 }

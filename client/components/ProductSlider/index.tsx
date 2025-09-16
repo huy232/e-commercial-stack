@@ -1,8 +1,6 @@
 "use client"
-import { FC, useEffect, useState } from "react"
-import Slider from "react-slick"
-import { CustomImage, CustomSlider } from "@/components"
-import { GlassMagnifier } from "react-image-magnifiers-v2"
+import { FC, useState } from "react"
+import { CustomImage, GlassMagnifier } from "@/components"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation, Pagination } from "swiper/modules"
 import "swiper/css" // Import Swiper styles
@@ -22,11 +20,7 @@ const ProductSlider: FC<ProductSliderProps> = ({ images }) => {
 	return (
 		<div className="w-full">
 			<div className="h-[120px] lg:h-[320px]">
-				<GlassMagnifier
-					imageSrc={displayImage}
-					imageAlt="Display product image"
-					className="glass-magnifier h-full"
-				/>
+				<GlassMagnifier imageSrc={displayImage} zoom={2} lensSize={50} />
 			</div>
 			<Swiper
 				modules={[Navigation, Pagination]}
