@@ -154,12 +154,11 @@ class ProductController {
 						categoryId = category._id
 						formattedQueries.category = categoryId
 						// Dynamic variant filtering
-						// Dynamic variant filtering
 						const categoryOptions = category.option || []
 						const variantQueries = []
 
 						for (const option of categoryOptions) {
-							const optionKey = option.type.toLowerCase() // Use exact type (e.g., 'color', 'storage')
+							const optionKey = option.type.toLowerCase()
 
 							if (queries[optionKey.toLowerCase()]) {
 								// Query params are in lowercase
@@ -167,24 +166,21 @@ class ProductController {
 									queries[optionKey.toLowerCase()] as string
 								).split(",")
 
-								// Push a condition for each option type and values to match
 								variantQueries.push({
 									variants: {
 										$elemMatch: {
-											"variant.type": new RegExp(option.type, "i"), // Match `type` in a case-insensitive way
+											"variant.type": new RegExp(option.type, "i"),
 											"variant.value": {
 												$in: values.map((value) => new RegExp(value, "i")),
-											}, // Match values case-insensitively
+											},
 										},
 									},
 								})
 
-								// Remove the option from main queries to avoid conflict
 								delete formattedQueries[optionKey.toLowerCase()]
 							}
 						}
 
-						// If there are dynamic option filters, apply them using $and
 						if (variantQueries.length > 0) {
 							formattedQueries.$and = variantQueries
 						}
@@ -799,36 +795,29 @@ class ProductController {
 
 	productBrand = asyncHandler(async (req: Request, res: Response) => {
 		try {
-			// Step 1: Aggregate brands that have at least 5 associated products, then randomly pick 5
 			const brandsWithProducts = await Product.aggregate([
-				{ $group: { _id: "$brand", count: { $sum: 1 } } }, // Group products by brand and count them
-				{ $match: { count: { $gte: 3 } } }, // Filter to include only brands with at least # products
-				{ $sample: { size: 5 } }, // Randomly select 5 brands
+				{ $group: { _id: "$brand", count: { $sum: 1 } } },
+				{ $match: { count: { $gte: 3 } } },
+				{ $sample: { size: 5 } },
 			])
 
-			// Get the brand IDs from the aggregation result
 			const brandIds = brandsWithProducts.map((b) => b._id)
 
-			// Step 2: Find the details of the selected brands
 			const randomBrands = await Brand.find({ _id: { $in: brandIds } })
 
-			// Step 3: Find products for each brand, limited to 5 products per brand
 			const productPromises = brandIds.map(async (brandId) => {
 				const products = await Product.find({ brand: brandId })
-					.limit(5) // Limit to 5 products per brand
-					.populate("brand") // Populate brand info
-					.populate("category") // Populate category info
+					.limit(5)
+					.populate("brand")
+					.populate("category")
 				return { brandId, products }
 			})
 
-			// Step 4: Wait for all promises to resolve
 			const productsByBrand = await Promise.all(productPromises)
 
-			// Step 5: Structure and send the response
 			const result = productsByBrand.map(({ brandId, products }) => {
 				const brand = randomBrands.find((b) => b._id.equals(brandId))
 
-				// Check if brand exists to avoid undefined error
 				if (brand) {
 					return {
 						brand: {

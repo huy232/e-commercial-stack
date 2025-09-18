@@ -89,7 +89,7 @@ export default async function Product({
 				category: category.slug || "",
 				limit: "10",
 			}),
-		{ method: "GET" }
+		{ method: "GET", cache: "no-cache" }
 	)
 	const relatedProducts = await relatedProductsResponse.json()
 

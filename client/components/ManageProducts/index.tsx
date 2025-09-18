@@ -32,7 +32,7 @@ const ManageProducts: FC = () => {
 
 			const fetchProductResponse = await fetch(
 				`/api/product/get-all-product?${queryString}`,
-				{ method: "GET" }
+				{ method: "GET", cache: "no-cache" }
 			)
 			const data = await fetchProductResponse.json()
 			setProductList(data.data)

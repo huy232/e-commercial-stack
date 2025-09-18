@@ -783,27 +783,35 @@ class OrderController {
 	updateProductAndVariantQuantities = async (cartItems: any[]) => {
 		for (const item of cartItems) {
 			const product = await Product.findById(item.product._id)
-			if (product) {
-				if (product.allowVariants && item.variant && product.variants) {
-					const variant = product.variants.find(
-						(v) => v._id.toString() === item.variant._id.toString()
-					)
-					if (variant) {
-						variant.stock = variant.stock - item.quantity
-					}
-					// Recalculate the product quantity by summing up all variant stocks
-					product.quantity = product.variants.reduce(
-						(total, v) => total + v.stock,
-						0
-					)
-					// Mark the variants array as modified
-					product.markModified("variants")
-				} else {
-					// If no variants, just update the product quantity
-					product.quantity = product.quantity - item.quantity
+			if (!product) continue
+
+			if (product.allowVariants && item.variant && product.variants) {
+				// Find and update the variant
+				const variant = product.variants.find(
+					(v) => v._id.toString() === item.variant._id.toString()
+				)
+				if (variant) {
+					variant.stock = Math.max(variant.stock - item.quantity, 0)
 				}
-				await product.save()
+
+				// Recalculate product total quantity as sum of all variant stocks
+				product.quantity = product.variants.reduce(
+					(total, v) => total + v.stock,
+					0
+				)
+
+				// Update sold
+				product.sold += item.quantity
+				product.markModified("variants")
+			} else {
+				// No variants → update stock directly
+				product.quantity = Math.max(product.quantity - item.quantity, 0)
+
+				// Increase sold by purchased quantity
+				product.sold += item.quantity
 			}
+
+			await product.save()
 		}
 	}
 

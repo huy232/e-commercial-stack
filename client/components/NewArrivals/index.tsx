@@ -30,7 +30,7 @@ const NewArrivals: FC<NewArrivalsProps> = ({ initialProducts }) => {
 			try {
 				const response = await fetch(
 					`/api/product/get-all-product?` + new URLSearchParams(sort),
-					{ method: "GET" }
+					{ method: "GET", cache: "no-cache" }
 				)
 				const data = await response.json()
 				setProducts(data.data)
