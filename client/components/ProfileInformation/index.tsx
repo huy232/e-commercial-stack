@@ -1,24 +1,21 @@
 "use client"
-import {
-	loginSuccess,
-	selectAuthUser,
-	selectIsAuthenticated,
-} from "@/store/slices/authSlice"
+import { loginSuccess, selectAuthUser } from "@/store/slices/authSlice"
 import { AppDispatch, ProfileUser } from "@/types"
 import { useDispatch, useSelector } from "react-redux"
 import defaultAvatar from "@/assets/images/defaultAvatar.png"
-import { Button, CustomImage, InputForm } from "@/components"
+import { Button, CustomImage, InputForm, showToast } from "@/components"
 import { FieldError, FieldValues, useForm } from "react-hook-form"
-import { ChangeEvent, FC, useCallback, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import clsx from "clsx"
 import moment from "moment"
-import { validatePhoneNumber } from "@/validators"
 import { FaFileUpload } from "@/assets/icons"
-import { API } from "@/constant"
 import { useRouter } from "next/navigation"
 import { useMounted } from "@/hooks"
 import { LoadingSpinner, path } from "@/utils"
 import { WEB_URL } from "@/constant"
+import { AddressElement, useStripe, useElements } from "@stripe/react-stripe-js"
+import { loadStripe } from "@stripe/stripe-js"
+
 interface CustomFieldError extends FieldError {
 	message: string
 }
@@ -35,14 +32,8 @@ const ProfileInformation = () => {
 	const router = useRouter()
 	const mounted = useMounted()
 	const user: ProfileUser = useSelector(selectAuthUser)
-
-	const [imageAvatar, setImageAvatar] = useState<string | File | null>(
-		user?.avatar || null
-	)
-	const [removeAvatar, setRemoveAvatar] = useState(false)
-	const [isImageChanged, setIsImageChanged] = useState(false)
-	const [loading, setLoading] = useState(false)
-
+	const stripe = useStripe()
+	const elements = useElements()
 	const {
 		register,
 		reset,
@@ -53,10 +44,16 @@ const ProfileInformation = () => {
 			email: user?.email || "",
 			firstName: user?.firstName || "",
 			lastName: user?.lastName || "",
-			mobile: user?.mobile,
-			address: user?.address?.[0] || "",
 		},
 	})
+
+	const [isAddressDirty, setIsAddressDirty] = useState(false)
+	const [imageAvatar, setImageAvatar] = useState<string | File | null>(
+		user?.avatar || null
+	)
+	const [removeAvatar, setRemoveAvatar] = useState(false)
+	const [isImageChanged, setIsImageChanged] = useState(false)
+	const [loading, setLoading] = useState(false)
 
 	useEffect(() => {
 		if (mounted && !user) {
@@ -70,8 +67,6 @@ const ProfileInformation = () => {
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,
-				mobile: user.mobile,
-				address: user.address?.[0] || "",
 			})
 		}
 	}, [user, reset])
@@ -109,65 +104,90 @@ const ProfileInformation = () => {
 
 	const handleSubmitProfile = handleSubmit(
 		async (data: Record<string, string>) => {
-			if (!loading && (isDirty || isImageChanged)) {
-				let hasError = false
-				const formData = new FormData()
-				for (let [key, value] of Object.entries(data)) {
-					formData.append(key, value)
-				}
-				if (imageAvatar) {
-					formData.append("avatar", imageAvatar)
-				} else {
-					hasError = true
-				}
-				if (hasError) {
-					return
-				}
+			if (!loading && (isDirty || isImageChanged || isAddressDirty)) {
 				setLoading(true)
 
-				const updateUserResponse = await fetch(`/api/user/user-update`, {
-					method: "PUT",
-					credentials: "include",
-					body: formData,
-				})
-				const updateUser = await updateUserResponse.json()
+				const addressElement = elements?.getElement(AddressElement)
 
-				if (updateUser.success) {
-					const currentUserResponse = await fetch(`/api/user/current`, {
-						method: "GET",
-						credentials: "include",
-						headers: {
-							"Content-Type": "application/json",
-						},
-					})
-					const currentUser = await currentUserResponse.json()
-					const updatedUserData = currentUser.data
-
-					// Dispatch new user data to Redux
-					await dispatch(loginSuccess(updatedUserData))
-
-					// Reset form with updated data
-					reset({
-						email: updatedUserData.email,
-						firstName: updatedUserData.firstName,
-						lastName: updatedUserData.lastName,
-						mobile: updatedUserData.mobile,
-						address: updatedUserData.address[0],
-					})
-
-					setRemoveAvatar(false)
-					setIsImageChanged(false) // Reset image change flag
+				if (!addressElement) {
+					alert("Billing form not ready yet.")
+					setLoading(false)
+					return
 				}
-				setLoading(false)
+
+				const { complete, value } = await addressElement.getValue()
+
+				if (!complete) {
+					alert("Please complete your billing information.")
+					setLoading(false)
+					return
+				}
+
+				const formData = new FormData()
+				for (let [key, value] of Object.entries(data)) {
+					if (key !== "address") {
+						formData.append(key, value as string)
+					}
+				}
+
+				formData.append("address", JSON.stringify(value))
+
+				if (imageAvatar) {
+					formData.append("avatar", imageAvatar)
+				}
+
+				try {
+					const updateUserResponse = await fetch(`/api/user/user-update`, {
+						method: "PUT",
+						credentials: "include",
+						body: formData,
+					})
+
+					const updateUser = await updateUserResponse.json()
+
+					if (updateUser.success) {
+						const currentUserResponse = await fetch(`/api/user/current`, {
+							method: "GET",
+							credentials: "include",
+							headers: { "Content-Type": "application/json" },
+						})
+						const currentUser = await currentUserResponse.json()
+						const updatedUserData = currentUser.data
+
+						await dispatch(loginSuccess(updatedUserData))
+
+						reset({
+							email: updatedUserData.email,
+							firstName: updatedUserData.firstName,
+							lastName: updatedUserData.lastName,
+						})
+
+						setRemoveAvatar(false)
+						setIsImageChanged(false)
+						setIsAddressDirty(false)
+						showToast("Successfully update user information", "success")
+					}
+				} catch (err) {
+					showToast(
+						"Something went wrong while update user information",
+						"error"
+					)
+					console.log(err)
+				} finally {
+					setLoading(false)
+				}
 			}
 		}
 	)
+
 	const submitClass = clsx(
 		`w-[120px] h-[40px] relative block ml-auto mr-0 border-2 hover-effect rounded p-1 group overflow-hidden my-2`,
-		loading || !(isDirty || isImageChanged)
+		loading || !(isDirty || isImageChanged || isAddressDirty)
 			? `border-gray-500 bg-gray-500 opacity-80 cursor-not-allowed`
 			: `border-red-500 hover:bg-red-500`
 	)
+
+	console.log(user)
 
 	return (
 		<div className="flex flex-col md:flex-row w-full">
@@ -239,6 +259,7 @@ const ProfileInformation = () => {
 				onSubmit={handleSubmitProfile}
 				className="w-full md:w-[220px] lg:w-[330px] xl:w-[440px] p-4"
 			>
+				<span className="font-bebasNeue text-xl mb-2">Account information</span>
 				<InputForm
 					register={register}
 					errorMessage={errors as { [key: string]: CustomFieldError }}
@@ -262,25 +283,47 @@ const ProfileInformation = () => {
 					defaultValue={user.lastName}
 					label="Last name"
 				/>
-				<InputForm
-					register={register}
-					errorMessage={errors as { [key: string]: CustomFieldError }}
-					id={"address"}
-					defaultValue={user.address}
-					label="Address"
-				/>
-				<InputForm
-					register={register}
-					errorMessage={errors as { [key: string]: CustomFieldError }}
-					id={"mobile"}
-					defaultValue={user.mobile ? user.mobile.toString() : ""}
-					label="Phone number"
-					// validate={validatePhoneNumber}
+
+				<div className="flex items-center gap-2 w-full my-2">
+					<div className="flex-1 border-t border-gray-300"></div>
+				</div>
+
+				<span className="font-bebasNeue text-xl mt-4 mb-2">
+					Billing information for order
+				</span>
+				<AddressElement
+					options={{
+						mode: "shipping",
+						allowedCountries: ["VN"],
+						fields: {
+							phone: "always",
+						},
+						validation: {
+							phone: { required: "always" },
+						},
+						defaultValues: {
+							name: user.address?.name,
+							phone: user.address?.phone,
+							address: {
+								line1: user.address?.line1 || "",
+								line2: user.address?.line2 || "",
+								city: user.address?.city || "",
+								state: user.address?.state || "",
+								postal_code: user.address?.postal_code || "",
+								country: user.address?.country || "VN",
+							},
+						},
+					}}
+					onChange={(event) => {
+						if (event.complete) {
+							setIsAddressDirty(true)
+						}
+					}}
 				/>
 				<Button
 					className={submitClass}
 					type="submit"
-					disabled={loading || !(isDirty || isImageChanged)}
+					disabled={loading || !(isDirty || isImageChanged || isAddressDirty)}
 					loading={loading}
 					aria-label="Update profile information"
 					role="button"

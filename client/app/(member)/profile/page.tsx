@@ -1,4 +1,4 @@
-import { ProfileInformation } from "@/components"
+import { ProfileInformation, ProfileWrapper } from "@/components"
 import { Metadata } from "next"
 
 type Props = {
@@ -20,6 +20,6 @@ export const metadata: Metadata = {
 }
 
 const Profile = (props: Props) => {
-	return <ProfileInformation />
+	return <ProfileWrapper />
 }
 export default Profile

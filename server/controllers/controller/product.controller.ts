@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { Brand, Product, ProductCategory } from "../../models"
+import { Brand, Order, Product, ProductCategory } from "../../models"
 import asyncHandler from "express-async-handler"
 import slugify from "slugify"
 import { parseInteger } from "../../utils/parseInteger"
@@ -441,6 +441,22 @@ class ProductController {
 			if (!star || !product_id || !comment || !updatedAt) {
 				throw new Error("Missing input while rating product")
 			}
+
+			const hasBought = await Order.exists({
+				orderBy: _id,
+				"products.product._id": product_id,
+				status: { $in: ["Cancelled", "Success", "Refund"] },
+			})
+
+			if (!hasBought) {
+				res.status(403).json({
+					status: false,
+					message: "You can only rate products you have purchased",
+					allowToComment: false,
+				})
+				return
+			}
+
 			const product = await Product.findById(product_id)
 			const alreadyRatingProduct = product?.ratings.find(
 				(element) => element.postedBy.toString() === _id

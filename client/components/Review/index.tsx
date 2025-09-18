@@ -47,7 +47,11 @@ const Review: FC<ReviewProps> = ({
 	}
 	return (
 		<>
-			<Modal isOpen={isVote} onClose={handleToggleVote}>
+			<Modal
+				isOpen={isVote}
+				onClose={handleToggleVote}
+				specificHeight="h-[80vh]"
+			>
 				<div className="flex items-center justify-center text-sm flex-col gap-2">
 					<ReviewOption
 						productName={productName}

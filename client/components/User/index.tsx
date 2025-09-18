@@ -85,7 +85,7 @@ const User = ({ user }: UserProps) => {
 					className={clsx(
 						"absolute z-10 min-w-[160px] duration-300 transition-all",
 						user && isOpen
-							? "min-h-[100px] p-1.5 opacity-100 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-heavy focus:outline-none top-[44px] left-[-100px] lg:left-[-60px] xl:left-[20px]"
+							? "min-h-[100px] p-1.5 opacity-100 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-heavy focus:outline-none top-[44px] left-[-100px] lg:left-[-60px] xl:left-[-30px]"
 							: "h-0 opacity-0"
 					)}
 					role="menu"

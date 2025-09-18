@@ -4,6 +4,21 @@ import * as bcrypt from "bcrypt"
 import { IProduct, IVariant } from "./product.model"
 import { ICartItem } from "./cart.model"
 
+const addressSchema = new Schema(
+	{
+		name: { type: String, required: true },
+		country: { type: String, required: true },
+		line1: { type: String, required: true },
+		line2: { type: String },
+		city: { type: String, required: true },
+		state: { type: String, required: true },
+		postal_code: { type: String, required: true },
+		phone: { type: String, required: true },
+		isDefault: { type: Boolean, default: false },
+	},
+	{ _id: true }
+)
+
 interface IUser extends Document {
 	firstName: string
 	lastName: string
@@ -12,7 +27,16 @@ interface IUser extends Document {
 	avatar: string
 	password: string
 	role: string[]
-	address: string[]
+	address: {
+		name: string
+		country: string
+		line1: string
+		line2: string
+		city: string
+		state: string
+		postal_code: string
+		phone: string
+	}
 	isBlocked: boolean
 	refreshToken?: string
 	passwordChangedAt?: string
@@ -49,7 +73,19 @@ const userSchema = new mongoose.Schema<IUser>(
 		},
 		googleId: { type: String, unique: true, sparse: true }, // Unique Google ID for social logins
 		role: { type: [String], default: ["user"] },
-		address: { type: [], default: [] },
+		address: {
+			type: addressSchema,
+			default: {
+				name: "",
+				country: "",
+				line1: "",
+				line2: "",
+				city: "",
+				state: "",
+				postal_code: "",
+				phone: "",
+			},
+		},
 		isBlocked: { type: Boolean, default: false },
 		refreshToken: { type: String },
 		passwordChangedAt: { type: String },

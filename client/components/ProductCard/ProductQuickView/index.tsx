@@ -86,7 +86,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ product }) => {
 				)}
 
 				<span className="text-xs block">Available: {product.quantity}</span>
-				<span className="text-xs block">Sold: 100</span>
+				<span className="text-xs block">Sold: ${product.sold}</span>
 
 				<span
 					className="line-clamp-2 lg:line-clamp-5 text-sm"

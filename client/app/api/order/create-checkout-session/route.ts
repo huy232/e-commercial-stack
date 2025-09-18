@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
 			credentials: "include",
 			body: JSON.stringify(body),
 		})
+
 		if (!res.ok) {
 			return NextResponse.json(
 				{ success: false, message: "Failed to create checkout session" },

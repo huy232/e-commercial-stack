@@ -1,6 +1,7 @@
 import { API } from "@/constant"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { UserCartType } from "./userAction"
+import { showToast } from "@/components"
 
 export interface DeleteCartI {
 	product_id: string
@@ -11,15 +12,6 @@ export const handleGetUserCart = createAsyncThunk(
 	"cart/handleGetUserCart",
 	async () => {
 		try {
-			// const response = await fetch(API + `/cart/`, {
-			// 	method: "GET",
-			// 	credentials: "include",
-			// 	headers: {
-			// 		"Content-Type": "application/json",
-			// 	},
-			// 	cache: "no-cache",
-			// })
-
 			const response = await fetch(`/api/cart/`, {
 				method: "GET",
 				credentials: "include",
@@ -58,9 +50,11 @@ export const handleCreateUserCart = createAsyncThunk(
 			if (!response.ok) {
 				throw new Error(`Error: ${response.status}`)
 			}
+			showToast("Successfully add product to cart", "success")
 			const responseData = await response.json()
 			return responseData
 		} catch (error) {
+			showToast("Something went wrong while add product to cart", "error")
 			throw error
 		}
 	}

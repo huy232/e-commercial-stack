@@ -27,10 +27,64 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 class OrderController {
 	createCheckoutSession = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response) => {
-			const { products, couponCode, backUrl } = req.body
+			const { products, couponCode, backUrl, notes, useExistingAddress } =
+				req.body
 			let discountObject: ICoupon | null = null
 			let coupon_id: string | null = null
 			let productPrice
+
+			const user = await User.findById(req.user._id)
+
+			if (!user) {
+				res.status(404).json({ message: "User not found" })
+			}
+
+			if (!user) throw new Error("User not found")
+
+			let customer
+			try {
+				customer = await stripe.customers.create(
+					{
+						email: user.email,
+						name: user.address?.name || `${user.firstName} ${user.lastName}`,
+						phone: user.address?.phone || undefined,
+						address: user.address
+							? {
+									line1: user.address.line1 || undefined,
+									line2: user.address.line2 || undefined,
+									city: user.address.city || undefined,
+									state: user.address.state || undefined,
+									postal_code: user.address.postal_code || undefined,
+									country: user.address.country || "VN",
+							  }
+							: undefined,
+					},
+					{ apiKey: process.env.STRIPE_SECRET_KEY }
+				)
+			} catch (err) {
+				res
+					.status(400)
+					.json({ message: "Failed to create Stripe customer", error: err })
+			}
+
+			if (useExistingAddress && user.address) {
+				try {
+					await stripe.customers.update(
+						customer.id,
+						{
+							shipping: {
+								name: customer.name,
+								phone: customer.phone,
+								address: customer.address!,
+							},
+						},
+						{ apiKey: process.env.STRIPE_SECRET_KEY }
+					)
+				} catch (err) {
+					console.error("Failed to update customer shipping:", err)
+				}
+			}
+
 			if (couponCode) {
 				const couponDoc = await Coupon.findOne({ code: couponCode })
 				if (couponDoc) {
@@ -102,27 +156,30 @@ class OrderController {
 					quantity: product.quantity,
 				}
 			})
-			// const placeholderOrder = await Order.create({
-			// 	products,
-			// 	total: 0,
-			// 	orderBy: req.user._id,
-			// })
-			// const orderId = placeholderOrder._id.toString()
+
 			const session = await stripe.checkout.sessions.create(
 				{
+					customer: customer.id,
 					payment_method_types: ["card"],
 					line_items: items,
 					mode: "payment",
-					// success_url: `${
-					// 	process.env.URL_CLIENT as string
-					// }/order-success?orderId=${orderId}`,
+					shipping_address_collection: {
+						allowed_countries: ["VN"],
+					},
+					phone_number_collection: { enabled: true },
+					customer_update: {
+						address: "auto",
+						name: "auto",
+						shipping: "auto",
+					},
 					success_url: `${process.env.URL_CLIENT as string}`,
 					cancel_url: `${process.env.URL_CLIENT as string}/${backUrl}`,
 					metadata: {
 						userId: req.user._id,
 						couponCode,
 						couponId: coupon_id,
-						// orderId,
+						notes: notes ?? "",
+						useExistingAddress: useExistingAddress ? "true" : "false",
 					},
 				},
 				{ apiKey: process.env.STRIPE_SECRET_KEY }
@@ -196,7 +253,7 @@ class OrderController {
 
 				const paymentIntent = await stripe.paymentIntents.create(
 					{
-						amount: 1000, // Replace with the actual amount
+						amount: 1000,
 						currency: "usd",
 						customer: customer.id,
 						payment_method: payment_method_id,
@@ -419,6 +476,11 @@ class OrderController {
 					const checkoutSucceeded = event.data.object
 					const userId = checkoutSucceeded.metadata?.userId
 					const couponId = checkoutSucceeded.metadata?.couponId
+					const notes = checkoutSucceeded.metadata?.notes
+					const useExistingAddress =
+						checkoutSucceeded.metadata?.useExistingAddress
+					const customerDetails = checkoutSucceeded.customer_details
+					let shippingAddress
 
 					if (userId) {
 						const user = await User.findById(userId)
@@ -429,6 +491,13 @@ class OrderController {
 								message: "User not found.",
 							})
 							return
+						}
+
+						if (useExistingAddress === "true") {
+							const user = await User.findById(userId)
+							shippingAddress = user?.address
+						} else {
+							shippingAddress = customerDetails
 						}
 
 						const populatedUserCart = await Cart.findOne({ user_id: userId })
@@ -473,12 +542,13 @@ class OrderController {
 
 						if (populatedUserCart) {
 							const orderData = {
-								// products: filteredCart,
 								products: filteredCart,
 								status: "Processing",
 								total: checkoutSucceeded.amount_total,
 								coupon: couponId ? couponId : null,
 								orderBy: userId,
+								notes,
+								shippingAddress,
 							}
 							try {
 								const order = await Order.create({
@@ -563,7 +633,30 @@ class OrderController {
 													.join("")}
 								      </tbody>
 								    </table>
-
+										<div style="margin-top: 20px; padding: 10px; border: 1px solid #eee; border-radius: 6px;">
+											<h3 style="color: #333;">Shipping Information</h3>
+											<p style="margin: 4px 0; font-size: 14px; color: #555;">
+												<strong>Name:</strong> ${shippingAddress?.name || "N/A"}
+											</p>
+											<p style="margin: 4px 0; font-size: 14px; color: #555;">
+												<strong>Phone:</strong> ${shippingAddress?.phone || "N/A"}
+											</p>
+											<p style="margin: 4px 0; font-size: 14px; color: #555;">
+												<strong>Address:</strong> 
+												${shippingAddress?.address?.line1 || ""}, 
+												${shippingAddress?.address?.line2 || ""}, 
+												${shippingAddress?.address?.city || ""}, 
+												${shippingAddress?.address?.state || ""}, 
+												${shippingAddress?.address?.postal_code || ""}, 
+												${shippingAddress?.address?.country || ""}
+											</p>
+										</div>
+										<div style="margin-top: 20px; padding: 10px; border: 1px solid #eee; border-radius: 6px;">
+											<h3 style="color: #333;">Order Note</h3>
+											<p style="margin: 4px 0; font-size: 14px; color: #555;">
+												${order.notes || "None"}
+											</p>
+     								</div>
 								    <div style="margin-top: 20px;">
 								      <p style="color: #555;">Coupon Applied: <strong>${
 												coupon ? coupon.name : "None"

@@ -5,6 +5,17 @@ export interface User {
 	username: string
 }
 
+type UserAddress = {
+	phone?: string
+	line1?: string
+	line2?: string
+	city?: string
+	state?: string
+	postal_code?: string
+	country?: string
+	name?: string
+}
+
 export interface ProfileUser {
 	_id: string
 	firstName: string
@@ -15,7 +26,7 @@ export interface ProfileUser {
 	password: string
 	role: string[]
 	cart: UserCart[]
-	address: string
+	address: UserAddress
 	wishlist: []
 	isBlocked: boolean
 	createdAt: string
@@ -32,7 +43,7 @@ export interface Users {
 	password: string
 	role: string[]
 	cart: UserCart[]
-	address: string
+	address: UserAddress
 	wishlist: []
 	isBlocked: boolean
 	createdAt: string
@@ -54,7 +65,7 @@ export interface UpdateUserProfile {
 	lastName: string
 	email: string
 	mobile?: number
-	address?: string
+	address?: UserAddress
 	avatar?: string
 }
 

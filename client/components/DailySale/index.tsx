@@ -88,16 +88,20 @@ const DailySale: FC<DailySaleProps> = ({ dailySale }) => {
 								fill
 								className="object-contain rounded-lg shadow-lg"
 							/>
-							{dailyDeal.discount.type === "fixed" && (
-								<span className="absolute text-[12px] bg-orange-500 font-bold rounded text-white px-1 top-1 right-1">
-									-{formatPrice(dailyDeal.discount.value)}
-								</span>
-							)}
-							{dailyDeal.discount.type === "percentage" && (
-								<span className="absolute text-[12px] bg-red-500 font-bold rounded text-white px-1 top-1 right-1">
-									-{dailyDeal.discount.value}%
-								</span>
-							)}
+
+							{dailyDeal?.discount?.type === "fixed" &&
+								dailyDeal.discount.value > 0 && (
+									<span className="absolute text-[12px] bg-orange-500 font-bold rounded text-white px-1 top-1 right-1">
+										-{formatPrice(dailyDeal.discount.value)}
+									</span>
+								)}
+
+							{dailyDeal?.discount?.type === "percentage" &&
+								dailyDeal.discount.value > 0 && (
+									<span className="absolute text-[12px] bg-red-500 font-bold rounded text-white px-1 top-1 right-1">
+										-{dailyDeal.discount.value}%
+									</span>
+								)}
 						</div>
 						<div className="flex flex-col justify-center items-center w-full">
 							<span className="line-clamp-2 text-center font-bold text-md lg:text-base font-inter">

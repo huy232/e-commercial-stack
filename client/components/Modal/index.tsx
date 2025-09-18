@@ -11,9 +11,15 @@ interface ModalProps {
 	isOpen: boolean
 	children: ReactNode
 	onClose?: () => void
+	specificHeight?: string
 }
 
-const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
+const Modal: FC<ModalProps> = ({
+	isOpen,
+	children,
+	onClose,
+	specificHeight,
+}) => {
 	const modalRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -56,7 +62,10 @@ const Modal: FC<ModalProps> = ({ isOpen, children, onClose }) => {
 					>
 						<div
 							ref={modalRef}
-							className="relative max-h-[90vh] w-[95%] max-w-5xl rounded-xl bg-white shadow-xl p-6 overflow-y-auto"
+							className={clsx(
+								"relative max-h-[90vh] w-[95%] max-w-5xl rounded-xl bg-white shadow-xl p-4 overflow-y-auto",
+								specificHeight
+							)}
 						>
 							<Button
 								className="absolute top-2 right-2 hover:opacity-80 duration-200"

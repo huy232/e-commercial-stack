@@ -21,6 +21,12 @@ import PaymentSkeleton from "./PaymentSkeleton"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { selectAuthUser } from "@/store/slices/authSlice"
+import {
+	FaExclamationTriangle,
+	FaMapMarkerAlt,
+	FaPhone,
+	FaUser,
+} from "react-icons/fa"
 
 const stripePromise = loadStripe(
 	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -36,6 +42,7 @@ export type UserCartProps = {
 }
 
 export interface CheckoutFormValues {
+	useExistingAddress: boolean
 	phoneNumber: string
 	country: CountryCode
 	province: string
@@ -51,12 +58,15 @@ export interface CheckoutFormValues {
 const Checkout = ({ coupon, discount }: UserCartProps) => {
 	const methods = useForm<CheckoutFormValues>({
 		defaultValues: {
+			useExistingAddress: false,
 			notes: "",
 			couponCode: discount ? (discount as string) : "",
 		},
 	})
 	const user = useSelector(selectAuthUser)
 	const cart = useSelector<RootState, Cart[] | null>(selectCart)
+	const { register, watch } = methods
+	const useExisting = watch("useExistingAddress")
 	const [clientSecret, setClientSecret] = useState("")
 	const mounted = useMounted()
 
@@ -96,7 +106,6 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 	}
 
 	if (mounted && !user) {
-		// UI for users not logged in
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 h-[60vh]">
 				<motion.div
@@ -112,19 +121,19 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 					<div className="flex gap-4 justify-center flex-wrap">
 						<Link
 							href="/login"
-							className="px-6 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition"
+							className="px-6 py-2 bg-red-400 text-white rounded-lg font-medium hover:bg-red-600 transition"
 						>
 							Login
 						</Link>
 						<Link
 							href="/register"
-							className="px-6 py-2 border-2 border-teal-500 text-teal-500 rounded-lg font-medium hover:bg-teal-500 hover:text-white transition"
+							className="px-6 py-2 border-2 border-red-400 text-red-500 rounded-lg font-medium hover:bg-red-500 hover:text-white transition"
 						>
 							Register
 						</Link>
 						<Link
-							href="/cart"
-							className="px-6 py-2 border-2 border-gray-400 text-gray-600 rounded-lg font-medium hover:bg-gray-200 transition"
+							href="/"
+							className="px-6 py-2 border-2 border-gray-400 text-gray-600 rounded-lg font-medium hover:bg-gray-400 hover:text-white transition"
 						>
 							Continue as guest
 						</Link>
@@ -166,6 +175,78 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 						readOnly={true}
 					/>
 				</div>
+
+				<div className="mx-4">
+					<label className="flex items-center gap-2 cursor-pointer">
+						<input
+							type="checkbox"
+							{...register("useExistingAddress")}
+							className="w-4 h-4 text-rose-500 rounded focus:ring-rose-400"
+						/>
+						<span className="text-sm text-gray-700">Use my saved address</span>
+					</label>
+				</div>
+				{useExisting && (
+					<>
+						{user?.address ? (
+							<motion.div
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								transition={{ duration: 0.3 }}
+								className="mt-4 p-2"
+							>
+								<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+									<FaMapMarkerAlt className="text-rose-500" />
+									Shipping Address
+								</h3>
+
+								<div className="transition-all space-y-3 text-sm text-gray-700 border border-rose-200 bg-gradient-to-br from-rose-50 to-white p-4 rounded-xl shadow-heavy">
+									<p className="flex items-center gap-2">
+										<FaUser className="text-gray-500" />
+										<span className="font-medium">{user.address.name}</span>
+									</p>
+									<p className="flex items-center gap-2">
+										<FaPhone className="text-gray-500" />
+										{user.address.phone}
+									</p>
+									<p className="flex items-start gap-2 leading-relaxed">
+										<FaMapMarkerAlt className="text-gray-500 mt-1" />
+										<span>
+											{user.address.line1}
+											{user.address.line2 && `, ${user.address.line2}`}
+											<br />
+											{user.address.city}, {user.address.state},{" "}
+											{user.address.postal_code}, {user.address.country}
+										</span>
+									</p>
+								</div>
+							</motion.div>
+						) : (
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.4 }}
+								className="mt-4 flex items-start gap-3 rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-800"
+							>
+								<FaExclamationTriangle className="mt-0.5 text-yellow-500" />
+								<div>
+									<p className="font-medium">No saved address found</p>
+									<p>
+										To use your existing address, please update your{" "}
+										<a
+											href="/profile"
+											className="underline font-medium text-yellow-700 hover:text-yellow-900"
+										>
+											Profile Information
+										</a>
+										.
+									</p>
+								</div>
+							</motion.div>
+						)}
+					</>
+				)}
 				{!clientSecret ? (
 					<PaymentSkeleton />
 				) : (

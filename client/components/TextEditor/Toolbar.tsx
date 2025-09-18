@@ -20,7 +20,13 @@ import { useState } from "react"
 import { Button } from "@/components"
 import { createPortal } from "react-dom"
 
-const Toolbar = ({ editor }: { editor: Editor }) => {
+const Toolbar = ({
+	editor,
+	disableUploadImage = false,
+}: {
+	editor: Editor
+	disableUploadImage?: boolean
+}) => {
 	const [isLinkModalOpen, setIsLinkModalOpen] = useState(false)
 	const [linkUrl, setLinkUrl] = useState("")
 
@@ -297,9 +303,10 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
 				/>
 				<label
 					htmlFor="image-upload"
-					className="cursor-pointer px-2 py-1 bg-gray-600 text-white rounded"
+					className="flex items-center cursor-pointer px-2 py-1 bg-gray-600 text-white rounded"
 				>
-					📷 <span className="hidden md:inline-block">Upload Images</span>
+					📷{" "}
+					<span className="hidden md:inline-block text-sm">Upload Images</span>
 				</label>
 
 				{/* Undo */}

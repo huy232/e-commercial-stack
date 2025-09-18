@@ -8,6 +8,8 @@ import { loadStripe } from "@stripe/stripe-js"
 import { Cart, ICoupon } from "@/types"
 import { usePathname, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
+import { useSelector } from "react-redux"
+import { selectAuthUser } from "@/store/slices/authSlice"
 
 interface IPayment {
 	userCart: Cart[] | null
@@ -19,7 +21,7 @@ interface IPayment {
 }
 
 const PaymentForm = ({ userCart, coupon }: IPayment) => {
-	const { handleSubmit } = useFormContext<CheckoutFormValues>()
+	const { handleSubmit, watch, register } = useFormContext<CheckoutFormValues>()
 	const stripe = useStripe()
 	const elements = useElements()
 	const [isProcessing, setIsProcessing] = useState(false)
@@ -28,8 +30,19 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const backUrl = `${pathname}?${searchParams.toString()}`
+	const user = useSelector(selectAuthUser)
+
+	const useExisting = watch("useExistingAddress")
+	const notes = watch("notes")
 
 	const makePayment = async () => {
+		if (useExisting && !user?.address) {
+			setMessage(
+				"⚠️ You must first add a saved address in your Profile Information before using this option."
+			)
+			return
+		}
+
 		try {
 			setIsProcessing(true)
 			const stripeClient = await loadStripe(
@@ -38,6 +51,8 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 			const body = {
 				products: userCart,
 				couponCode: coupon ? coupon.data.code : "",
+				notes,
+				useExistingAddress: useExisting,
 				backUrl,
 			}
 
@@ -60,6 +75,22 @@ const PaymentForm = ({ userCart, coupon }: IPayment) => {
 
 	return (
 		<div className="text-center space-y-4">
+			<div className="mx-4">
+				<label
+					htmlFor="notes"
+					className="block text-sm font-medium text-gray-700 mb-1"
+				>
+					Order Notes
+				</label>
+				<textarea
+					id="notes"
+					{...register("notes")}
+					placeholder="Write any special requests or delivery notes..."
+					className="w-full border rounded-lg p-2 text-sm focus:ring-rose-400 focus:border-rose-400"
+					rows={3}
+				/>
+			</div>
+
 			<Button
 				className="py-3 px-8 rounded-full font-semibold bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md hover:from-rose-600 hover:to-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				type="submit"

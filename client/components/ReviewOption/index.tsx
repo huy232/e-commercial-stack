@@ -42,7 +42,7 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 			initial={{ opacity: 0, scale: 0.95 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ duration: 0.3 }}
-			className="w-full mx-auto bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4"
+			className="w-full mx-auto bg-white rounded-2xl shadow-lg p-2 flex flex-col gap-4"
 			onClick={(e) => e.stopPropagation()}
 		>
 			<h2 className="text-xl font-bold text-gray-800">{productName}</h2>
@@ -52,7 +52,11 @@ const ReviewOption: FC<ReviewOptionsProps> = ({
 					Your Review
 				</label>
 				<div className="border rounded-lg shadow-sm">
-					<TextEditor value={value} onChange={setValue} />
+					<TextEditor
+						value={value}
+						onChange={setValue}
+						disableUploadImage={true}
+					/>
 				</div>
 			</div>
 

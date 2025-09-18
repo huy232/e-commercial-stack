@@ -747,7 +747,6 @@ class UserController {
 			}
 		}
 	)
-
 	updateUser = asyncHandler(
 		async (req: AuthenticatedRequest, res: Response): Promise<void> => {
 			const { _id } = req.user
@@ -755,22 +754,44 @@ class UserController {
 			if (!_id) {
 				throw new Error("User ID is missing")
 			}
-			let updateData = {}
 
-			// Check if request body contains data
+			let updateData: any = {}
+
 			if (Object.keys(req.body).length > 0) {
-				updateData = { ...updateData, ...req.body }
+				updateData = { ...req.body }
+
+				if (updateData.address && typeof updateData.address === "string") {
+					try {
+						const parsed = JSON.parse(updateData.address)
+
+						updateData.address = {
+							name: parsed.name,
+							country: parsed.address.country,
+							line1: parsed.address.line1,
+							line2: parsed.address.line2,
+							city: parsed.address.city,
+							state: parsed.address.state,
+							postal_code: parsed.address.postal_code,
+							phone: parsed.phone,
+							isDefault: true,
+						}
+					} catch (err) {
+						console.error("Failed to parse address:", err)
+					}
+				}
 			}
-			// Check if request files contain avatar image
+
 			if (images && images.avatar) {
-				updateData = { ...updateData, avatar: images.avatar[0].path }
+				updateData.avatar = images.avatar[0].path
 			}
+
 			if (Object.keys(updateData).length === 0) {
 				throw new Error("No data to update")
 			}
 			const response = await User.findByIdAndUpdate(_id, updateData, {
 				new: true,
 			}).select("-password -refreshToken")
+
 			if (response) {
 				res.status(200).json({
 					success: true,
