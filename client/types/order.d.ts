@@ -6,4 +6,15 @@ export type OrderType = {
 	coupon: null | ICoupon
 	orderBy: Users
 	createdAt: Date
+	notes: string
+	shippingAddress: {
+		name: string
+		country: string
+		line1: string
+		line2: string
+		city: string
+		state: string
+		postal_code: string
+		phone: string
+	}
 }

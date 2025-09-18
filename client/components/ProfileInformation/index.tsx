@@ -47,6 +47,7 @@ const ProfileInformation = () => {
 		},
 	})
 
+	const [addressInitialized, setAddressInitialized] = useState(false)
 	const [isAddressDirty, setIsAddressDirty] = useState(false)
 	const [imageAvatar, setImageAvatar] = useState<string | File | null>(
 		user?.avatar || null
@@ -187,8 +188,6 @@ const ProfileInformation = () => {
 			: `border-red-500 hover:bg-red-500`
 	)
 
-	console.log(user)
-
 	return (
 		<div className="flex flex-col md:flex-row w-full">
 			<div className="flex flex-col items-center lg:w-[120px] w-full">
@@ -315,6 +314,11 @@ const ProfileInformation = () => {
 						},
 					}}
 					onChange={(event) => {
+						if (!addressInitialized) {
+							setAddressInitialized(true)
+							return
+						}
+
 						if (event.complete) {
 							setIsAddressDirty(true)
 						}

@@ -1,12 +1,18 @@
 "use client"
-import { API } from "@/constant"
 import { ICoupon, ProfileUser, VariantType } from "@/types"
 import { FC } from "react"
 import { CustomImage } from ".."
 import { formatPrice } from "../../utils/formatPrice"
 import { statusConfig } from "@/constant/orderStatus"
 import clsx from "clsx"
-import { MdOutlinePriceChange, RiCoupon2Fill } from "@/assets/icons"
+import {
+	MdOutlinePriceChange,
+	RiCoupon2Fill,
+	FaUser,
+	FaPhoneAlt,
+	FaMapMarkerAlt,
+} from "@/assets/icons"
+import { motion } from "framer-motion"
 
 interface UserOrderProps {
 	user: ProfileUser
@@ -19,6 +25,7 @@ interface UserOrderItem {
 	orderBy: string
 	status: string
 	total: number
+	notes?: string
 	products: {
 		product: {
 			_id: string
@@ -37,21 +44,24 @@ interface UserOrderItem {
 	}[]
 }
 
-const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
+const UserOrder: FC<UserOrderProps> = ({ user, userOrder }) => {
 	const { data } = userOrder
-	if (data.length === 0) {
+	if (!data || data.length === 0) {
 		return <div>There is currently no order.</div>
 	}
+
 	return (
 		<>
 			{data.map((item: UserOrderItem) => {
 				const statusKey = item.status.toLowerCase() as keyof typeof statusConfig
 				const statusIcon = statusConfig[statusKey].icon
+
 				return (
 					<div
 						key={item._id}
 						className="bg-gray-800 p-3 my-3 rounded-lg shadow-md mx-2"
 					>
+						{/* Header: status + id */}
 						<div className="my-1">
 							<div className="md:flex md:justify-between items-center">
 								<span
@@ -69,6 +79,7 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 									</h3>
 								</div>
 							</div>
+
 							{item.coupon && (
 								<div className="flex flex-col justify-end p-1 items-end border-r-2 border-solid border-white mt-2">
 									<div className="flex items-center gap-0.5">
@@ -91,10 +102,64 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 									</div>
 								</div>
 							)}
+
 							<p className="text-xs rounded p-1 text-right text-green-500 my-1">
 								Total: {formatPrice(item.total)}
 							</p>
 						</div>
+
+						<div className="bg-white rounded-md p-3 mb-3 shadow">
+							<h4 className="font-semibold text-gray-800 mb-2 text-sm">
+								Billing Information
+							</h4>
+							<div className="space-y-1 text-sm text-gray-600">
+								<p className="flex items-center gap-2">
+									<FaUser className="text-blue-500" />{" "}
+									<span>{user?.address?.name || "N/A"}</span>
+								</p>
+								<p className="flex items-center gap-2">
+									<FaPhoneAlt className="text-green-500" />{" "}
+									<span>{user?.address?.phone || "N/A"}</span>
+								</p>
+								<p className="flex items-start gap-2">
+									<FaMapMarkerAlt className="text-red-500 mt-[2px]" />
+									<span>
+										{[
+											user?.address?.line1,
+											user?.address?.line2,
+											user?.address?.city,
+											user?.address?.state,
+											user?.address?.postal_code,
+											user?.address?.country,
+										]
+											.filter(Boolean)
+											.join(", ") || "N/A"}
+									</span>
+								</p>
+							</div>
+						</div>
+
+						{item.notes && item.notes.trim().length > 0 && (
+							<motion.div
+								initial={{ opacity: 0, y: 6 }}
+								animate={{ opacity: 1, y: 0 }}
+								className="bg-yellow-50 border-l-4 border-yellow-400 rounded p-3 mb-3"
+							>
+								<div className="flex items-start gap-3">
+									<div className="text-2xl leading-none">📝</div>
+									<div>
+										<h5 className="text-sm font-semibold text-yellow-800">
+											Your note for this order
+										</h5>
+										<p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
+											{item.notes}
+										</p>
+									</div>
+								</div>
+							</motion.div>
+						)}
+
+						{/* Products */}
 						<div className="grid sm:grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-lg p-2 shadow-heavy">
 							{item.products.map((product, index) => (
 								<div
@@ -103,6 +168,7 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 										product.variant?._id || index
 									}`}
 								>
+									{/* Product image */}
 									<div className="relative flex items-center w-[120px] h-[120px]">
 										<CustomImage
 											src={product.product.thumbnail}
@@ -114,12 +180,15 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 											{product.quantity}
 										</span>
 									</div>
+
+									{/* Product info */}
 									<div className="py-1 px-2">
 										<h4 className="w-[160px] h-[54px] text-sm text-gray-900 font-semibold relative">
 											<span className="line-clamp-2">
 												{product.product.title}
 											</span>
 										</h4>
+
 										<div className="flex flex-col">
 											{product.product.discount ? (
 												<div className="flex flex-col text-xs gap-0.5">
@@ -155,18 +224,18 @@ const UserOrder: FC<UserOrderProps> = ({ userOrder }) => {
 												</span>
 											)}
 										</div>
+
+										{/* Variants */}
 										{product?.variant && (
 											<div className="text-xs text-gray-500 mt-2">
-												{product.variant.variant.map((variantObject, key) => {
-													return (
-														<p className="capitalize" key={key}>
-															<span className="text-black">
-																{variantObject.type}:{" "}
-															</span>
-															<span>{variantObject.value}</span>
-														</p>
-													)
-												})}
+												{product.variant.variant.map((variantObject, key) => (
+													<p className="capitalize" key={key}>
+														<span className="text-black">
+															{variantObject.type}:{" "}
+														</span>
+														<span>{variantObject.value}</span>
+													</p>
+												))}
 											</div>
 										)}
 									</div>

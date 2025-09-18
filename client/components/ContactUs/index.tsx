@@ -48,7 +48,7 @@ export default function ContactUs() {
 						</p>
 						<p>
 							<span className="font-semibold">✉️ Email:</span>{" "}
-							support@shopdemo.com
+							thai.giahuy123@gmail.com
 						</p>
 						<p>
 							<span className="font-semibold">🕒 Hours:</span> Mon–Fri, 9am –
@@ -82,7 +82,6 @@ export default function ContactUs() {
 							disabled={false}
 							data-testid="send-message-button"
 							id="send-message-button"
-							
 						>
 							Send Message
 						</Button>

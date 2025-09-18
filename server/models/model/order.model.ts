@@ -3,14 +3,12 @@ import mongoose, { Document, Schema } from "mongoose"
 interface IAddress {
 	name?: string
 	phone?: string
-	address: {
-		line1: string
-		line2?: string
-		city?: string
-		state?: string
-		postal_code?: string
-		country?: string
-	}
+	line1: string
+	line2?: string
+	city?: string
+	state?: string
+	postal_code?: string
+	country?: string
 }
 
 interface IOrder extends Document {

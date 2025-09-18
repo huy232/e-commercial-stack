@@ -1,5 +1,5 @@
 "use client"
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { OrderType } from "@/types"
 import clsx from "clsx"
 import moment from "moment"
@@ -7,6 +7,12 @@ import { formatPrice } from "@/utils"
 import { orderHeaders, sortableOrderFields } from "@/constant"
 import { SortableTableHeader, Button } from "@/components"
 import { AnimatePresence, motion } from "framer-motion"
+import {
+	FaUser,
+	FaPhoneAlt,
+	FaMapMarkerAlt,
+	FaStickyNote,
+} from "react-icons/fa"
 
 interface OrdersTableRowProps {
 	orderList: OrderType[] | []
@@ -19,15 +25,25 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 	onOrderListChange,
 	loading,
 }) => {
-	const [loadingRemove, setLoadingRemove] = useState<string[]>([])
-	const [enableEdit, setEnableEdit] = useState<boolean>(false)
+	const [enableEdit, setEnableEdit] = useState(false)
 	const [modifiedOrders, setModifiedOrders] = useState<{
 		[key: string]: string
 	}>({})
 	const [orderStatuses, setOrderStatuses] = useState<{ [key: string]: string }>(
-		() =>
-			Object.fromEntries(orderList.map((order) => [order._id, order.status]))
+		{}
 	)
+	const [expandedRow, setExpandedRow] = useState<string | null>(null)
+
+	const idToStr = (id: any) =>
+		typeof id === "string" ? id : id?.toString?.() ?? String(id)
+
+	useEffect(() => {
+		const map = Object.fromEntries(
+			orderList.map((o) => [idToStr(o._id), o.status])
+		)
+		setOrderStatuses(map)
+		setModifiedOrders({})
+	}, [orderList])
 
 	const orderStatus = [
 		"Cancelled",
@@ -38,223 +54,313 @@ const OrdersTableRow: FC<OrdersTableRowProps> = ({
 	]
 
 	const handleStatusChange = (orderId: string, newStatus: string) => {
-		const originalOrder = orderList.find((order) => order._id === orderId)
+		const originalOrder = orderList.find((o) => idToStr(o._id) === orderId)
 		if (!originalOrder) return
-
 		const originalStatus = originalOrder.status
 
-		setOrderStatuses((prev) => ({
-			...prev,
-			[orderId]: newStatus,
-		}))
-
-		setModifiedOrders((prev) => {
-			if (originalStatus !== newStatus) {
-				return { ...prev, [orderId]: newStatus }
-			} else {
-				const { [orderId]: _, ...rest } = prev
-				return rest
-			}
-		})
+		setOrderStatuses((prev) => ({ ...prev, [orderId]: newStatus }))
+		setModifiedOrders((prev) =>
+			originalStatus !== newStatus
+				? { ...prev, [orderId]: newStatus }
+				: (() => {
+						const { [orderId]: _, ...rest } = prev
+						return rest
+				  })()
+		)
 	}
 
 	const handleUpdateOrders = async () => {
 		await fetch("/api/order/update-orders", {
-			body: JSON.stringify(modifiedOrders),
-			credentials: "include",
 			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-			},
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(modifiedOrders),
 		})
 		setModifiedOrders({})
 		setEnableEdit(false)
 		onOrderListChange()
 	}
 
-	// Skeleton for loading state
-	const SkeletonRow = () => (
-		<motion.tr
-			className="animate-pulse text-sm bg-white/60 border"
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-		>
-			{Array.from({ length: 7 }).map((_, idx) => (
-				<td key={idx} className="px-2 py-3">
-					<div className="h-4 bg-gray-200 rounded w-3/4"></div>
-				</td>
-			))}
-		</motion.tr>
-	)
+	// 🔹 Mobile Card view
+	const MobileCard = ({ order }: { order: OrderType }) => {
+		const id = idToStr(order._id)
+		return (
+			<div
+				key={id}
+				className={clsx(
+					"bg-white/70 shadow-sm hover:shadow-md rounded p-3 transition-all",
+					modifiedOrders[id] ? "border-2 border-red-500" : "border"
+				)}
+			>
+				{/* Order Summary */}
+				<span className="line-clamp-1 text-sm font-semibold">{order._id}</span>
 
-	const SkeletonCard = () => (
-		<div className="animate-pulse bg-white/60 border rounded p-3 shadow-sm">
-			<div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-			<div className="h-3 bg-gray-200 rounded w-1/3 mb-1"></div>
-			<div className="h-3 bg-gray-200 rounded w-1/2 mb-1"></div>
-			<div className="h-3 bg-gray-200 rounded w-1/4"></div>
-		</div>
-	)
+				<div className="grid grid-cols-[80px_auto] gap-1 mt-2 text-xs">
+					<span className="text-gray-500">Total</span>
+					<span className="font-semibold text-green-600">
+						{formatPrice(order.total)}
+					</span>
+				</div>
+
+				<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+					<span className="text-gray-500">Status</span>
+					<select
+						value={orderStatuses[id] ?? order.status}
+						disabled={!enableEdit}
+						onChange={(e) => handleStatusChange(id, e.target.value)}
+						className="border rounded px-1 py-0.5 text-xs focus:outline-none"
+					>
+						{orderStatus.map((s) => (
+							<option key={s} value={s}>
+								{s}
+							</option>
+						))}
+					</select>
+				</div>
+
+				<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+					<span className="text-gray-500">Coupon</span>
+					<span>{order.coupon?.name || "None"}</span>
+				</div>
+
+				<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
+					<span className="text-gray-500">Created</span>
+					<span className="italic text-gray-500">
+						{moment(order.createdAt).fromNow()}
+					</span>
+				</div>
+
+				{/* Billing Info */}
+				<div className="mt-3 border-t pt-2 text-xs text-gray-700 space-y-1">
+					<p className="flex items-center gap-1">
+						<FaUser className="text-blue-500" /> {order.orderBy.firstName}
+						{order.orderBy.lastName}
+					</p>
+					<p className="flex items-center gap-1">
+						<FaPhoneAlt className="text-green-500" />
+						{order.shippingAddress.phone || "N/A"}
+					</p>
+					<p className="flex items-start gap-1">
+						<FaMapMarkerAlt className="text-red-500 mt-0.5" />
+						<div className="space-y-1 text-gray-600">
+							<p>
+								<span className="font-medium">Line 1: </span>
+								{order.shippingAddress.line1 || "None"}
+							</p>
+							<p>
+								<span className="font-medium">Line 2: </span>
+								{order.shippingAddress.line2 || "None"}
+							</p>
+							<p>
+								<span className="font-medium">City: </span>
+								{order.shippingAddress.city || "N/A"}
+							</p>
+							<p>
+								<span className="font-medium">State: </span>
+								{order.shippingAddress.state || "N/A"}
+							</p>
+							<p>
+								<span className="font-medium">Postal Code: </span>
+								{order.shippingAddress.postal_code || "N/A"}
+							</p>
+							<p>
+								<span className="font-medium">Country: </span>
+								{order.shippingAddress.country || "N/A"}
+							</p>
+						</div>
+					</p>
+				</div>
+
+				{/* Note */}
+				{order.notes && (
+					<div className="mt-2 bg-yellow-50 border-l-4 border-yellow-400 rounded p-2 text-xs">
+						<p className="flex items-center gap-1 font-semibold text-yellow-800">
+							<FaStickyNote /> Note
+						</p>
+						<p className="mt-1 whitespace-pre-wrap text-gray-700">
+							{order.notes}
+						</p>
+					</div>
+				)}
+			</div>
+		)
+	}
 
 	return (
 		<>
-			{/* Top Action Buttons */}
-			<motion.div
-				className="flex flex-wrap justify-end my-4 mx-2 gap-2 sm:gap-4"
-				initial={{ opacity: 0, y: -10 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.3 }}
-			>
-				<AnimatePresence>
-					{enableEdit && (
-						<motion.div
-							key="update-btn"
-							initial={{ opacity: 0, scale: 0.9 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0, scale: 0.9 }}
-							transition={{ duration: 0.2 }}
-						>
-							<Button
-								onClick={handleUpdateOrders}
-								className="px-4 py-1 bg-green-500 hover:bg-opacity-80 hover:brightness-110 rounded shadow-sm transition-all"
-								disabled={Object.keys(modifiedOrders).length === 0}
-							>
-								Update
-							</Button>
-						</motion.div>
-					)}
-				</AnimatePresence>
-
-				<motion.div whileTap={{ scale: 0.9 }}>
+			{/* Top buttons */}
+			<div className="flex justify-end gap-3 mb-4">
+				{enableEdit && (
 					<Button
-						className={clsx(
-							"rounded px-4 py-1 transition-all duration-200 ease-in-out shadow-sm",
-							enableEdit ? "bg-red-500 text-white" : "bg-orange-500 text-white"
-						)}
-						onClick={() => {
-							if (enableEdit) {
-								setEnableEdit(false)
-								setModifiedOrders({})
-								setOrderStatuses(
-									Object.fromEntries(orderList.map((o) => [o._id, o.status]))
-								)
-							} else setEnableEdit(true)
-						}}
-						disabled={loadingRemove.length > 0}
+						onClick={handleUpdateOrders}
+						disabled={Object.keys(modifiedOrders).length === 0}
+						className="px-4 py-1 bg-green-500 text-white rounded"
 					>
-						{enableEdit ? "Cancel" : "Edit"}
+						Update
 					</Button>
-				</motion.div>
-			</motion.div>
+				)}
+				<Button
+					className={clsx(
+						"px-4 py-1 rounded text-white",
+						enableEdit ? "bg-red-500" : "bg-orange-500"
+					)}
+					onClick={() => {
+						if (enableEdit) {
+							setEnableEdit(false)
+							setModifiedOrders({})
+							setOrderStatuses(
+								Object.fromEntries(
+									orderList.map((o) => [idToStr(o._id), o.status])
+								)
+							)
+						} else setEnableEdit(true)
+					}}
+				>
+					{enableEdit ? "Cancel" : "Edit"}
+				</Button>
+			</div>
 
 			{/* Mobile Cards */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 lg:hidden">
 				{loading
-					? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-					: orderList.map((order) => (
+					? Array.from({ length: 6 }).map((_, i) => (
 							<div
-								key={order._id}
-								className={clsx(
-									"bg-white/60 shadow-sm hover:shadow-md rounded p-3 transition-all",
-									modifiedOrders[order._id]
-										? "border-2 border-red-500"
-										: "border"
-								)}
-							>
-								<span className="line-clamp-1 text-sm font-semibold">
-									{order._id}
-								</span>
-
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-2 text-xs">
-									<span className="text-gray-500">Total</span>
-									<span className="font-semibold text-green-600">
-										{formatPrice(order.total)}
-									</span>
-								</div>
-
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
-									<span className="text-gray-500">Status</span>
-									<select
-										value={orderStatuses[order._id]}
-										disabled={!enableEdit}
-										onChange={(e) =>
-											handleStatusChange(order._id, e.target.value)
-										}
-										className="border rounded px-1 py-0.5 focus:outline-none focus:ring-main transition-all text-xs"
-									>
-										{orderStatus.map((s) => (
-											<option key={s}>{s}</option>
-										))}
-									</select>
-								</div>
-
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
-									<span className="text-gray-500">Coupon</span>
-									<span>{order.coupon?.name || "None"}</span>
-								</div>
-
-								<div className="grid grid-cols-[80px_auto] gap-1 mt-1 text-xs">
-									<span className="text-gray-500">Created</span>
-									<span className="italic text-gray-500">
-										{moment(order.createdAt).fromNow()}
-									</span>
-								</div>
-							</div>
+								key={i}
+								className="animate-pulse bg-white rounded p-3 h-32"
+							></div>
+					  ))
+					: orderList.map((order: OrderType) => (
+							<MobileCard key={idToStr(order._id)} order={order} />
 					  ))}
 			</div>
 
 			{/* Desktop Table */}
-			<table className="hidden lg:table table-auto mb-6 text-left w-full">
+			<table className="hidden lg:table w-full text-sm mb-6">
 				<SortableTableHeader
 					headers={orderHeaders}
 					sortableFields={sortableOrderFields}
 				/>
 				<tbody>
-					{loading
-						? Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
-						: orderList.map((order, index) => (
+					{orderList.map((order, index) => {
+						const id = idToStr(order._id)
+						return (
+							<>
 								<motion.tr
-									key={order._id}
+									key={id}
 									layout
 									initial={{ opacity: 0, y: 10 }}
 									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -10 }}
-									transition={{ duration: 0.25 }}
 									className={clsx(
-										"text-sm bg-white/60 shadow-sm hover:shadow-md transition-all",
-										modifiedOrders[order._id]
-											? "border-2 border-red-500"
-											: "border border-transparent"
+										"bg-white/60 border-b hover:bg-gray-50 transition",
+										modifiedOrders[id] && "border-2 border-red-500"
 									)}
 								>
-									<td className="px-2 py-1">{index + 1}</td>
-									<td className="px-2 py-1">{order._id}</td>
-									<td className="px-2 py-1">
+									<td className="px-2 py-2">{index + 1}</td>
+									<td className="px-2 py-2">{order._id}</td>
+									<td className="px-2 py-2">
 										{order.orderBy.firstName} {order.orderBy.lastName}
 									</td>
-									<td className="px-2 py-1">
+									<td className="px-2 py-2">
 										<select
-											value={orderStatuses[order._id]}
+											value={orderStatuses[id] ?? order.status}
 											disabled={!enableEdit}
-											onChange={(e) =>
-												handleStatusChange(order._id, e.target.value)
-											}
-											className="bg-transparent focus:outline-none"
+											onChange={(e) => handleStatusChange(id, e.target.value)}
+											className="bg-transparent"
 										>
 											{orderStatus.map((s) => (
-												<option key={s}>{s}</option>
+												<option key={s} value={s}>
+													{s}
+												</option>
 											))}
 										</select>
 									</td>
-									<td className="px-2 py-1">{order.coupon?.name || "None"}</td>
-									<td className="px-2 py-1 text-green-600 font-semibold">
+									<td className="px-2 py-2">{order.coupon?.name || "None"}</td>
+									<td className="px-2 py-2 text-green-600">
 										{formatPrice(order.total)}
 									</td>
-									<td className="px-2 py-1">
+									<td className="px-2 py-2">
 										{moment(order.createdAt).format("DD-MM-YYYY")}
 									</td>
 								</motion.tr>
-						  ))}
+
+								<AnimatePresence>
+									<motion.tr
+										initial={{ opacity: 0, y: -10 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: -10 }}
+										className="bg-gray-50 border-b-2 border-slate-700 border-solid"
+									>
+										<td colSpan={7} className="px-1 py-2">
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 text-xs text-gray-700">
+												<div className="bg-white rounded-lg shadow px-1 border">
+													<h4 className="font-semibold mb-3 text-gray-800">
+														Billing Info
+													</h4>
+
+													<div className="flex items-center gap-2 mb-2">
+														<FaUser className="text-blue-500" />
+														<span className="font-medium text-gray-700">
+															{order.shippingAddress.name || "N/A"}
+														</span>
+													</div>
+
+													<div className="flex items-center gap-2 mb-2">
+														<FaPhoneAlt className="text-green-500" />
+														<span className="text-gray-600">
+															{order.shippingAddress.phone || "N/A"}
+														</span>
+													</div>
+
+													<div className="flex items-start gap-2">
+														<FaMapMarkerAlt className="text-red-500 mt-1" />
+														<div className="space-y-1 text-gray-600">
+															<p>
+																<span className="font-medium">Line 1: </span>
+																{order.shippingAddress.line1 || "None"}
+															</p>
+															<p>
+																<span className="font-medium">Line 2: </span>
+																{order.shippingAddress.line2 || "None"}
+															</p>
+															<p>
+																<span className="font-medium">City: </span>
+																{order.shippingAddress.city || "N/A"}
+															</p>
+															<p>
+																<span className="font-medium">State: </span>
+																{order.shippingAddress.state || "N/A"}
+															</p>
+															<p>
+																<span className="font-medium">
+																	Postal Code:{" "}
+																</span>
+																{order.shippingAddress.postal_code || "N/A"}
+															</p>
+															<p>
+																<span className="font-medium">Country: </span>
+																{order.shippingAddress.country || "N/A"}
+															</p>
+														</div>
+													</div>
+												</div>
+
+												{order.notes && (
+													<div className="bg-yellow-50 border-l-4 border-yellow-400 rounded p-2">
+														<p className="flex items-center gap-1 font-semibold text-yellow-800">
+															<FaStickyNote /> Note
+														</p>
+														<p className="mt-1 whitespace-pre-wrap text-gray-700">
+															{order.notes}
+														</p>
+													</div>
+												)}
+											</div>
+										</td>
+									</motion.tr>
+								</AnimatePresence>
+							</>
+						)
+					})}
 				</tbody>
 			</table>
 		</>

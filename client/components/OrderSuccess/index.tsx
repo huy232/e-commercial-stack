@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react"
 import CustomImage from "../CustomImage"
 import { formatPrice } from "@/utils"
 import { motion } from "framer-motion"
+import UserMap from "./UserMap"
 
 const OrderSuccess = ({ orderId }: { orderId: string }) => {
 	const [loading, setLoading] = useState<boolean>(true)
@@ -47,8 +48,18 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 		return null
 	}
 
+	const shipping = bill.shippingAddress
+	const notes = bill.notes
+
+	const geoAddress = {
+		lat: 10.7769,
+		lng: 106.7009,
+		label: `${shipping?.line1}, ${shipping?.city}`,
+	}
+
 	return (
 		<section className="flex flex-col items-center justify-start min-h-screen py-10 px-4 lg:px-0 gap-8">
+			{/* Success header */}
 			<motion.div
 				initial={{ opacity: 0, scale: 0.5 }}
 				animate={{ opacity: 1, scale: 1 }}
@@ -83,14 +94,14 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 				</p>
 			</motion.div>
 
+			{/* Product list */}
 			<div className="w-full max-w-3xl grid gap-4">
 				{bill.products.map((item, index) => (
 					<motion.div
 						key={index}
-						className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300"
+						className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 bg-white"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -20 }}
 					>
 						<CustomImage
 							src={item.product.thumbnail}
@@ -100,15 +111,13 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 						/>
 						<div className="flex-1 flex flex-col">
 							<span className="font-semibold">{item.product.title}</span>
-							{item.variant &&
-								Array.isArray(item.variant.variant) &&
-								item.variant.variant.map(
-									(v: { type: string; value: string }, idx: number) => (
-										<p className="text-gray-500 text-xs capitalize" key={idx}>
-											{v.type}: {v.value}
-										</p>
-									)
-								)}
+							{item.variant?.variant?.map(
+								(v: { type: string; value: string }, idx: number) => (
+									<p className="text-gray-500 text-xs capitalize" key={idx}>
+										{v.type}: {v.value}
+									</p>
+								)
+							)}
 							<span className="text-sm">Quantity: {item.quantity}</span>
 						</div>
 						<div className="text-green-500 font-semibold">
@@ -117,6 +126,7 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 					</motion.div>
 				))}
 
+				{/* Totals */}
 				<motion.div
 					className="border border-teal-500 rounded-lg p-4 mt-4 bg-teal-50"
 					initial={{ opacity: 0, y: 20 }}
@@ -133,8 +143,65 @@ const OrderSuccess = ({ orderId }: { orderId: string }) => {
 						<span>{formatPrice(bill.total)}</span>
 					</div>
 				</motion.div>
+
+				{/* Shipping Info */}
+				<motion.div
+					className="border rounded-lg p-6 bg-white shadow-sm mt-6"
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+				>
+					<h3 className="text-lg font-semibold text-teal-600 mb-4">
+						Shipping Information
+					</h3>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
+						<p>
+							<strong>Name:</strong> {shipping?.name}
+						</p>
+						<p>
+							<strong>Phone:</strong> {shipping?.phone}
+						</p>
+						<p className="md:col-span-2">
+							<strong>Address Line 1:</strong> {shipping?.line1}
+						</p>
+						{shipping?.line2 && (
+							<p className="md:col-span-2">
+								<strong>Address Line 2:</strong> {shipping.line2}
+							</p>
+						)}
+						<p>
+							<strong>City:</strong> {shipping?.city}
+						</p>
+						<p>
+							<strong>State:</strong> {shipping?.state}
+						</p>
+						<p>
+							<strong>Postal Code:</strong> {shipping?.postal_code}
+						</p>
+						<p>
+							<strong>Country:</strong> {shipping?.country}
+						</p>
+					</div>
+
+					{/* Map */}
+					<UserMap address={geoAddress} />
+				</motion.div>
+
+				{/* Notes */}
+				{notes && (
+					<motion.div
+						className="border rounded-lg p-6 bg-yellow-50 shadow-sm mt-6"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+					>
+						<h3 className="text-lg font-semibold text-yellow-700 mb-2 flex items-center gap-2">
+							📝 Notes from you
+						</h3>
+						<p className="text-gray-700 text-sm">{notes}</p>
+					</motion.div>
+				)}
 			</div>
 
+			{/* Back button */}
 			<motion.div
 				whileHover={{ scale: 1.05 }}
 				whileTap={{ scale: 0.95 }}

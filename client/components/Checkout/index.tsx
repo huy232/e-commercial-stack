@@ -167,16 +167,13 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 				<div className="mx-4 col-span-1 row-span-2 max-h-[500px] overflow-y-auto">
 					<CartCheckout mounted={mounted} cart={cart} />
 				</div>
-				<div className="mx-4 col-span-1">
+				<div className="mx-4 col-span-1 row-span-1">
 					<CouponCheckout
 						mounted={mounted}
 						coupon={coupon}
 						discount={discount}
 						readOnly={true}
 					/>
-				</div>
-
-				<div className="mx-4">
 					<label className="flex items-center gap-2 cursor-pointer">
 						<input
 							type="checkbox"
@@ -194,7 +191,7 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -10 }}
 								transition={{ duration: 0.3 }}
-								className="mt-4 p-2"
+								className="p-2"
 							>
 								<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
 									<FaMapMarkerAlt className="text-rose-500" />
@@ -255,7 +252,7 @@ const Checkout = ({ coupon, discount }: UserCartProps) => {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.4 }}
-							className="flex flex-col col-span-1 lg:col-start-2 lg:col-end-2 mb-4"
+							className="flex flex-col col-span-1 lg:col-start-2 lg:col-end-2 mb-4 row-span-3"
 						>
 							<div className="mx-4 border-rose-500 border-2 rounded-lg p-4 mb-4 shadow-sm hover:shadow-md transition">
 								<div className="flex justify-between items-center py-3">

@@ -42,25 +42,30 @@ class OrderController {
 			if (!user) throw new Error("User not found")
 
 			let customer
+
 			try {
-				customer = await stripe.customers.create(
-					{
-						email: user.email,
-						name: user.address?.name || `${user.firstName} ${user.lastName}`,
-						phone: user.address?.phone || undefined,
-						address: user.address
-							? {
-									line1: user.address.line1 || undefined,
-									line2: user.address.line2 || undefined,
-									city: user.address.city || undefined,
-									state: user.address.state || undefined,
-									postal_code: user.address.postal_code || undefined,
-									country: user.address.country || "VN",
-							  }
-							: undefined,
-					},
-					{ apiKey: process.env.STRIPE_SECRET_KEY }
-				)
+				// base data for all customers
+				const customerData: Stripe.CustomerCreateParams = {
+					email: user.email,
+					name: `${user.firstName} ${user.lastName}`,
+				}
+
+				// only attach phone/address if using existing address
+				if (useExistingAddress && user.address) {
+					customerData.phone = user.address.phone || undefined
+					customerData.address = {
+						line1: user.address.line1 || undefined,
+						line2: user.address.line2 || undefined,
+						city: user.address.city || undefined,
+						state: user.address.state || undefined,
+						postal_code: user.address.postal_code || undefined,
+						country: user.address.country || "VN",
+					}
+				}
+
+				customer = await stripe.customers.create(customerData, {
+					apiKey: process.env.STRIPE_SECRET_KEY,
+				})
 			} catch (err) {
 				res
 					.status(400)
@@ -497,7 +502,17 @@ class OrderController {
 							const user = await User.findById(userId)
 							shippingAddress = user?.address
 						} else {
-							shippingAddress = customerDetails
+							shippingAddress = {
+								email: customerDetails.email,
+								phone: customerDetails.phone,
+								name: customerDetails.name,
+								line1: customerDetails.address.line1,
+								line2: customerDetails.address.line2,
+								city: customerDetails.address.city,
+								country: customerDetails.address.country,
+								postal_code: customerDetails.address.postal_code,
+								state: customerDetails.address.state,
+							}
 						}
 
 						const populatedUserCart = await Cart.findOne({ user_id: userId })
@@ -633,23 +648,56 @@ class OrderController {
 													.join("")}
 								      </tbody>
 								    </table>
-										<div style="margin-top: 20px; padding: 10px; border: 1px solid #eee; border-radius: 6px;">
-											<h3 style="color: #333;">Shipping Information</h3>
-											<p style="margin: 4px 0; font-size: 14px; color: #555;">
-												<strong>Name:</strong> ${shippingAddress?.name || "N/A"}
-											</p>
-											<p style="margin: 4px 0; font-size: 14px; color: #555;">
-												<strong>Phone:</strong> ${shippingAddress?.phone || "N/A"}
-											</p>
-											<p style="margin: 4px 0; font-size: 14px; color: #555;">
-												<strong>Address:</strong> 
-												${shippingAddress?.address?.line1 || ""}, 
-												${shippingAddress?.address?.line2 || ""}, 
-												${shippingAddress?.address?.city || ""}, 
-												${shippingAddress?.address?.state || ""}, 
-												${shippingAddress?.address?.postal_code || ""}, 
-												${shippingAddress?.address?.country || ""}
-											</p>
+										<div style="padding:10px;border:1px solid #eee;border-radius:6px">
+												<h3 style="color:#222;margin-bottom:10px;font-size:16px;">📦 Shipping Information</h3>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">Name:</strong> ${
+														order.shippingAddress?.name || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">Phone:</strong> ${
+														order.shippingAddress?.phone || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">Address Line 1:</strong> ${
+														order.shippingAddress?.line1 || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">Address Line 2:</strong> ${
+														order.shippingAddress?.line2 || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">City:</strong> ${
+														order.shippingAddress?.city || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">State/Province:</strong> ${
+														order.shippingAddress?.state || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">Postal Code:</strong> ${
+														order.shippingAddress?.postal_code || "N/A"
+													}
+												</p>
+
+												<p style="margin:6px 0;font-size:14px;color:#444;">
+													<strong style="color:#111;">Country:</strong> ${
+														order.shippingAddress?.country || "N/A"
+													}
+												</p>
 										</div>
 										<div style="margin-top: 20px; padding: 10px; border: 1px solid #eee; border-radius: 6px;">
 											<h3 style="color: #333;">Order Note</h3>

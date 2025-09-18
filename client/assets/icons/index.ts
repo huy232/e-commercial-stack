@@ -23,6 +23,9 @@ export {
 	FaFileUpload,
 	FaStarHalfAlt,
 	FaTrash,
+	FaUser,
+	FaPhoneAlt,
+	FaMapMarkerAlt,
 } from "react-icons/fa"
 export {
 	AiFillHome,
