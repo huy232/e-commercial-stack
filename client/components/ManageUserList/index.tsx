@@ -33,6 +33,7 @@ const ManageUserList: FC = () => {
 				const response = await fetch(`/api/user/get-all-users?${queryString}`, {
 					method: "GET",
 					credentials: "include",
+					cache: "no-cache",
 				})
 				const userResponse = await response.json()
 
