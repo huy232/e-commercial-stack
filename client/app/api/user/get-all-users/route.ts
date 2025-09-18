@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { API } from "@/constant"
 import { NextRequest, NextResponse } from "next/server"
 
