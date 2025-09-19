@@ -161,31 +161,35 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 			return
 		}
 
-		setLoading(true)
-
-		const createProductResponse = await fetch("/api/product/create", {
-			method: "POST",
-			body: formData,
-			credentials: "include",
-		})
-		const responseData = await createProductResponse.json()
-		if (responseData.success) {
-			reset({
-				quantity: "0",
-				price: "0",
-				productName: "",
+		try {
+			setLoading(true)
+			const createProductResponse = await fetch("/api/product/create-product", {
+				method: "POST",
+				body: formData,
+				credentials: "include",
 			})
-			setValue("quantity", "0")
-			setThumbnail(null)
-			setProductImages([])
-			setVariantFields([])
-			setAllowVariants(false)
-			setPublicProduct(false)
-			if (editorPreviewRef.current) {
-				editorPreviewRef.current.clear()
+			const responseData = await createProductResponse.json()
+			if (responseData.success) {
+				reset({
+					quantity: "0",
+					price: "0",
+					productName: "",
+				})
+				setValue("quantity", "0")
+				setThumbnail(null)
+				setProductImages([])
+				setVariantFields([])
+				setAllowVariants(false)
+				setPublicProduct(false)
+				if (editorPreviewRef.current) {
+					editorPreviewRef.current.clear()
+				}
 			}
+		} catch (error) {
+			console.log(error)
+		} finally {
+			setLoading(false)
 		}
-		setLoading(false)
 	})
 
 	useEffect(() => {
@@ -210,9 +214,12 @@ const CreateProduct: FC<CreateProductProps> = ({ categories }) => {
 	return (
 		<>
 			{loading && (
-				<Modal isOpen={true}>
-					<LoadingSpinner color="red-500" text="Creating product..." />
-				</Modal>
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+					<div className="flex flex-col items-center gap-4 bg-white p-6 rounded-lg shadow-lg">
+						<div className="animate-spin rounded-full h-10 w-10 border-4 border-red-500 border-t-transparent"></div>
+						<p className="text-gray-700 font-medium">Creating product...</p>
+					</div>
+				</div>
 			)}
 			<form
 				onSubmit={handleSubmitProduct}

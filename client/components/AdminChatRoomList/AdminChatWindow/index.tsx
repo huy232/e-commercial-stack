@@ -11,7 +11,7 @@ const socketServerURL =
 	process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"
 
 interface Props {
-	sessionId: string
+	roomId: string
 }
 
 let socket: Socket
@@ -22,7 +22,7 @@ const MessageSkeleton = () => (
 	</div>
 )
 
-const AdminChatWindow = ({ sessionId }: Props) => {
+const AdminChatWindow = ({ roomId }: Props) => {
 	const user = useSelector(selectAuthUser)
 	const [messages, setMessages] = useState<
 		{ sender: string; message: string; createdAt: string }[]
@@ -40,7 +40,7 @@ const AdminChatWindow = ({ sessionId }: Props) => {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					roomId: sessionId,
+					roomId: roomId,
 					sender: adminId,
 					message: input.trim(),
 				}),
@@ -52,11 +52,11 @@ const AdminChatWindow = ({ sessionId }: Props) => {
 	}
 
 	useEffect(() => {
-		if (!sessionId) return
+		if (!roomId) return
 
 		const loadMessages = async () => {
 			try {
-				const res = await fetch(`/api/chat/messages/${sessionId}`, {
+				const res = await fetch(`/api/chat/messages/${roomId}`, {
 					credentials: "include",
 				})
 				const data = await res.json()
@@ -69,16 +69,16 @@ const AdminChatWindow = ({ sessionId }: Props) => {
 		}
 
 		loadMessages()
-	}, [sessionId])
+	}, [roomId])
 
 	useEffect(() => {
-		if (!sessionId) return
+		if (!roomId) return
 
 		socket = io(socketServerURL, {
 			withCredentials: true,
 		})
 
-		socket.emit("joinRoom", sessionId)
+		socket.emit("joinRoom", roomId)
 
 		socket.on("newMessage", (msg) => {
 			setMessages((prev) => [...prev, msg])
@@ -87,7 +87,7 @@ const AdminChatWindow = ({ sessionId }: Props) => {
 		return () => {
 			socket.disconnect()
 		}
-	}, [sessionId])
+	}, [roomId])
 
 	const groupedMessages = messages.reduce((groups, msg) => {
 		const dateKey = formatDate(msg.createdAt)

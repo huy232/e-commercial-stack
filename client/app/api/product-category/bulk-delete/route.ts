@@ -19,7 +19,8 @@ export async function DELETE(req: NextRequest) {
 				cookie: req.headers.get("cookie") || "",
 			},
 			credentials: "include",
-			body: JSON.stringify({ categoryIds }), // Sending the array of IDs to the backend
+			body: JSON.stringify({ categoryIds }),
+			cache: "no-cache",
 		})
 		const data = await backendRes.json()
 		return NextResponse.json(data, { status: backendRes.status })

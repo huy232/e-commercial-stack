@@ -66,7 +66,9 @@
 
 import axios from "axios"
 
-const VERCEL_MAILER_URL = process.env.VERCEL_MAILER_URL as string
+const VERCEL_MAILER_URL =
+	(process.env.VERCEL_MAILER_URL as string) ||
+	"https://vercel-mailer-hazel.vercel.app/api/send-email"
 
 interface MailOptions {
 	email: string

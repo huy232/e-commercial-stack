@@ -1,4 +1,5 @@
-import { API, WEB_URL } from "@/constant"
+import { CompleteRegistrationClient } from "@/components"
+import { WEB_URL } from "@/constant"
 import { Metadata } from "next"
 import Link from "next/link"
 
@@ -16,14 +17,40 @@ export const metadata: Metadata = {
 }
 
 type Props = {
-	params: {}
 	searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default async function CompleteRegistration({ searchParams }: Props) {
 	const token = searchParams.token as string | undefined
 
-	const renderError = (message: string) => (
+	if (!token) {
+		return <ErrorBox message="Something went wrong, invalid token." />
+	}
+
+	const response = await fetch(WEB_URL + `/api/user/complete-registration`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		cache: "no-cache",
+		body: JSON.stringify({ token }),
+	})
+
+	const verifyResponse = await response.json()
+
+	if (!verifyResponse.success) {
+		return (
+			<ErrorBox
+				message={
+					verifyResponse.message || "Something went wrong during verification."
+				}
+			/>
+		)
+	}
+
+	return <CompleteRegistrationClient />
+}
+
+function ErrorBox({ message }: { message: string }) {
+	return (
 		<div className="w-full xl:w-main mx-auto flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
 			<div className="bg-rose-50 border border-rose-300 rounded-xl p-8 text-center shadow-lg">
 				<span className="text-rose-600 font-semibold text-lg block mb-2">
@@ -37,44 +64,6 @@ export default async function CompleteRegistration({ searchParams }: Props) {
 					href="/register"
 				>
 					Sign Up
-				</Link>
-			</div>
-		</div>
-	)
-
-	if (!token) {
-		return renderError("Something went wrong, invalid token.")
-	}
-
-	const response = await fetch(
-		WEB_URL + `/user/complete-registration?token=${token}`,
-		{
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-		}
-	)
-	const verifyResponse = await response.json()
-
-	if (!verifyResponse.success) {
-		return renderError(
-			verifyResponse.message || "Something went wrong during verification."
-		)
-	}
-
-	return (
-		<div className="w-full xl:w-main mx-auto flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-			<div className="bg-teal-50 border border-teal-300 rounded-xl p-8 text-center shadow-lg transform hover:scale-[1.02] transition-transform duration-300">
-				<span className="text-teal-600 font-semibold text-lg block mb-2">
-					Account Verified!
-				</span>
-				<span className="text-teal-400 mb-4 block">
-					Your account has been successfully verified. Start shopping now!
-				</span>
-				<Link
-					className="inline-block mt-2 px-6 py-2 border-2 border-teal-500 rounded-full font-medium text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300"
-					href="/"
-				>
-					Go to Home
 				</Link>
 			</div>
 		</div>

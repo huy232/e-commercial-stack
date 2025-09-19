@@ -13,6 +13,7 @@ export async function PUT(request: NextRequest) {
 				cookie: request.headers.get("cookie") || "",
 			},
 			body: JSON.stringify({ password, token }),
+			cache: "no-cache",
 		})
 		const data = await response.json()
 		return new Response(JSON.stringify(data), {

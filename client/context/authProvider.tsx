@@ -36,6 +36,7 @@ export default function AuthProvider({
 					const userRes = await fetch(`/api/user/current`, {
 						method: "GET",
 						credentials: "include",
+						cache: "no-cache",
 					})
 					const userData = (await userRes.json()).data
 					dispatch(loginSuccess(userData))

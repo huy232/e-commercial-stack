@@ -15,6 +15,7 @@ export async function DELETE(
 				headers: {
 					cookie: req.headers.get("cookie") || "",
 				},
+				cache: "no-cache",
 			}
 		)
 

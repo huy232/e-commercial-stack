@@ -36,9 +36,9 @@ const configureSocket = (server: http.Server) => {
 
 		socket.on("userLoggedIn", () => {})
 
-		socket.on("joinRoom", (chatSessionId) => {
-			socket.join(chatSessionId)
-			console.log(`Socket ${socket.id} joined room: ${chatSessionId}`)
+		socket.on("joinRoom", (chatRoomId) => {
+			socket.join(chatRoomId)
+			console.log(`Socket ${socket.id} joined room: ${chatRoomId}`)
 		})
 
 		socket.on("disconnect", () => {

@@ -14,6 +14,7 @@ export async function GET(
 				cookie: request.headers.get("cookie") || "",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

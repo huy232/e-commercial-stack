@@ -35,22 +35,22 @@ class ChatService {
 	}
 
 	// Save a message to the database
-	async saveMessage(chatSessionId: string, sender: string, message: string) {
+	async saveMessage(chatRoomId: string, sender: string, message: string) {
 		return await Message.create({
-			chatSession: chatSessionId,
+			chatSession: chatRoomId,
 			sender,
 			message,
 		})
 	}
 
 	// Get messages for a given chat session, sorted oldest to newest
-	async getMessagesBySession(sessionId: string) {
-		return await Message.find({ chatSession: sessionId }).sort({ createdAt: 1 })
+	async getMessagesBySession(roomId: string) {
+		return await Message.find({ chatSession: roomId }).sort({ createdAt: 1 })
 	}
 
 	// Get a specific chat session (no more population needed)
-	async getChatSessionById(sessionId: string) {
-		return await ChatSession.findById(sessionId)
+	async getChatSessionById(roomId: string) {
+		return await ChatSession.findById(roomId)
 	}
 }
 

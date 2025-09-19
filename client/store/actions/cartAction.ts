@@ -2,37 +2,40 @@ import { API } from "@/constant"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { UserCartType } from "./userAction"
 import { showToast } from "@/components"
+import { Cart } from "@/types"
 
 export interface DeleteCartI {
 	product_id: string
 	variant_id?: string | null
 }
 
-export const handleGetUserCart = createAsyncThunk(
-	"cart/handleGetUserCart",
-	async () => {
-		try {
-			const response = await fetch(`/api/cart/`, {
-				method: "GET",
-				credentials: "include",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				cache: "no-cache",
-			})
+export const handleGetUserCart = createAsyncThunk<
+	{ data: Cart },
+	void,
+	{ rejectValue: string }
+>("cart/handleGetUserCart", async (_, thunkAPI) => {
+	try {
+		const response = await fetch(`/api/cart/`, {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			cache: "no-cache",
+		})
 
-			if (!response.ok) {
-				throw new Error(`Error: ${response.status}`)
-			}
-
-			const responseData = await response.json()
-			return responseData
-		} catch (error) {
-			console.error("Error fetching cart:", error)
-			throw error
+		if (!response.ok) {
+			throw new Error(`Error: ${response.status}`)
 		}
+
+		const responseData = await response.json()
+		return responseData
+	} catch (error: any) {
+		console.error("Error fetching cart:", error)
+		return thunkAPI.rejectWithValue(error.message)
+		// throw error
 	}
-)
+})
 
 export const handleCreateUserCart = createAsyncThunk(
 	"cart/handleCreateUserCart",

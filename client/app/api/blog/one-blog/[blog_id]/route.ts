@@ -13,6 +13,7 @@ export async function GET(
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

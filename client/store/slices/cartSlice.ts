@@ -38,7 +38,8 @@ const cartSlice = createSlice({
 		})
 		builder.addCase(handleGetUserCart.rejected, (state, action) => {
 			state.isLoading = false
-			state.error = action.error.message || "Failed to fetch cart"
+			state.error =
+				action.payload || action.error.message || "Failed to fetch cart"
 		})
 
 		// Create new cart

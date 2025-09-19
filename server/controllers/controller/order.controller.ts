@@ -186,6 +186,7 @@ class OrderController {
 						notes: notes ?? "",
 						useExistingAddress: useExistingAddress ? "true" : "false",
 					},
+					billing_address_collection: "required",
 				},
 				{ apiKey: process.env.STRIPE_SECRET_KEY }
 			)
@@ -487,6 +488,29 @@ class OrderController {
 					const customerDetails = checkoutSucceeded.customer_details
 					let shippingAddress
 
+					if (
+						!customerDetails ||
+						!customerDetails.email ||
+						!customerDetails.name ||
+						!customerDetails.address?.line1 ||
+						!customerDetails.address?.city ||
+						!customerDetails.address?.postal_code ||
+						!customerDetails.address?.country ||
+						!customerDetails.phone
+					) {
+						console.error("Missing required billing details", customerDetails)
+
+						// Optional: refund immediately if critical fields missing
+						await stripe.refunds.create({
+							payment_intent: checkoutSucceeded.payment_intent,
+						})
+
+						return res.status(400).json({
+							success: false,
+							message: "Missing required billing information",
+						})
+					}
+
 					if (userId) {
 						const user = await User.findById(userId)
 
@@ -759,6 +783,11 @@ class OrderController {
 								})
 							} catch (error) {
 								console.log("Error while update order in checkout session")
+								res.status(400).json({
+									success: false,
+									message: "Error while update order in checkout session",
+								})
+								return
 							}
 						}
 						await this.updateProductAndVariantQuantities(populatedCart)

@@ -136,6 +136,7 @@ class UserController {
 
 				return
 			} catch (err) {
+				console.log(err)
 				res.status(500).json({
 					success: false,
 					message:
@@ -169,13 +170,24 @@ class UserController {
 					token as string,
 					process.env.JWT_SECRET as string
 				)
+
 				const userData = decodedToken as Record<string, any>
 				const { firstName, lastName, email, password } = userData
+				const rawPassword = decryptToRawPassword(password)
+
+				const existingUser = await User.findOne({ email })
+				if (existingUser) {
+					res.status(400).json({
+						success: false,
+						message: "User already registered with this email.",
+					})
+				}
+
 				const createdUser = await User.create({
 					firstName,
 					lastName,
 					email,
-					password,
+					password: rawPassword,
 				})
 
 				const accessToken = generateAccessToken(
@@ -202,7 +214,7 @@ class UserController {
 				// Set access token cookie
 				res.cookie("accessToken", accessToken, {
 					httpOnly: true,
-					maxAge: 60 * 1000,
+					maxAge: 15 * 60 * 1000,
 					sameSite: "none",
 					secure: true,
 				})
@@ -212,6 +224,8 @@ class UserController {
 					message: "User created successfully.",
 				})
 			} catch (error) {
+				console.error("Error in verifyRegister:", error)
+
 				res.status(400).json({
 					success: false,
 					message: "Invalid or expired token.",
@@ -242,9 +256,7 @@ class UserController {
 				const user = await User.findOne({ email })
 
 				if (!user) {
-					res
-						.status(401)
-						.json({ success: false, message: "Invalid credentials" })
+					res.status(401).json({ success: false, message: "Invalid user" })
 					return
 				}
 
@@ -280,7 +292,7 @@ class UserController {
 
 					res.cookie("accessToken", accessToken, {
 						httpOnly: true,
-						maxAge: 60 * 1000,
+						maxAge: 15 * 60 * 1000,
 						sameSite: "none",
 						secure: true,
 					})
@@ -290,7 +302,6 @@ class UserController {
 						message: "Login successfully",
 						userData: {
 							...rest,
-							// cart: populatedCart
 						},
 						accessToken,
 					})
@@ -365,7 +376,7 @@ class UserController {
 		// Set access token cookie
 		res.cookie("accessToken", accessToken, {
 			httpOnly: true,
-			maxAge: 60 * 1000,
+			maxAge: 15 * 60 * 1000,
 			sameSite: "none",
 			secure: true,
 		})
@@ -733,6 +744,20 @@ class UserController {
 			if (!_id) {
 				throw new Error("Missing inputs to delete user")
 			}
+			const specificUser = await User.findById(_id).select(
+				"-refreshToken -password"
+			)
+
+			if (!specificUser) {
+				res.status(403).json({ message: "Cannot find user to delete" })
+				return
+			}
+
+			if (specificUser.role.includes("super_admin")) {
+				res.status(403).json({ message: "Cannot delete super admin" })
+				return
+			}
+
 			const response = await User.findByIdAndDelete(_id)
 			if (response) {
 				res.status(200).json({
@@ -753,6 +778,23 @@ class UserController {
 			const images = req.files as UploadedFiles
 			if (!_id) {
 				throw new Error("User ID is missing")
+			}
+
+			const specificUser = await User.findById(_id).select(
+				"-refreshToken -password"
+			)
+
+			if (!specificUser) {
+				res.status(403).json({ message: "Cannot find user to update" })
+				return
+			}
+
+			if (
+				specificUser.role.includes("super_admin") &&
+				req.user._id !== specificUser._id
+			) {
+				res.status(403).json({ message: "Cannot update super admin" })
+				return
 			}
 
 			let updateData: any = {}
@@ -813,6 +855,7 @@ class UserController {
 			if (Object.keys(req.body).length === 0) {
 				throw new Error("Missing inputs to update user")
 			}
+
 			const response = await User.findByIdAndUpdate(_id, req.body, {
 				new: true,
 			}).select("-password -refreshToken")

@@ -151,6 +151,7 @@ const ProfileInformation = () => {
 							method: "GET",
 							credentials: "include",
 							headers: { "Content-Type": "application/json" },
+							cache: "no-cache",
 						})
 						const currentUser = await currentUserResponse.json()
 						const updatedUserData = currentUser.data

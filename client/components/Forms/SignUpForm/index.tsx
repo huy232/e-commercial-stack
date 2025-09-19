@@ -23,6 +23,7 @@ const SignUpForm = () => {
 		setValue,
 	} = useForm({ mode: "onChange" })
 
+	const [loading, setLoading] = useState(false)
 	const [errorMessage, setErrorMessage] = useState<string>("")
 	const [errorsField, setErrorsField] = useState<[] | undefined>([])
 	const [showSignUpComplete, setShowSignUpComplete] = useState(false)
@@ -55,26 +56,30 @@ const SignUpForm = () => {
 	]
 
 	const handleRegister = handleSubmit(async (data) => {
-		const { firstName, lastName, email, password } = data
-		const hashPassword = await passwordHashingClient(password)
+		try {
+			const { firstName, lastName, email, password } = data
+			const hashPassword = await passwordHashingClient(password)
 
-		const registerResponse = await fetch(`/api/user/register`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				firstName,
-				lastName,
-				email,
-				password: hashPassword,
-			}),
-			cache: "no-cache",
-		})
-		const response = await registerResponse.json()
-		if (response.success) {
-			setShowSignUpComplete(true)
-		} else {
-			setErrorsField(response.errors || [])
-			setErrorMessage(response.message || "An error occurred during sign up.")
+			const registerResponse = await fetch(`/api/user/register`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					firstName,
+					lastName,
+					email,
+					password: hashPassword,
+				}),
+				cache: "no-cache",
+			})
+			const response = await registerResponse.json()
+			if (response.success) {
+				setShowSignUpComplete(true)
+			} else {
+				setErrorsField(response.errors || [])
+				setErrorMessage(response.message || "An error occurred during sign up.")
+			}
+		} finally {
+			setLoading(false)
 		}
 	})
 

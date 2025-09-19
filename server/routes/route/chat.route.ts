@@ -9,7 +9,7 @@ router.post("/start", ChatController.startChat)
 
 // Admin-only: fetch messages from session
 router.get(
-	"/messages/:sessionId",
+	"/messages/:roomId",
 	[verifyAccessToken, isAdmin],
 	ChatController.getMessages
 )
@@ -18,7 +18,7 @@ router.post("/send", ChatController.sendMessage)
 
 router.get("/rooms", [verifyAccessToken, isAdmin], ChatController.getChatRooms)
 router.put(
-	"/rooms/:sessionId/assign-admin",
+	"/rooms/:roomId/assign-admin",
 	[verifyAccessToken, isAdmin],
 	ChatController.assignAdminToRoom
 )
@@ -28,5 +28,5 @@ router.get(
 	[verifyAccessToken, isAdmin],
 	ChatController.getAllChatRooms
 )
-router.get("/:sessionId", ChatController.getChatSession)
+router.get("/:roomId", ChatController.getChatSession)
 export { router as chatRouter }

@@ -24,6 +24,7 @@ export async function PUT(
 			},
 			credentials: "include",
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		const data = await res.json()

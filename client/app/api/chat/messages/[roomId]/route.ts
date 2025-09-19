@@ -2,20 +2,21 @@ import { NextRequest, NextResponse } from "next/server"
 import { API } from "@/constant"
 
 type Params = {
-	params: { sessionId: string }
+	params: { roomId: string }
 }
 
 export async function GET(req: NextRequest, { params }: Params) {
 	try {
-		const { sessionId } = params
+		const { roomId } = params
 
-		const res = await fetch(`${API}/chat/messages/${sessionId}`, {
+		const res = await fetch(`${API}/chat/messages/${roomId}`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 				cookie: req.headers.get("cookie") || "",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

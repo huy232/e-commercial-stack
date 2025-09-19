@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
 			},
 			body: JSON.stringify(body),
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		const data = await response.json()

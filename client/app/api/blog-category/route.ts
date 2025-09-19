@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
 			},
 			credentials: "include",
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {
@@ -77,6 +79,7 @@ export async function PUT(request: NextRequest) {
 			},
 			credentials: "include",
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {
@@ -114,6 +117,7 @@ export async function DELETE(request: NextRequest) {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

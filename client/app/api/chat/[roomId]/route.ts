@@ -1,27 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
 import { API } from "@/constant"
 
-export async function PUT(
-	req: NextRequest,
-	{ params }: { params: { roomId: string } }
-) {
+interface Params {
+	params: { roomId: string }
+}
+
+export async function GET(request: NextRequest, { params }: Params) {
 	try {
 		const { roomId } = params
-		const body = await req.json()
 
-		const res = await fetch(`${API}/chat/rooms/${roomId}/assign-admin`, {
-			method: "PUT",
+		const res = await fetch(`${API}/chat/${roomId}`, {
+			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
-				cookie: req.headers.get("cookie") || "",
+				cookie: request.headers.get("cookie") || "",
 			},
 			credentials: "include",
-			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {
 			return NextResponse.json(
-				{ success: false, message: "Failed to assign admin" },
+				{ success: false, message: "Failed to fetch chat session" },
 				{ status: res.status }
 			)
 		}
@@ -29,7 +29,7 @@ export async function PUT(
 		const data = await res.json()
 		return NextResponse.json(data, { status: 200 })
 	} catch (error) {
-		console.error("Error in assign-admin proxy:", error)
+		console.error("Error in chat session proxy:", error)
 		return NextResponse.json(
 			{ success: false, message: "Internal Server Error" },
 			{ status: 500 }

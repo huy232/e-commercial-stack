@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
 				cookie: request.headers.get("cookie") || "",
 			},
 			body: JSON.stringify({ email }),
+			cache: "no-cache",
 		})
 
 		const data = await response.json()

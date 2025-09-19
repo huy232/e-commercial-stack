@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
 				cookie: req.headers.get("cookie") || "",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		const data = await backendRes.json()

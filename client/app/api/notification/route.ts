@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
 			headers: {
 				cookie: request.headers.get("cookie") || "",
 			},
+			cache: "no-cache",
 		})
 
 		const data = await response.json()

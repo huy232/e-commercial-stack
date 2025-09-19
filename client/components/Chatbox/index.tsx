@@ -21,7 +21,7 @@ const ChatBox = () => {
 
 	const [unreadCount, setUnreadCount] = useState(0)
 
-	const [chatSessionId, setChatSessionId] = useState<string | null>(null)
+	const [chatRoomId, setChatRoomId] = useState<string | null>(null)
 	const [currentSender, setCurrentSender] = useState<string | null>(null)
 	const [messages, setMessages] = useState<
 		{ sender: string; message: string; createdAt: string }[]
@@ -53,11 +53,11 @@ const ChatBox = () => {
 	}
 
 	const initSocket = useCallback(
-		(sessionId: string, clientId: string) => {
+		(roomId: string, clientId: string) => {
 			socket = io(socketServerURL)
 
 			socket.on("connect", () => {
-				socket.emit("joinRoom", sessionId)
+				socket.emit("joinRoom", roomId)
 			})
 
 			socket.on("newMessage", (msg) => {
@@ -80,19 +80,19 @@ const ChatBox = () => {
 	useEffect(() => {
 		if (typeof window === "undefined") return
 
-		const existingSessionId = sessionStorage.getItem("chatSessionId")
+		const existingRoomId = sessionStorage.getItem("roomId")
 		const existingGuestId = sessionStorage.getItem("guestId")
 		const clientId = user?.id || existingGuestId || generateGuestId()
 
 		setCurrentSender(clientId)
 
-		if (existingSessionId) {
+		if (existingRoomId) {
 			setChatStarted(true)
-			setChatSessionId(existingSessionId)
+			setChatRoomId(existingRoomId)
 
-			fetchMessages(existingSessionId)
+			fetchMessages(existingRoomId)
 
-			initSocket(existingSessionId, clientId)
+			initSocket(existingRoomId, clientId)
 		}
 	}, [initSocket, user?.id])
 
@@ -125,14 +125,14 @@ const ChatBox = () => {
 			}
 
 			const data = await res.json()
-			const sessionId = data?._id
-			if (!sessionId) throw new Error("No session ID returned")
+			const roomId = data?._id
+			if (!roomId) throw new Error("No room ID returned")
 
-			sessionStorage.setItem("chatSessionId", sessionId)
+			sessionStorage.setItem("chatRoomId", roomId)
 			setCurrentSender(clientId)
-			setChatSessionId(sessionId)
+			setChatRoomId(roomId)
 			setChatStarted(true)
-			initSocket(sessionId, clientId)
+			initSocket(roomId, clientId)
 		} catch (err) {
 			console.error("Error starting chat:", err)
 		} finally {
@@ -140,10 +140,10 @@ const ChatBox = () => {
 		}
 	}
 
-	const fetchMessages = async (sessionId: string) => {
+	const fetchMessages = async (roomId: string) => {
 		setLoading(true)
 		try {
-			const res = await fetch(`/api/chat/${sessionId}`)
+			const res = await fetch(`/api/chat/${roomId}`)
 			if (!res.ok) {
 				throw new Error("Failed to fetch messages")
 			}
@@ -157,10 +157,10 @@ const ChatBox = () => {
 	}
 
 	const sendMessage = async () => {
-		if (!inputMessage.trim() || !chatSessionId) return
+		if (!inputMessage.trim() || !chatRoomId) return
 
 		const messageObj = {
-			roomId: chatSessionId,
+			roomId: chatRoomId,
 			sender: currentSender || generateGuestId(),
 			message: inputMessage.trim(),
 			senderName: guestNameInput || generateGuestName(),
@@ -168,8 +168,8 @@ const ChatBox = () => {
 
 		try {
 			setLoading(true)
-			if (!chatSessionId) {
-				console.error("❌ No chatSessionId available")
+			if (!chatRoomId) {
+				console.error("❌ No chatRoomId available")
 				return
 			}
 

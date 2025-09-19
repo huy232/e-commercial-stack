@@ -12,6 +12,7 @@ export async function PUT(request: NextRequest) {
 			},
 			credentials: "include",
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 		if (!res.ok) {
 			return NextResponse.json(

@@ -4,7 +4,15 @@ import { NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json()
-		const { token } = body
+		const token = typeof body === "string" ? body : body?.token
+
+		if (!token) {
+			return NextResponse.json(
+				{ success: false, message: "Missing token" },
+				{ status: 400 }
+			)
+		}
+
 		const url = new URL(API + `/user/complete-registration`)
 		url.searchParams.append("token", token)
 
@@ -15,22 +23,23 @@ export async function POST(request: NextRequest) {
 				"Content-Type": "application/json",
 				cookie: request.headers.get("cookie") || "",
 			},
+			cache: "no-cache",
 		})
+
 		const data = await response.json()
-		return new Response(JSON.stringify(data), {
-			status: response.status,
-			headers: {
-				"Content-Type": "application/json",
-				cookie: request.headers.get("cookie") || "",
-			},
-		})
+
+		const nextRes = NextResponse.json(data, { status: response.status })
+
+		const setCookie = response.headers.get("set-cookie")
+		if (setCookie) {
+			nextRes.headers.set("set-cookie", setCookie)
+		}
+
+		return nextRes
 	} catch (error) {
 		console.error("Error verify user:", error)
 		return NextResponse.json(
-			{
-				success: false,
-				message: "Error verify user",
-			},
+			{ success: false, message: "Error verify user" },
 			{ status: 500 }
 		)
 	}

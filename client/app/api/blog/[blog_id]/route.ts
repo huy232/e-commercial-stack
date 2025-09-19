@@ -15,6 +15,7 @@ export async function PUT(
 			headers: { "Content-Type": "application/json" },
 			credentials: "include",
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

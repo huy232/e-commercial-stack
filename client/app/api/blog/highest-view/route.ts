@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
 				cookie: req.headers.get("cookie") || "",
 			},
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

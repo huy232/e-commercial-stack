@@ -13,6 +13,7 @@ export async function DELETE(request: NextRequest) {
 				cookie: request.headers.get("cookie") || "",
 			},
 			body: JSON.stringify({ user_id: _id }),
+			cache: "no-cache",
 		})
 
 		const data = await response.json()

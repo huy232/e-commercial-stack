@@ -13,6 +13,7 @@ export async function PUT(req: NextRequest) {
 			},
 			credentials: "include",
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 
 		const data = await backendRes.json()

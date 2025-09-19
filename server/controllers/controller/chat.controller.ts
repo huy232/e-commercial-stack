@@ -58,8 +58,8 @@ class ChatController {
 
 	async getMessages(req: Request, res: Response) {
 		try {
-			const { sessionId } = req.params
-			const messages = await ChatService.getMessagesBySession(sessionId)
+			const { roomId } = req.params
+			const messages = await ChatService.getMessagesBySession(roomId)
 
 			res.status(200).json({ success: true, messages })
 		} catch (error) {
@@ -72,22 +72,22 @@ class ChatController {
 
 	async getChatSession(req: Request, res: Response) {
 		try {
-			const { sessionId } = req.params
+			const { roomId } = req.params
 
-			const session = await ChatService.getChatSessionById(sessionId)
+			const session = await ChatService.getChatSessionById(roomId)
 			if (!session) {
 				return res
 					.status(404)
 					.json({ success: false, message: "Session not found" })
 			}
 
-			const messages = await Message.find({ chatSession: sessionId }).sort({
+			const messages = await Message.find({ chatSession: roomId }).sort({
 				timestamp: 1,
 			})
 
 			res.status(200).json({
 				success: true,
-				sessionId: session._id,
+				roomId: session._id,
 				messages,
 			})
 		} catch (error) {
@@ -140,14 +140,14 @@ class ChatController {
 
 	async assignAdminToRoom(req: AuthenticatedRequest, res: Response) {
 		try {
-			const { sessionId } = req.params
+			const { roomId } = req.params
 			const adminId = req.user?._id
 			const adminName = req.user?.name || "Admin"
-			const isAdminGuest = false // or detect guest from your logic
+			const isAdminGuest = false
 
 			if (!adminId) return res.status(401).json({ message: "Unauthorized" })
 
-			const session = await ChatSession.findById(sessionId)
+			const session = await ChatSession.findById(roomId)
 			if (!session)
 				return res.status(404).json({ message: "Session not found" })
 

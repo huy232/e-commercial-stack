@@ -16,6 +16,7 @@ export async function PUT(
 				cookie: request.headers.get("cookie") || "",
 			},
 			body: JSON.stringify(body),
+			cache: "no-cache",
 		})
 		const data = await response.json()
 		return new Response(JSON.stringify(data), {

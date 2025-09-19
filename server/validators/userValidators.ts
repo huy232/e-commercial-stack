@@ -63,9 +63,8 @@ const emailValidator = check("email")
 	.withMessage("Invalid email format")
 	.isLength({ max: 100 })
 	.withMessage("Email must not exceed 100 characters")
-	.normalizeEmail()
+	.normalizeEmail({ gmail_remove_dots: false })
 	.trim()
-	.escape()
 
 export const validateRegisterUser: ValidationChain[] = [
 	nameValidator("firstName"),

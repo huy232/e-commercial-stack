@@ -182,7 +182,7 @@ const AdminChatRoomList = () => {
 			{/* Chat Window */}
 			<div className="flex-1 p-4 lg:ml-0 ml-0 lg:relative">
 				{activeRoomId ? (
-					<AdminChatWindow sessionId={activeRoomId} />
+					<AdminChatWindow roomId={activeRoomId} />
 				) : (
 					<p className="text-gray-500 text-center mt-10">
 						Select a room to join the chat

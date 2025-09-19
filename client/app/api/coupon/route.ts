@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
 				cookie: request.headers.get("cookie") || "",
 			},
 			credentials: "include",
+			cache: "no-cache",
 		})
 
 		if (!res.ok) {

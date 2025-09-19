@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
 					cookie: req.headers.get("cookie") || "",
 				},
 				credentials: "include",
+				cache: "no-cache",
 			}
 		)
 

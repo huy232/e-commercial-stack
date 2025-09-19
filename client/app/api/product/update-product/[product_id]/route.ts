@@ -14,6 +14,7 @@ export async function PUT(
 				method: "PUT",
 				body: formData,
 				credentials: "include",
+				cache: "no-cache",
 			}
 		)
 

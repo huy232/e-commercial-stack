@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 		const res = await fetch(API + `/wishlist/user${query ? `?${query}` : ""}`, {
 			method: "GET",
 			credentials: "include",
-			cache: "no-store",
+			cache: "no-cache",
 			headers: {
 				"Content-Type": "application/json",
 				cookie: request.headers.get("cookie") || "",

@@ -10,6 +10,7 @@ export async function PUT(request: NextRequest) {
 				"Content-Type": "application/json",
 				cookie: request.headers.get("cookie") || "",
 			},
+			cache: "no-cache",
 		})
 
 		const data = await response.json()

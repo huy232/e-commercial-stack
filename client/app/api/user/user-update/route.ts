@@ -10,6 +10,7 @@ export async function PUT(request: NextRequest) {
 			headers: {
 				cookie: request.headers.get("cookie") || "",
 			},
+			cache: "no-cache",
 		})
 		const data = await response.json()
 		return new Response(JSON.stringify(data), {
