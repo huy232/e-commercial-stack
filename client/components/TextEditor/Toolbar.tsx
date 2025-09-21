@@ -294,20 +294,26 @@ const Toolbar = ({
 				</Button>
 
 				{/* Image Upload Button */}
-				<input
-					type="file"
-					accept="image/*"
-					onChange={handleImageUpload}
-					className="hidden"
-					id="image-upload"
-				/>
-				<label
-					htmlFor="image-upload"
-					className="flex items-center cursor-pointer px-2 py-1 bg-gray-600 text-white rounded"
-				>
-					📷{" "}
-					<span className="hidden md:inline-block text-sm">Upload Images</span>
-				</label>
+				{!disableUploadImage && (
+					<>
+						<input
+							type="file"
+							accept="image/*"
+							onChange={handleImageUpload}
+							className="hidden"
+							id="image-upload"
+						/>
+						<label
+							htmlFor="image-upload"
+							className="flex items-center cursor-pointer px-2 py-1 bg-gray-600 text-white rounded"
+						>
+							📷{" "}
+							<span className="hidden md:inline-block text-sm">
+								Upload Images
+							</span>
+						</label>
+					</>
+				)}
 
 				{/* Undo */}
 				<Button

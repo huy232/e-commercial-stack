@@ -1,6 +1,6 @@
 export const UserOrderSkeleton = () => {
 	return (
-		<div className="bg-gray-800 p-3 my-3 rounded-lg shadow-md mx-2 animate-pulse w-full">
+		<div className="bg-gray-800 p-3 my-3 rounded-lg shadow-md md:mx-2 animate-pulse w-full">
 			{/* Header */}
 			<div className="flex justify-between items-center mb-3">
 				<div className="h-5 w-28 bg-gray-600 rounded"></div>

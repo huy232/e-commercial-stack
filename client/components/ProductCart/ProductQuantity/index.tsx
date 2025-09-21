@@ -1,5 +1,7 @@
 "use client"
 import { FC, useCallback, useEffect } from "react"
+import { motion } from "framer-motion"
+import { Minus, Plus } from "lucide-react" // nice icons
 import { Button } from "@/components"
 
 interface ProductQuantityProps {
@@ -17,13 +19,13 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 }) => {
 	const handleIncrement = useCallback(() => {
 		if (quantity < quantityLimit) {
-			setQuantity((prevQuantity) => prevQuantity + 1)
+			setQuantity((prev) => prev + 1)
 		}
 	}, [quantity, setQuantity, quantityLimit])
 
 	const handleDecrement = useCallback(() => {
 		if (quantity > 1) {
-			setQuantity((prevQuantity) => prevQuantity - 1)
+			setQuantity((prev) => prev - 1)
 		}
 	}, [quantity, setQuantity])
 
@@ -31,9 +33,9 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			let value = parseInt(e.target.value, 10)
 			if (isNaN(value) || value < 1) {
-				value = 1 // Set to the minimum value if the entered value is less than 1
+				value = 1
 			} else if (value > quantityLimit) {
-				value = quantityLimit // Set to the maximum value if the entered value is greater than the limit
+				value = quantityLimit
 			}
 			setQuantity(value)
 		},
@@ -47,41 +49,38 @@ const ProductQuantity: FC<ProductQuantityProps> = ({
 	}, [quantity, quantityLimit, setQuantity])
 
 	return (
-		<div className="max-sm:mx-auto flex gap-2 items-center my-2">
+		<div className="max-sm:mx-auto flex gap-3 items-center my-3">
 			{allowQuantity && (
 				<>
-					<span className="font-semibold">Quantity</span>
-					<div className="flex items-center">
-						<Button
-							className="border-r border-black"
+					<span className="font-semibold text-gray-700">Quantity</span>
+					<div className="flex items-center bg-white border rounded-full shadow-sm overflow-hidden">
+						{/* Decrement button */}
+						<motion.button
+							whileTap={{ scale: 0.9 }}
 							onClick={handleDecrement}
-							aria-label="Decrease quantity"
-							role="button"
-							tabIndex={0}
-							data-testid="decrease-quantity-button"
-							id="decrease-quantity-button"
 							disabled={quantity <= 1}
+							className="p-2 px-3 text-gray-700 hover:bg-gray-100 disabled:opacity-40"
 						>
-							-
-						</Button>
+							<Minus className="w-4 h-4" />
+						</motion.button>
+
+						{/* Input */}
 						<input
-							className="py-2 outline-none w-[60px] text-black text-center"
+							className="w-[60px] text-center py-2 border-x outline-none text-gray-900 font-medium"
 							type="number"
 							value={quantity}
 							onChange={handleChange}
 						/>
-						<Button
-							className="border-l border-black"
+
+						{/* Increment button */}
+						<motion.button
+							whileTap={{ scale: 0.9 }}
 							onClick={handleIncrement}
 							disabled={quantity >= quantityLimit}
-							aria-label="Increase quantity"
-							role="button"
-							tabIndex={0}
-							data-testid="increase-quantity-button"
-							id="increase-quantity-button"
+							className="p-2 px-3 text-gray-700 hover:bg-gray-100 disabled:opacity-40"
 						>
-							+
-						</Button>
+							<Plus className="w-4 h-4" />
+						</motion.button>
 					</div>
 				</>
 			)}

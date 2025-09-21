@@ -36,6 +36,7 @@ interface UserOrderItem {
 				type: "percentage" | "fixed"
 				value: number
 				productPrice: number
+				expirationDate: Date
 			} | null
 			variants?: VariantType[]
 		}
@@ -81,26 +82,32 @@ const UserOrder: FC<UserOrderProps> = ({ user, userOrder }) => {
 							</div>
 
 							{item.coupon && (
-								<div className="flex flex-col justify-end p-1 items-end border-r-2 border-solid border-white mt-2">
-									<div className="flex items-center gap-0.5">
-										<RiCoupon2Fill className="text-rose-500" size={20} />
-										<span className="text-white text-xs rounded p-[2px] underline mb-[1px]">
+								<motion.div
+									initial={{ opacity: 0, y: -5 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3 }}
+									className="flex flex-col items-end bg-gradient-to-r from-yellow-100 to-yellow-200 border border-yellow-400 rounded-md p-2 mt-2 shadow-sm w-fit mx-auto md:ml-auto md:mr-0"
+								>
+									<div className="flex items-center gap-1">
+										<RiCoupon2Fill className="text-rose-600" size={20} />
+										<span className="bg-rose-500 text-white text-xs font-bold px-2 py-[2px] rounded">
 											{item.coupon.code}
 										</span>
 									</div>
-									<div className="flex">
+
+									<div className="flex mt-1">
 										{item.coupon.discountType === "percentage" && (
-											<span className="text-gray-500 text-xs italic">
-												Applied: {item.coupon.discount}% discount
+											<span className="text-green-700 text-sm font-semibold">
+												🎉 {item.coupon.discount}% OFF applied
 											</span>
 										)}
 										{item.coupon.discountType === "fixed" && (
-											<span className="text-gray-500 text-xs italic">
-												Applied: -{item.coupon.discount} discount
+											<span className="text-red-700 text-sm font-semibold">
+												💸 -{formatPrice(item.coupon.discount)} discount
 											</span>
 										)}
 									</div>
-								</div>
+								</motion.div>
 							)}
 
 							<p className="text-xs rounded p-1 text-right text-green-500 my-1">
@@ -113,16 +120,25 @@ const UserOrder: FC<UserOrderProps> = ({ user, userOrder }) => {
 								Billing Information
 							</h4>
 							<div className="space-y-1 text-sm text-gray-600">
-								<p className="flex items-center gap-2">
-									<FaUser className="text-blue-500" />{" "}
+								<p className="flex items-start md:items-center gap-2">
+									<FaUser
+										className="text-blue-500 w-[20px] h-[20px] shrink-0"
+										size={20}
+									/>{" "}
 									<span>{user?.address?.name || "N/A"}</span>
 								</p>
-								<p className="flex items-center gap-2">
-									<FaPhoneAlt className="text-green-500" />{" "}
+								<p className="flex items-start md:items-center gap-2">
+									<FaPhoneAlt
+										className="text-green-500 w-[20px] h-[20px] shrink-0"
+										size={20}
+									/>{" "}
 									<span>{user?.address?.phone || "N/A"}</span>
 								</p>
-								<p className="flex items-start gap-2">
-									<FaMapMarkerAlt className="text-red-500 mt-[2px]" />
+								<p className="flex items-start md:items-center gap-2">
+									<FaMapMarkerAlt
+										className="text-red-500 w-[20px] h-[20px] shrink-0"
+										size={20}
+									/>
 									<span>
 										{[
 											user?.address?.line1,
@@ -163,7 +179,7 @@ const UserOrder: FC<UserOrderProps> = ({ user, userOrder }) => {
 						<div className="grid sm:grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-lg p-2 shadow-heavy">
 							{item.products.map((product, index) => (
 								<div
-									className="flex flex-col md:flex-row gap-2 max-sm:border-b-2 max-sm:border-black/20 pb-2 max-sm:last:border-b-0 hover:shadow-lg transition-shadow duration-300 justify-center"
+									className="flex flex-col md:flex-row gap-2 max-sm:border-b-2 max-sm:border-black/20 pb-2 max-sm:last:border-b-0 hover:shadow-lg transition-shadow duration-300"
 									key={`${product.product._id}-${
 										product.variant?._id || index
 									}`}
@@ -190,7 +206,9 @@ const UserOrder: FC<UserOrderProps> = ({ user, userOrder }) => {
 										</h4>
 
 										<div className="flex flex-col">
-											{product.product.discount ? (
+											{product.product.discount &&
+											new Date(product.product.discount.expirationDate) >
+												new Date() ? (
 												<div className="flex flex-col text-xs gap-0.5">
 													<span className="line-through text-[12px] text-gray-400 italic">
 														{formatPrice(product.product.price)}
@@ -211,17 +229,6 @@ const UserOrder: FC<UserOrderProps> = ({ user, userOrder }) => {
 														{formatPrice(product.product.price)}
 													</span>
 												</div>
-											)}
-
-											{!!product.variant && !!product.variant.price && (
-												<span className="flex flex-col">
-													<span className="text-[12px] text-gray-700">
-														(Variant price+)
-													</span>
-													<span className="text-sm text-green-400">
-														{formatPrice(product.variant.price)}
-													</span>
-												</span>
 											)}
 										</div>
 

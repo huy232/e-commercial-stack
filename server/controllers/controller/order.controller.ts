@@ -505,10 +505,11 @@ class OrderController {
 							payment_intent: checkoutSucceeded.payment_intent,
 						})
 
-						return res.status(400).json({
-							success: false,
-							message: "Missing required billing information",
-						})
+						return res.redirect(
+							`${
+								process.env.URL_CLIENT as string
+							}/cancel-checkout?error=missing_fields`
+						)
 					}
 
 					if (userId) {
